@@ -1,0 +1,26 @@
+{
+  "current": "danbooru_2026-10-01_pt20-ia-dd.csv",
+  "files": [
+    {
+      "file": "danbooru_2026-10-01_pt20-ia-dd.csv",
+      "date": "2026-10-01",
+      "rows": 220510,
+      "sha256": "45afb2554525464ee49112512f6367ee004bd351afcef5f2435e99d6286884e3",
+      "url": "https://github.com/DraconicDragon/dbr-e621-lists-archive/blob/main/tag-lists/danbooru/danbooru_2026-10-01_pt20-ia-dd.csv",
+      "imported": "2026-10-26"
+    }
+  ],
+  "e621": {
+    "current": "e621_2026-10-01_pt20-ia-ed.csv",
+    "files": [
+      {
+        "file": "e621_2026-10-01_pt20-ia-ed.csv",
+        "date": "2026-10-01",
+        "rows": 149252,
+        "sha256": "36c382558a385c4430d9bfd1874a6db5c30f6259210b644ddfcc4e5c264897e7",
+        "url": "https://github.com/DraconicDragon/dbr-e621-lists-archive/blob/main/tag-lists/e621/e621_2026-10-01_pt20-ia-ed.csv",
+        "imported": "2026-10-29"
+      }
+    ]
+  }
+}

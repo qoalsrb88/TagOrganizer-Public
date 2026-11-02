@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "note": "태그 이름은 정규화한 형태(소문자, 밑줄 대신 공백)로 적는다. 별칭이 아니라 대표 이름을 쓴다. 부위 기반 규칙은 태그의 regions가 전부 가려질 때만 그 태그를 뺀다.",
+  "regions": ["head", "face", "eyes", "front_torso", "back", "arms", "hands", "hips", "thighs", "lower_legs", "feet"],
+  "quick": {
+    "note": "배열 세팅의 크롭/시점 퀵 덮어쓰기(organize 의 framing·view)에 보여 줄 태그. 덮어쓰면 프롬프트의 같은 서브 카테고리(composition/framing·composition/angle) 태그를 모두 이 태그로 바꾼다.",
+    "framing": ["portrait", "close-up", "upper body", "cowboy shot", "full body", "lower body", "feet out of frame", "head out of frame"],
+    "view": ["from behind", "from side", "from above", "from below", "straight-on", "profile", "pov", "dutch angle"]
+  },
+  "framing": {
+    "label": "크롭 규칙",
+    "gates": [
+      {"tags": ["portrait", "close-up", "headshot portrait", "bust portrait"], "hide": ["hands", "hips", "thighs", "lower_legs", "feet"]},
+      {"tags": ["upper body", "half-length portrait"], "hide": ["hips", "thighs", "lower_legs", "feet"]},
+      {"tags": ["cowboy shot", "three-quarter portrait"], "hide": ["lower_legs", "feet"]},
+      {"tags": ["feet out of frame"], "hide": ["feet"]},
+      {"tags": ["head out of frame"], "hide": ["head", "face", "eyes"]},
+      {"tags": ["lower body"], "hide": ["head", "face", "eyes"]},
+      {"tags": ["full body", "full-length portrait"], "hide": []}
+    ],
+    "exempt": ["multiple views", "reference sheet", "split screen", "comic", "4koma", "reference inset", "collage"]
+  },
+  "view": {
+    "label": "시점 규칙",
+    "gates": [
+      {"tags": ["from behind", "rear view"], "hide": ["front_torso", "face", "eyes"], "reveal": {"looking back": ["face", "eyes"]}}
+    ],
+    "exempt": ["multiple views", "reference sheet", "split screen", "comic", "4koma", "reference inset", "collage", "mirror", "reflection"],
+    "multi_subject_exempt": true
+  },
+  "multi_subject": {
+    "any": ["multiple girls", "multiple boys", "multiple others",
+            "2girls", "3girls", "4girls", "5girls", "6+girls",
+            "2boys", "3boys", "4boys", "5boys", "6+boys",
+            "2others", "3others", "4others", "5others", "6+others"],
+    "count_single": ["1girl", "1boy", "1other"]
+  },
+  "explicit": [
+    {
+      "id": "high_angle_no_dof",
+      "label": "위에서 내려본 시점에는 원근·배경 흐림 제외",
+      "when_any": ["bird's eye view", "from above"],
+      "unless_any": [],
+      "remove": ["depth of field", "blurry background", "perspective"],
+      "default": "on"
+    },
+    {
+      "id": "closed_eyes_eye_color",
+      "label": "두 눈을 감으면 눈을 떠야 보이는 눈 태그(눈 색·동공 등) 제외 — 행동 우선",
+      "when_any": ["closed eyes", "^_^", ">_<"],
+      "unless_any": ["one eye closed", "multiple views", "reference sheet", "split screen", "comic", "4koma", "reference inset", "collage"],
+      "remove_selectors": ["body/eyes"],
+      "multi_subject_exempt": true,
+      "default": "on"
+    }
+  ]
+}

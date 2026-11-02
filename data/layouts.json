@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "note": "태그는 include가 맞고 except가 맞지 않는 첫 섹션에 들어간다. 어느 섹션에도 맞지 않으면 맨 끝에 붙는다. 선택자: main, main/sub, 뒤에 @identity, 또는 *.",
+  "layouts": {
+    "default": {
+      "label": "기본",
+      "sections": [
+        {"id": "count", "label": "인원", "include": ["subject/count"]},
+        {"id": "character", "label": "캐릭터·작품", "include": ["subject", "series"]},
+        {"id": "style", "label": "스타일", "include": ["style"]},
+        {"id": "composition", "label": "구도", "include": ["composition"]},
+        {"id": "gaze", "label": "시선", "include": ["action/gaze"]},
+        {"id": "action", "label": "행동", "include": ["action"], "except": ["action/expression"]},
+        {"id": "clothes", "label": "의상", "include": ["clothes"], "except": ["clothes/hair_acc"]},
+        {"id": "body", "label": "신체", "include": ["body"], "except": ["body/hair", "body/eyes"]},
+        {"id": "expression", "label": "표정", "include": ["action/expression"]},
+        {"id": "eyes", "label": "눈", "include": ["body/eyes"]},
+        {"id": "hair", "label": "머리카락", "include": ["body/hair", "clothes/hair_acc"]},
+        {"id": "object", "label": "사물·풍경 요소", "include": ["object", "background/scenery"]},
+        {"id": "effect", "label": "이펙트", "include": ["effect"]},
+        {"id": "background", "label": "배경", "include": ["background"]},
+        {"id": "meta", "label": "메타·텍스트", "include": ["meta", "text"]},
+        {"id": "natural", "label": "자연어 문장", "include": ["natural"]},
+        {"id": "rest", "label": "미분류·알 수 없음", "include": ["etc", "unknown"]},
+        {"id": "special", "label": "문법 토큰", "include": ["special"]}
+      ]
+    },
+    "compact": {
+      "label": "간단히(6줄)",
+      "sections": [
+        {"id": "who", "label": "대상·스타일", "include": ["subject", "series", "style"]},
+        {"id": "pose", "label": "구도·행동", "include": ["composition", "action"]},
+        {"id": "look", "label": "의상·신체", "include": ["clothes", "body"]},
+        {"id": "scene", "label": "사물·이펙트·배경", "include": ["object", "effect", "background"]},
+        {"id": "meta", "label": "메타·텍스트", "include": ["meta", "text"]},
+        {"id": "rest", "label": "나머지", "include": ["*"]}
+      ]
+    }
+  }
+}

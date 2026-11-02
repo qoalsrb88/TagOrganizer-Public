@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "note": "exclude에 적은 선택자에 맞는 태그를 뺀다. 미분류(etc)·알 수 없음(unknown)은 프리셋으로 빼지 않는다.",
+  "presets": {
+    "sort_only": {
+      "label": "정렬만",
+      "exclude": []
+    },
+    "character_swap": {
+      "label": "캐릭터 교체 (외형만)",
+      "desc": "캐릭터·작품 이름과 캐릭터 고유 외형(identity=1: 머리·눈·체형·종족 등)을 뺀다. 의상은 남긴다.",
+      "exclude": ["subject/character", "series", "*@identity"]
+    },
+    "character_outfit_swap": {
+      "label": "캐릭터 교체 (외형+의상)",
+      "desc": "캐릭터 교체에 더해 의상 전체를 뺀다.",
+      "exclude": ["subject/character", "series", "*@identity", "clothes"]
+    },
+    "outfit_swap": {
+      "label": "의상 교체",
+      "desc": "의상만 뺀다.",
+      "exclude": ["clothes"]
+    },
+    "pose_reference": {
+      "label": "포즈만 참고",
+      "desc": "캐릭터·외형·의상·작가를 빼고 구도·행동·배경·분위기를 남긴다.",
+      "exclude": ["subject/character", "series", "style/artist", "*@identity", "clothes"]
+    }
+  }
+}

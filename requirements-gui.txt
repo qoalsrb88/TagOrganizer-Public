@@ -1,0 +1,4 @@
+# 관리 툴(GUI) 전용. 코어(bmk_tag_organizer_core.py)와 CLI 는 표준 라이브러리만 쓴다.
+# QtCore·QtGui·QtWidgets·QtSvg(테스트는 QtTest)만 쓰므로 Essentials 로 충분하다(전체 PySide6 보다 훨씬 작다).
+# 전체 PySide6 가 이미 깔려 있어도 된다.
+PySide6-Essentials>=6.6

@@ -1,0 +1,93 @@
+﻿name,primary,secondary,rating,regions,identity,status,by,confidence,note,aliases,models,same_as,use_instead,ref
+masterpiece,meta/quality,,,,,reviewed,,,"품질 태그(NAI 에서는 미학 태그, V4.5 이상)",,illustrious|nai|anima,,,https://docs.novelai.net/en/image/tags
+best quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai|anima,,,https://docs.novelai.net/en/image/tags
+amazing quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai,,,https://docs.novelai.net/en/image/tags
+great quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai,,,https://docs.novelai.net/en/image/tags
+good quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+normal quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai|anima,,,https://docs.novelai.net/en/image/tags
+low quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+bad quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai,,,https://docs.novelai.net/en/image/tags
+worst quality,meta/quality,,,,,reviewed,,,품질 태그,,illustrious|nai|anima,,,https://docs.novelai.net/en/image/tags
+very aesthetic,meta/aesthetic,,,,,reviewed,,,미학 태그,,nai|animagine,,,https://docs.novelai.net/en/image/tags
+aesthetic,meta/aesthetic,,,,,reviewed,,,미학 태그,,nai|animagine,,,https://docs.novelai.net/en/image/tags
+displeasing,meta/aesthetic,,,,,reviewed,,,미학 태그,,nai|animagine,,,https://docs.novelai.net/en/image/tags
+very displeasing,meta/aesthetic,,,,,reviewed,,,미학 태그,,nai|animagine,,,https://docs.novelai.net/en/image/tags
+newest,meta/date,,,,,reviewed,,,시기 태그,,animagine|illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+recent,meta/date,,,,,reviewed,,,시기 태그,,animagine|illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+mid,meta/date,,,,,reviewed,,,시기 태그,,animagine|illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+early,meta/date,,,,,reviewed,,,시기 태그,,animagine|illustrious|anima,,,https://huggingface.co/circlestone-labs/Anima
+year 2005,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2006,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2007,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2008,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2009,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2010,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2011,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2012,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2013,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2014,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2015,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2016,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2017,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2018,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2019,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2020,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2021,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2022,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2023,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2024,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2025,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+year 2026,meta/date,,,,,reviewed,,,연도 태그,,nai|anima,,,https://docs.novelai.net/en/image/tags
+general,meta/rating_tag,,,,,reviewed,,,등급 태그,,,,,
+sensitive,meta/rating_tag,,,,,reviewed,,,등급 태그,,anima,,,https://huggingface.co/circlestone-labs/Anima
+questionable,meta/rating_tag,,,,,reviewed,,,등급 태그,,,,,
+nsfw,meta/rating_tag,,,,,reviewed,,,등급 태그,,anima,,,https://huggingface.co/circlestone-labs/Anima
+explicit,meta/rating_tag,,,,,reviewed,,,등급 태그,,anima,,,https://huggingface.co/circlestone-labs/Anima
+safe,meta/rating_tag,,,,,reviewed,,,등급 태그,,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_9,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony|anima,,,https://huggingface.co/circlestone-labs/Anima
+score_8,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_7,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_6,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_5,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_4,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_3,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_2,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_1,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지) — Anima 미학 점수(PonyV7 미학 모델 기준),,anima,,,https://huggingface.co/circlestone-labs/Anima
+score_8_up,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony,,,
+score_7_up,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony,,,
+score_6_up,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony,,,
+score_5_up,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony,,,
+score_4_up,meta/quality,,,,,reviewed,,,점수 태그(밑줄 유지),,pony,,,
+source_anime,style/art_style,,,,,reviewed,,,출처 태그(밑줄 유지),,pony,,,
+source_cartoon,style/art_style,,,,,reviewed,,,출처 태그(밑줄 유지),,pony,,,
+source_furry,style/art_style,,,,,reviewed,,,출처 태그(밑줄 유지),,pony,,,
+source_pony,style/art_style,,,,,reviewed,,,출처 태그(밑줄 유지),,pony,,,
+rating_safe,meta/rating_tag,,,,,reviewed,,,등급 태그(밑줄 유지),,pony,,,
+rating_questionable,meta/rating_tag,,,,,reviewed,,,등급 태그(밑줄 유지),,pony,,,
+rating_explicit,meta/rating_tag,,,,,reviewed,,,등급 태그(밑줄 유지),,pony,,,
+fur dataset,meta/technical,,,,,reviewed,,,"데이터셋 지정 태그(V4 이상, 프롬프트 맨 앞)",,nai,,,https://docs.novelai.net/en/image/tags
+background dataset,meta/technical,,,,,reviewed,,,"데이터셋 지정 태그(V4.5 이상, 인물 없는 풍경·정물 등)",,nai,,,https://docs.novelai.net/en/image/tags
+ye-pop,meta/technical,,,,,reviewed,,,데이터셋 태그 — Anima 는 첫 줄에 따로 쓰고 줄바꿈(deviantart 도 같지만 Danbooru 작품 태그라 그대로),,anima,,,https://huggingface.co/circlestone-labs/Anima
+top aesthetic,meta/aesthetic,,,,,accepted,claude:2026-10-29,0.95,미학 태그(V4 이상),,nai,,,https://docs.novelai.net/en/image/tags
+low complexity,meta/aesthetic,,,,,accepted,claude:2026-10-29,0.85,복잡도 태그(V5) — 화풍이 크게 바뀜,,nai,,,https://docs.novelai.net/en/image/tags
+medium complexity,meta/aesthetic,,,,,accepted,claude:2026-10-29,0.85,복잡도 태그(V5),,nai,,,https://docs.novelai.net/en/image/tags
+high complexity,meta/aesthetic,,,,,accepted,claude:2026-10-29,0.85,복잡도 태그(V5) — 보통 그림에 권장,,nai,,,https://docs.novelai.net/en/image/tags
+ultra complexity,meta/aesthetic,,,,,accepted,claude:2026-10-29,0.85,복잡도 태그(V5),,nai,,,https://docs.novelai.net/en/image/tags
+has alpha,meta/technical,,,,,accepted,claude:2026-10-29,0.8,"알파 채널을 쓰라는 지정(V5, transparent background 보다 추상적)",,nai,,,https://docs.novelai.net/en/image/tags
+location,background/location,,,,,accepted,claude:2026-10-29,0.85,indoors·outdoors 를 합친 것 — 어떤 장소든,,nai,,,https://docs.novelai.net/en/image/tags
+depthness,meta/quality,,,,,reviewed,user:2026-10-29,,,,nai,,,https://docs.novelai.net/en/image/tags
+attractive male,body/skin,,g,,1,accepted,claude:2026-10-29,0.7,이름 그대로(V5) — bishounen 선례,,nai,,,https://docs.novelai.net/en/image/tags
+meta:novel era,meta/date,,,,,accepted,claude:2026-10-29,0.85,덜 현대적인 느낌으로(V5),,nai,,,https://docs.novelai.net/en/image/tags
+meta:golden era,meta/date,,,,,accepted,claude:2026-10-29,0.85,조금 더 현대적인 느낌으로(V5),,nai,,,https://docs.novelai.net/en/image/tags
+visual novel art,style/art_style,meta/genre,,,,accepted,claude:2026-10-29,0.85,비주얼 노벨 화풍(V5),,nai,,,https://docs.novelai.net/en/image/tags
+visual novel bg,style/art_style,meta/genre,,,,accepted,claude:2026-10-29,0.8,비주얼 노벨 배경 화풍(V5),,nai,,,https://docs.novelai.net/en/image/tags
+visual novel chibi,style/art_style,meta/genre,,,,accepted,claude:2026-10-29,0.8,비주얼 노벨 SD 캐릭터 화풍(V5),,nai,,,https://docs.novelai.net/en/image/tags
+visual novel sprite,style/art_style,meta/genre,,,,accepted,claude:2026-10-29,0.8,비주얼 노벨 스탠딩 화풍(V5),,nai,,,https://docs.novelai.net/en/image/tags
+bar eyes,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru |_|),,nai,|_|,,https://docs.novelai.net/en/image/tags
+neutral face,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru :|),,nai,:|,,https://docs.novelai.net/en/image/tags
+neco-arc eyes,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru <|>_<|>),,nai,<|>_<|>,,https://docs.novelai.net/en/image/tags
+square bikini,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru eyepatch_bikini),,nai,eyepatch_bikini,,https://docs.novelai.net/en/image/tags
+character image,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru tachi-e),,nai,tachi-e,,https://docs.novelai.net/en/image/tags
+open \m/,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru \||/),,nai,\||/,,https://docs.novelai.net/en/image/tags
+double peace,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru double_v),,nai,double_v,,https://docs.novelai.net/en/image/tags
+peace sign,,,,,,accepted,claude:2026-10-29,,NAI 표기(Danbooru v),,nai,v,,https://docs.novelai.net/en/image/tags

@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "note": "메인 카테고리 id는 고정(바꾸면 overlay 마이그레이션 필요). 서브 카테고리·표시명·색·설명은 자유롭게 고쳐도 된다. desc는 LLM 분류 지침으로도 쓴다.",
+  "categories": [
+    {
+      "id": "meta", "label": "메타", "color": "#64748b", "rated": false,
+      "desc": "이미지 내용이 아니라 품질·연도·등급·관리 정보를 나타내는 태그",
+      "subs": [
+        {"id": "quality", "label": "품질", "desc": "해상도·품질 등급 (absurdres, lowres, masterpiece)"},
+        {"id": "aesthetic", "label": "미학", "desc": "모델 학습용 미학 점수 태그 (very aesthetic, displeasing)"},
+        {"id": "date", "label": "연도/시기", "desc": "제작 시기 (year 2024, newest, old)"},
+        {"id": "rating_tag", "label": "등급 태그", "desc": "프롬프트에 쓰는 등급 표시 (general, sensitive, nsfw, explicit)"},
+        {"id": "genre", "label": "작품 성격·장르", "desc": "그림의 장르·설정·성격 (fantasy, science fiction, parody, crossover, meme, personification)"},
+        {"id": "technical", "label": "관리용", "desc": "번역·출처·해설 등 사이트 관리 태그 (translation request, commentary)"}
+      ]
+    },
+    {
+      "id": "style", "label": "스타일", "color": "#a855f7", "rated": false,
+      "desc": "그림을 어떻게 그렸는가: 작가, 재료, 화풍, 색 처리",
+      "subs": [
+        {"id": "artist", "label": "작가", "desc": "작가 이름"},
+        {"id": "medium", "label": "매체", "desc": "그린 도구·매체 (traditional media, watercolor (medium), photoshop (medium))"},
+        {"id": "art_style", "label": "화풍", "desc": "화풍·표현 방식 (anime coloring, realistic, sketch, chibi, lineart)"},
+        {"id": "color", "label": "색감", "desc": "그림 전체의 색 처리 (monochrome, greyscale, limited palette, spot color)"}
+      ]
+    },
+    {
+      "id": "subject", "label": "대상", "color": "#ef4444", "rated": false,
+      "desc": "그림에 나오는 인물·존재의 수, 종족, 캐릭터",
+      "subs": [
+        {"id": "count", "label": "인원", "desc": "인원 수 (1girl, 2boys, solo, multiple girls, no humans)"},
+        {"id": "species", "label": "종족", "desc": "종족·존재 유형 (elf, robot, cat girl, monster girl, android)"},
+        {"id": "character", "label": "캐릭터", "desc": "특정 캐릭터 이름"}
+      ]
+    },
+    {
+      "id": "series", "label": "작품", "color": "#f59e0b", "rated": false,
+      "desc": "작품·시리즈·프랜차이즈·브랜드 이름",
+      "subs": []
+    },
+    {
+      "id": "text", "label": "텍스트", "color": "#94a3b8", "rated": false,
+      "desc": "그림 안의 글자, 서명, 워터마크",
+      "subs": [
+        {"id": "mark", "label": "서명·워터마크", "desc": "작가명·서명·워터마크·SNS 아이디 (artist name, signature, watermark, twitter username)"},
+        {"id": "in_image", "label": "그림 속 글자", "desc": "그림 속 글자와 말풍선 (english text, korean text, speech bubble, sound effects)"}
+      ]
+    },
+    {
+      "id": "composition", "label": "구도", "color": "#0ea5e9", "rated": true,
+      "desc": "화면을 어떻게 잘랐고 어디서 봤는가. 다른 태그의 보임 여부를 결정하는 기준(gate) 태그가 여기 속한다",
+      "subs": [
+        {"id": "framing", "label": "크롭", "desc": "화면에 담긴 범위 (upper body, cowboy shot, full body, portrait, feet out of frame)"},
+        {"id": "angle", "label": "시점", "desc": "보는 방향·각도 (from above, from below, from side, from behind, dutch angle, pov)"},
+        {"id": "focus", "label": "포커스", "desc": "특정 부위·대상 강조 (face focus, ass focus, solo focus, male focus)"},
+        {"id": "format", "label": "형식", "desc": "화면 형식 (multiple views, reference sheet, comic, 4koma, split screen, border)"}
+      ]
+    },
+    {
+      "id": "action", "label": "행동", "color": "#3b82f6", "rated": true,
+      "desc": "자세, 몸짓, 시선, 표정, 무엇을 들고 무엇과 상호작용하는가",
+      "subs": [
+        {"id": "posture", "label": "자세", "desc": "몸 전체 자세와 위치 (standing, sitting, lying, on back, kneeling, on bench)"},
+        {"id": "gesture", "label": "몸짓", "desc": "손·팔·다리 동작 (hand up, peace sign, arms behind back, crossed legs)"},
+        {"id": "gaze", "label": "시선", "desc": "어디를 보는가 (looking at viewer, looking back, looking away)"},
+        {"id": "expression", "label": "표정", "desc": "표정과 감정 (smile, blush, crying, open mouth, closed eyes, angry)"},
+        {"id": "activity", "label": "활동", "desc": "무엇을 하고 있는가 (eating, reading, walking, running, sleeping, singing, fighting)"},
+        {"id": "holding", "label": "소지", "desc": "무언가를 들거나 다루는 동작 (holding, holding sword, holding leaf)"},
+        {"id": "interaction", "label": "상호작용", "desc": "다른 대상과의 행동 (hug, kiss, holding hands, headpat)"},
+        {"id": "sexual", "label": "성행위", "desc": "성적 행위"}
+      ]
+    },
+    {
+      "id": "clothes", "label": "의상", "color": "#14b8a6", "rated": true,
+      "desc": "입거나 착용한 것과 그 상태",
+      "subs": [
+        {"id": "headwear", "label": "모자", "desc": "모자·두건·헬멧 (hat, beret, hood, helmet)"},
+        {"id": "hair_acc", "label": "머리 장식", "desc": "머리카락에 다는 장식 (hairband, hair ornament, hair ribbon, hairclip)"},
+        {"id": "top", "label": "상의", "desc": "상의 (shirt, sweater, blouse, sleeves)"},
+        {"id": "bottom", "label": "하의", "desc": "하의 (skirt, shorts, pants)"},
+        {"id": "onepiece", "label": "원피스·전신", "desc": "위아래가 하나인 옷 (dress, school uniform, swimsuit, kimono, bodysuit, leotard)"},
+        {"id": "outer", "label": "아우터", "desc": "겉옷 (jacket, coat, cardigan, cape, hoodie)"},
+        {"id": "underwear", "label": "속옷", "desc": "속옷 (panties, bra, lingerie)"},
+        {"id": "legwear", "label": "레그웨어", "desc": "다리에 신는 것 (thighhighs, pantyhose, socks, leggings)"},
+        {"id": "footwear", "label": "신발", "desc": "신발 (shoes, boots, high heels, sandals)"},
+        {"id": "handwear", "label": "장갑", "desc": "손·팔 착용물 (gloves, detached sleeves, wrist cuffs)"},
+        {"id": "accessory", "label": "장신구", "desc": "장신구·소품성 착용물 (earrings, necklace, choker, necktie, glasses)"},
+        {"id": "detail", "label": "디테일·무늬", "desc": "옷 한 벌이 아니라 옷의 디테일·재단·무늬 (frills, buttons, fur trim, clothing cutout, off shoulder, striped clothes, plaid clothes)"},
+        {"id": "state", "label": "착용 상태", "desc": "옷의 상태나 노출 정도 (open clothes, wet clothes, torn clothes, see-through, nude)"}
+      ]
+    },
+    {
+      "id": "body", "label": "신체", "color": "#22c55e", "rated": true,
+      "desc": "몸과 외모. 캐릭터 고유 외형이면 identity=1",
+      "subs": [
+        {"id": "hair", "label": "머리카락", "desc": "머리 길이·모양·색·상태 (long hair, twintails, black hair, floating hair)"},
+        {"id": "eyes", "label": "눈", "desc": "눈 색·모양 (blue eyes, heterochromia, slit pupils, glowing eyes)"},
+        {"id": "face", "label": "얼굴", "desc": "얼굴 특징 (freckles, fang, mole under eye, makeup, eyelashes)"},
+        {"id": "skin", "label": "피부·체형", "desc": "피부와 전체 체형 (dark skin, pale skin, muscular, curvy, plump, shiny skin)"},
+        {"id": "torso", "label": "상체", "desc": "가슴·배·등 (large breasts, collarbone, navel, cleavage, abs)"},
+        {"id": "lower", "label": "하체", "desc": "엉덩이·골반·허벅지 (ass, wide hips, thighs, groin)"},
+        {"id": "limbs", "label": "팔다리·손발", "desc": "팔·손·다리·발 (fingernails, nail polish, armpits, barefoot feet, soles, toes)"},
+        {"id": "features", "label": "이종 특징", "desc": "사람이 아닌 신체 특징 (animal ears, tail, wings, horns, halo, pointy ears)"}
+      ]
+    },
+    {
+      "id": "object", "label": "사물", "color": "#f97316", "rated": true,
+      "desc": "몸·의상이 아닌 물체, 생물, 액체, 기호",
+      "subs": [
+        {"id": "prop", "label": "소품", "desc": "들거나 놓인 물건 (book, umbrella, cup, phone, bag)"},
+        {"id": "weapon", "label": "무기", "desc": "무기 (sword, gun, bow (weapon))"},
+        {"id": "food", "label": "음식", "desc": "음식·음료 (cake, food, drinking straw)"},
+        {"id": "animal", "label": "동물", "desc": "주인공이 아닌 동물 (cat, bird, dog)"},
+        {"id": "vehicle", "label": "탈것·기계", "desc": "탈것과 큰 기계 (car, motor vehicle, aircraft, mecha, military vehicle)"},
+        {"id": "nature", "label": "자연물", "desc": "식물·자연 소재 (flower, leaf, petals, branch)"},
+        {"id": "fluid", "label": "액체·체액", "desc": "몸이나 사물의 액체 (sweat, tears, saliva, blood, water drop)"},
+        {"id": "symbol", "label": "기호", "desc": "그림 위 기호·형상 (heart, star (symbol), musical note, spoken heart)"}
+      ]
+    },
+    {
+      "id": "effect", "label": "이펙트", "color": "#d946ef", "rated": false,
+      "desc": "장면이나 카메라가 보여주는 빛·대기·렌즈 효과",
+      "subs": [
+        {"id": "lighting", "label": "조명", "desc": "빛과 그림자 (sunlight, backlighting, dappled sunlight, rim lighting, reflection)"},
+        {"id": "atmosphere", "label": "대기·입자", "desc": "공기 중 효과 (light particles, sparkle, falling leaves, steam, smoke)"},
+        {"id": "lens", "label": "렌즈·후보정", "desc": "촬영·후보정 효과 (depth of field, bokeh, lens flare, chromatic aberration, blurry)"},
+        {"id": "motion", "label": "움직임 표현", "desc": "움직임 표현 (motion lines, speed lines, motion blur)"}
+      ]
+    },
+    {
+      "id": "background", "label": "배경", "color": "#84cc16", "rated": false,
+      "desc": "배경의 형식, 장소, 시간·날씨, 풍경 요소",
+      "subs": [
+        {"id": "bg_type", "label": "배경 형식", "desc": "배경 처리 방식 (simple background, white background, gradient background)"},
+        {"id": "location", "label": "장소", "desc": "장소 (park, bedroom, classroom, cityscape, indoors, outdoors, nature)"},
+        {"id": "time", "label": "시간·날씨·계절", "desc": "시간대·날씨·계절 (day, night, sunset, rain, snow, autumn)"},
+        {"id": "scenery", "label": "풍경 요소", "desc": "배경에 놓인 큰 요소 (sky, cloud, tree, building, bench, water)"}
+      ]
+    }
+  ],
+  "system": [
+    {"id": "etc", "label": "미분류", "color": "#9ca3af", "desc": "DB에 있지만 아직 분류하지 않은 태그"},
+    {"id": "unknown", "label": "알 수 없음", "color": "#6b7280", "desc": "DB에 없는 토큰(자연어, 오타, LoRA 트리거 단어)"},
+    {"id": "special", "label": "문법 토큰", "color": "#78716c", "desc": "LoRA·임베딩·와일드카드·동적 프롬프트"},
+    {"id": "natural", "label": "자연어 문장", "color": "#64748b", "desc": "마침표로 끝나는 문장(Anima·NAI 4.5 의 자연어 묘사). 입력 그대로 내보낸다"}
+  ]
+}

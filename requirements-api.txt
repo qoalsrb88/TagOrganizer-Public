@@ -1,0 +1,3 @@
+# API 배치 분류(python tagorg.py api …) 전용. 코어와 다른 명령은 표준 라이브러리만 쓴다.
+# api plan 은 SDK 없이도 돈다(--count 만 필요). 키는 local/anthropic.env — docs/api-batch.md.
+anthropic>=0.49
