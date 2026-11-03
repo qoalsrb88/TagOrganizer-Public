@@ -243,7 +243,7 @@ def stylesheet(t: Dict[str, str]) -> str:
     QPushButton[ghost="true"]:disabled {{ background:transparent; color:{disabled}; }}
     QPushButton[chip="true"] {{ background:{surface}; color:{fg}; border:1px solid {border}; border-radius:12px; padding:2px 12px; min-height:18px; min-width:20px; }}
     QPushButton[chip="true"]:hover {{ border-color:{accent}; }}
-    QPushButton[chip="true"]:checked {{ background:{accent}; color:{on_accent}; border-color:{accent}; font-weight:600; }}
+    QPushButton[chip="true"]:checked {{ background:{accent}; color:{on_accent}; border-color:{accent}; }}
     QPushButton[chip="true"]:disabled {{ background:{bg}; color:{disabled}; border-color:{border}; }}
     QPushButton[chip="true"]:checked:disabled {{ background:{surface2}; color:{muted}; }}
     QPushButton[chip="true"][present="true"]:!checked {{ border:1px solid {accent}; color:{accent}; }}
