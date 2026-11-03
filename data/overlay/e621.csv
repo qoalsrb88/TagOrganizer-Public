@@ -2524,6 +2524,11 @@ facial_scar,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 얼굴 흉터
 facial_spikes,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴(턱·뺨)에 난 가시 · 선례 head_spikes·e621 facial_markings,,
 facial_spots,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.8,위키 없음 · 얼굴의 반점 무늬 · 선례 e621 facial_markings,,
 facial_tuft,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.9,e621 위키: 얼굴의 털·깃털 뭉치 · chest_tuft 선례(§9 tuft),,
+facing_aside,e621,,,,,,accepted,claude:2026-11-03,0.85,위키 없음 · looking_aside→looking_to_the_side 선례,,facing_to_the_side
+facing_away_from_viewer,e621,,,,,,accepted,claude:2026-11-03,0.9,위키 없음 · 이름 그대로 facing_away,,facing_away
+facing_each_other,e621,action/interaction,,g,,,accepted,claude:2026-11-03,0.9,e621 위키: 가슴을 맞대고 마주 봄 · back-to-back 선례,,
+facing_forward,e621,,,,,,accepted,claude:2026-11-03,0.85,위키 없음 · looking_forward→looking_ahead 선례,,facing_ahead
+facing_partner,e621,action/gaze,,g,,,accepted,claude:2026-11-03,0.85,위키 없음 · looking_at_partner·facing_another 선례,,
 fail,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 창피한 실수 — failure 와 같은 뜻,,failure
 fainted,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 기절 — unconscious 와 같은 뜻,,unconscious
 fake_breasts,e621,object/prop,body/torso,g,front_torso,,accepted,claude:2026-10-29,0.65,e621 위키: 옷 속에 넣거나 붙인 물건(풍선·과일)으로 만든 가짜 가슴 · breast_padding·implant 와 구별,,

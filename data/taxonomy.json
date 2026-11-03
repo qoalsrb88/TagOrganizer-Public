@@ -62,7 +62,7 @@
       "subs": [
         {"id": "posture", "label": "자세", "desc": "몸 전체 자세와 위치 (standing, sitting, lying, on back, kneeling, on bench)"},
         {"id": "gesture", "label": "몸짓", "desc": "손·팔·다리 동작 (hand up, peace sign, arms behind back, crossed legs)"},
-        {"id": "gaze", "label": "시선", "desc": "어디를 보는가 (looking at viewer, looking back, looking away)"},
+        {"id": "gaze", "label": "시선", "desc": "어디를 보는가, 얼굴이 어디를 향하는가 (looking at viewer, looking back, looking to the side, facing away, facing viewer)"},
         {"id": "expression", "label": "표정", "desc": "표정과 감정 (smile, blush, crying, open mouth, closed eyes, angry)"},
         {"id": "activity", "label": "활동", "desc": "무엇을 하고 있는가 (eating, reading, walking, running, sleeping, singing, fighting)"},
         {"id": "holding", "label": "소지", "desc": "무언가를 들거나 다루는 동작 (holding, holding sword, holding leaf)"},

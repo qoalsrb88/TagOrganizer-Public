@@ -25,7 +25,7 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 - **역할·직업 의상**(maid, miko, nun, witch)은 `clothes` 메인만 쓴다(서브 없이). 머리 장식처럼 부분이면 해당 서브.
 - **alternate costume, cosplay**처럼 "평소와 다른 옷"이라는 정보는 `clothes` 메인만.
 - **holding X**는 `action/holding`, 들고 있는 물건 자체(sword, cup)는 `object`.
-- **looking at X**는 `action/gaze`. **facing viewer / facing away**는 몸의 방향이므로 `composition/angle`.
+- **looking X**는 `action/gaze`. **facing X**는 위키 정의상 looking X에서 눈을 감거나 가린 짝이므로 같은 `action/gaze`(facing viewer, facing away, facing back, facing to the side, facing down). 보는 쪽이 아니라 카메라 위치를 말하는 태그(from side, from behind, profile, straight-on)만 `composition/angle`. 두 인물이 몸을 마주 대는 것(facing each other)은 back-to-back처럼 `action/interaction`.
 - **활동**(eating, reading, sleeping, walking, running, singing, fighting)은 `action/activity`. 몸 자세(standing, sitting, lying, kneeling, on back, on bed)는 `action/posture`. 손·팔·다리 동작(hand up, v, arms behind back, crossed legs, spread legs, head tilt)은 `action/gesture`.
 - **표정**은 얼굴에 드러나는 것 전부: 웃음·입 모양·눈 감기·볼 붉힘·눈썹(v-shaped eyebrows)·이모티콘 태그(:d, ^_^, :3) → `action/expression`.
 - **만화 기호**(heart, star (symbol), sweatdrop, flying sweatdrops, anger vein, musical note) → `object/symbol`.
@@ -46,7 +46,7 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 - **입에 문 것**(mouth hold, food in mouth)은 `action/holding`, regions face.
 - **그리기 관례**(outline, silhouette, halftone, chibi only)는 `style/art_style`. 매체(oekaki, card (medium), dakimakura (medium))는 `style/medium`.
 - **가린 것 너머로 보이게 그린 부위**(eyes visible through hair, eyebrows visible through hat, blush visible through hair, mouth visible through hair)는 그림체가 아니라 **최종으로 보이는 그 부위의 분류**로 한다: 눈 → `body/eyes`, 눈썹·입·수염 → `body/face`, 귀 → `body/features`, 홍조 → `action/expression`(blush 와 같이), 안경 → `clothes/accessory`. regions 는 그 부위(eyes·face·head), rating 은 g. 그림체로 두면 배열에서 작가·화풍 줄에 섞인다.
-- **크롭으로 잘린 부위**(cropped legs, cropped torso, foot out of frame, out of frame, wide shot, close-up)는 `composition/framing`. 바라보는 쪽(facing viewer, facing away)과 원근(foreshortening, pov hands)은 `composition/angle`.
+- **크롭으로 잘린 부위**(cropped legs, cropped torso, foot out of frame, out of frame, wide shot, close-up)는 `composition/framing`. 원근(foreshortening, pov hands)은 `composition/angle`.
 
 ## 2. rating (그 태그가 있으면 이미지가 최소 이 등급이 된다)
 
@@ -91,7 +91,7 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 
 비우는 것: 꼬리·날개(정면·측면에서도 보임), 자세·활동·시선, holding X, 목에 거는 것(choker, collar, scarf), 몸 전체에 걸친 상태(wet, sweat, shiny skin), 배경·이펙트·메타.
 
-참고: 시점 규칙(from behind)은 front_torso·face·eyes를 가린다(looking back이면 face·eyes는 보임). 따라서 표정 태그도 from behind 단일 샷에서는 빠진다.
+참고: 시점 규칙(from behind)은 front_torso·face·eyes를 가린다. 고개를 돌려 얼굴이 보이는 시선 태그(looking 계열, facing viewer·back·to the side·up)가 있으면 face·eyes는 보인다. 따라서 표정 태그는 from behind 단일 샷에서 시선 태그가 없거나 facing away일 때 빠진다.
 
 ## 4. identity (캐릭터 고유 외형)
 

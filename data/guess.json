@@ -6,6 +6,7 @@
   "patterns": [
     {"pattern": "holding *", "primary": "action/holding"},
     {"pattern": "looking at *", "primary": "action/gaze"},
+    {"pattern": "facing *", "primary": "action/gaze"},
     {"pattern": "hand on *", "primary": "action"},
     {"pattern": "hands on *", "primary": "action"},
     {"pattern": "grabbing *", "primary": "action"},
