@@ -1,0 +1,766 @@
+// NovelAI 전용 UI 를 실제 크롬으로 시험한다(수동 실행 — 인터넷의 novelai.net 을 연다. 로그인·생성 요청은 하지 않는다).
+//
+//   python tagorg.py extension --no-build
+//   node tests/extension/e2e_nai.mjs
+//
+// 임시 프로필의 헤드리스 크롬에 확장 사본을 그대로(권한을 더하지 않고) 올린다. 입력과 클릭은 실제 입력 이벤트로 보낸다.
+// 화면을 보려면 E2E_SHOT=폴더 를 주면 스크린샷을 남긴다.
+import { cpSync, existsSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { launchChrome, sleep, waitFor } from "./cdp.mjs";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const NAI_URL = "https://novelai.net/image";
+const WORD_PROMPT = "smile, 1girl, shoes, upper body, long hair, white shirt, masterpiece";
+
+const browser = launchChrome();
+const { send, evaluate, attach, listeners } = browser;
+const copy = join(browser.tmp, "ext");
+cpSync(join(ROOT, "extension"), copy, { recursive: true });
+if (!existsSync(join(copy, "data", "tagpack.json.gz"))) throw new Error("먼저 python tagorg.py extension 을 실행하세요");
+
+let failures = 0;
+function check(name, ok, detail) {
+  if (!ok) failures++;
+  console.log(`${ok ? "ok  " : "FAIL"} ${name}${ok || detail === undefined ? "" : `  ${JSON.stringify(detail)}`}`);
+}
+
+const squeeze = (text) => text.replace(/\s+/g, "");
+
+try {
+  const { id: extId } = await send("Extensions.loadUnpacked", { path: copy });
+  const swTarget = await waitFor(async () => {
+    const { targetInfos } = await send("Target.getTargets");
+    return targetInfos.find((t) => t.type === "service_worker" && t.url.includes(extId));
+  }, "서비스 워커");
+  const sw = await attach(swTarget.targetId);
+  const stored = (key) => evaluate(sw, `chrome.storage.local.get(${JSON.stringify(key)}).then((x) => x[${JSON.stringify(key)}] ?? null)`);
+
+  const { targetId } = await send("Target.createTarget", { url: "about:blank" });
+  const page = await attach(targetId);
+  await send("Page.enable", {}, page);
+  const pageErrors = [];
+  listeners.push((m) => {
+    if (m.method === "Runtime.exceptionThrown" && String(m.params.exceptionDetails.url || m.params.exceptionDetails.exception?.description || "").includes("chrome-extension")) {
+      pageErrors.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
+    }
+  });
+  await send("Page.navigate", { url: NAI_URL }, page);
+  await send("Page.bringToFront", {}, page);
+  const ev = (expression) => evaluate(page, expression);
+  await waitFor(() => ev("!!document.querySelector('.ProseMirror')").catch(() => false), "NovelAI 입력창");
+  await sleep(1500);
+  await ev("[...document.querySelectorAll('.modal-close')].filter((el) => el.getBoundingClientRect().width > 0)[0]?.click()");
+  await sleep(1200);
+
+  const VISIBLE = "[...document.querySelectorAll('.ProseMirror')].filter((el) => el.getBoundingClientRect().width > 0 && el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))";
+  const click = async (x, y) => {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y }, page);
+    await send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", clickCount: 1 }, page);
+    await send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 }, page);
+    await sleep(250);
+  };
+  const clickExpr = async (expression) => {
+    const at = await ev(`(() => { const el = ${expression}; if (!el) return null; el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
+    if (!at) throw new Error(`찾지 못함: ${expression}`);
+    await click(at[0], at[1]);
+  };
+  const key = async (name, code, vk, { modifiers = 0, command } = {}) => {
+    await send("Input.dispatchKeyEvent", { type: "rawKeyDown", modifiers, key: name, code, windowsVirtualKeyCode: vk, ...(command ? { commands: [command] } : {}) }, page);
+    await send("Input.dispatchKeyEvent", { type: "keyUp", modifiers, key: name, code, windowsVirtualKeyCode: vk }, page);
+  };
+  const type = async (index, text) => {
+    // NovelAI 의 태그 자동완성 목록을 닫는다(덮인 채 누르면 목록의 태그가 들어간다)
+    if (await ev("document.activeElement?.classList.contains('ProseMirror')")) {
+      await key("Escape", "Escape", 27);
+      await sleep(100);
+    }
+    const at = await ev(`(() => { const el = ${VISIBLE}[${index}]; el.scrollIntoView({ block: 'center' }); const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + Math.min(r.height / 2, 20)]; })()`);
+    await sleep(150);
+    await click(at[0], at[1]);
+    await key("a", "KeyA", 65, { modifiers: 2, command: "selectAll" });
+    await sleep(100);
+    if (text) await send("Input.insertText", { text }, page);
+    else await key("Delete", "Delete", 46, { command: "deleteForward" });
+    await sleep(350);
+  };
+  const boxText = (index) => ev(`${VISIBLE}[${index}].innerText`);
+  const undo = async () => {
+    await key("z", "KeyZ", 90, { modifiers: 2, command: "undo" });
+    await sleep(350);
+  };
+  const part = (name) => `document.getElementById('tagorg-nai-button')?.shadowRoot.querySelector('.${name}')`;
+  const toast = () => ev("document.getElementById('tagorg-toast-host')?.shadowRoot.textContent || ''");
+  const clearToast = () => ev("document.getElementById('tagorg-toast-host')?.remove()");
+  const toastHas = async (text) => {
+    await waitFor(async () => (await toast()).includes(text), `알림 "${text}"`, 8000).catch(() => {});
+    return toast();
+  };
+  const sortByButton = async (expected) => {
+    await clearToast();
+    await clickExpr(part("main"));
+    return toastHas(expected);
+  };
+  const narrow = async () => {
+    await send("Emulation.setDeviceMetricsOverride", { width: 800, height: 900, deviceScaleFactor: 1, mobile: false }, page);
+    await sleep(1000);
+  };
+  const wide = async () => {
+    await send("Emulation.clearDeviceMetricsOverride", {}, page);
+    await sleep(1000);
+  };
+  const screenshot = async (name) => {
+    if (!process.env.E2E_SHOT) return;
+    const { data } = await send("Page.captureScreenshot", { format: "png" }, page);
+    writeFileSync(join(process.env.E2E_SHOT, name), Buffer.from(data, "base64"));
+  };
+
+  // ─── 버튼 ───────────────────────────────────────────────────────
+  await waitFor(() => ev("!!document.getElementById('tagorg-nai-button')"), "버튼");
+  check("머리글에 버튼이 붙음", await ev("!!document.getElementById('tagorg-nai-button').closest('.image-gen-prompt-main')"));
+  check("기본 폭에서는 글자를 뺌", await ev("document.getElementById('tagorg-nai-button').classList.contains('compact')"));
+
+  await type(0, WORD_PROMPT);
+  let message = await sortByButton("개 정렬");
+  let text = await boxText(0);
+  check("버튼을 누르면 정렬", text.startsWith("1girl"), text);
+  check("구도 규칙으로 빠진 태그를 알림", !text.includes("shoes") && message.includes("shoes"), { text, message });
+  check("알림에 입력창 이름", message.startsWith("Prompt"), message);
+  check("입력창에 포커스가 남음", await ev(`document.activeElement === ${VISIBLE}[0]`));
+  const sortedFirst = text;
+
+  message = await sortByButton("이미 정렬돼");
+  check("이미 정렬된 글은 다시 넣지 않음", message.includes("이미 정렬돼"), message);
+
+  await undo();
+  check("실제 Ctrl+Z 로 되돌림", squeeze(await boxText(0)) === squeeze(WORD_PROMPT), await boxText(0));
+
+  await clearToast();
+  await clickExpr(part("main"));
+  await toastHas("개 정렬");
+  await narrow();
+  const remade = await boxText(0);
+  check("입력창을 새로 만들어도 정렬된 글이 나옴(앱이 그 글을 앎)", squeeze(remade) === squeeze(sortedFirst), remade);
+  check("좁은 배치에도 버튼이 붙음", await ev("!!document.getElementById('tagorg-nai-button')?.isConnected"));
+  check("머리글이 넓으면 글자를 보임", await ev("!document.getElementById('tagorg-nai-button').classList.contains('compact')"));
+  await wide();
+
+  // ─── 일부 선택 ──────────────────────────────────────────────────
+  const select = (start, end) => ev(`(async () => {
+    const el = ${VISIBLE}[0];
+    el.focus();
+    const node = document.createTreeWalker(el, NodeFilter.SHOW_TEXT).nextNode();
+    const range = document.createRange();
+    range.setStart(node, ${start});
+    range.setEnd(node, ${end});
+    const selection = getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    await new Promise((r) => setTimeout(r, 150));
+  })()`);
+  await type(0, "keep, smile, 1girl, tail");
+  await select(6, 18);
+  await sortByButton("개 정렬");
+  text = await boxText(0);
+  check("고른 부분만 정렬하고 앞뒤를 지킴", squeeze(text) === squeeze("keep, 1girl,\nsmile, tail") && text.startsWith("keep, 1girl,"), text);
+
+  await type(0, "1.2::a, smile, 1girl ::");
+  await select(0, 13);
+  message = await sortByButton("잘렸습니다");
+  check("잘린 강조는 바꾸지 않고 알림", message.includes("잘렸습니다") && (await boxText(0)).trim() === "1.2::a, smile, 1girl ::", message);
+
+  await type(0, "smile, 1girl");
+  await select(0, 5);
+  await sortByButton("개 정렬");
+  check("조각 하나만 고르면 전체 정렬", (await boxText(0)).startsWith("1girl"), await boxText(0));
+
+  // ─── 대상·UC ────────────────────────────────────────────────────
+  await type(0, WORD_PROMPT);
+  await type(1, "shoes, upper body, lowres");
+  message = await sortByButton("개 정렬");
+  text = await boxText(1);
+  check("마지막으로 누른 입력창이 대상", message.startsWith("UC") && squeeze(await boxText(0)) === squeeze(WORD_PROMPT), message);
+  check("UC 는 구도 규칙으로 태그를 빼지 않음", text.includes("shoes") && text.includes("upper body") && text.includes("lowres"), text);
+
+  // ─── 메뉴 ───────────────────────────────────────────────────────
+  const MENU = "document.getElementById('tagorg-nai-menu')?.shadowRoot";
+  const menuItems = () => ev(`[...(${MENU}?.querySelectorAll('button') || [])].map((b) => b.innerText.replace(/\\s+/g, ' ').trim())`);
+  const menuItem = (label) => `[...${MENU}.querySelectorAll('button')].find((b) => b.innerText.includes(${JSON.stringify(label)}))`;
+  const openMenu = async () => {
+    await clickExpr(part("more"));
+    await waitFor(() => ev(`!!${MENU}`), "메뉴");
+  };
+  await openMenu();
+  let items = await menuItems();
+  check("메뉴에 대상·프리셋·모두 정렬·패널", items.some((x) => x.includes("Prompt")) && items.some((x) => x.includes("UC")) && items.some((x) => x.includes("모두 정렬")) && items.some((x) => x.includes("미리보기 패널")), items);
+  check("입력창 포커스 유지", await ev(`document.activeElement === ${VISIBLE}[1]`));
+  await key("Escape", "Escape", 27);
+  await sleep(150);
+  check("Esc 로 메뉴 닫힘", !(await ev(`!!${MENU}`)));
+  await openMenu();
+  await clickExpr(`${menuItem("Prompt")}`);
+  await waitFor(() => ev(`!!${MENU}`), "메뉴 다시 그림");
+  await sleep(300);
+  const checkedTarget = await ev(`[...${MENU}.querySelectorAll('button')].filter((b) => b.querySelector('.mark').textContent).map((b) => b.innerText.trim())`);
+  check("메뉴에서 대상을 바꿈", checkedTarget.some((x) => x.includes("Prompt")), checkedTarget);
+  const layouts = await evaluate(sw, "fetch(chrome.runtime.getURL('data/catalog.json')).then((r) => r.json()).then((c) => [...Object.values(c.layouts), ...c.arrangements.map((a) => a.label)])");
+  const other = layouts.find((label) => !checkedTarget.some((x) => x.includes(label)));
+  await clearToast();
+  await clickExpr(menuItem(other));
+  message = await toastHas("개 정렬");
+  check("프리셋을 고르면 그 프리셋으로 정렬", message.includes(other), { other, message });
+  const saved = await stored("nai_boxes");
+  check("고른 프리셋을 입력창 묶음에 기억", Boolean(saved?.prompt?.preset), saved);
+  await openMenu();
+  const marked = await ev(`[...${MENU}.querySelectorAll('button')].filter((b) => b.querySelector('.mark').textContent).map((b) => b.innerText.trim())`);
+  check("메뉴에 고른 프리셋 표시", marked.some((x) => x.includes(other)), marked);
+  await click(200, 27);   // 윗줄의 빈 곳(화면 가운데 예시 그림을 누르면 프롬프트가 바뀐다)
+  await sleep(150);
+  check("바깥을 누르면 메뉴 닫힘", !(await ev(`!!${MENU}`)));
+  await evaluate(sw, "chrome.storage.local.remove('nai_boxes')");
+
+  await type(0, WORD_PROMPT);
+  await type(1, "lowres, shoes");
+  await openMenu();
+  await clearToast();
+  await clickExpr(menuItem("모두 정렬"));
+  message = await toastHas("UC");
+  check("보이는 입력창 모두 정렬", (await boxText(0)).startsWith("1girl") && message.includes("Prompt") && message.includes("UC"), { message, a: await boxText(0) });
+
+  // ─── 패널 ───────────────────────────────────────────────────────
+  const stackedCount = await ev(`${VISIBLE}.length`);
+  const PANEL = "document.getElementById('tagorg-nai-panel')?.shadowRoot";
+  const attachFrame = async () => {
+    const target = await waitFor(async () => {
+      const { targetInfos } = await send("Target.getTargets", { filter: [{}] });
+      return targetInfos.find((t) => t.type === "iframe" && t.url.includes("nai/panel.html"));
+    }, "패널 iframe");
+    const frame = await attach(target.targetId);
+    listeners.push((m) => {
+      if (m.method === "Runtime.exceptionThrown" && m.sessionId === frame) pageErrors.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
+    });
+    return frame;
+  };
+  const inFrame = async (frame, expression) => evaluate(frame, expression);
+  const frameOffset = () => ev(`(() => { const r = ${PANEL}.querySelector('iframe').getBoundingClientRect(); return [r.x, r.y]; })()`);
+  const clickInFrame = async (frame, expression) => {
+    const at = await inFrame(frame, `(() => { const el = ${expression}; el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
+    const offset = await frameOffset();
+    await click(offset[0] + at[0], offset[1] + at[1]);
+  };
+  const frameReady = (frame) => waitFor(() => inFrame(frame, "document.querySelectorAll('#boxes button').length > 0 && !document.getElementById('state').textContent.includes('읽는 중')").catch(() => false), "패널 준비");
+  const previewText = (frame) => inFrame(frame, "document.getElementById('text').value");
+
+  await type(0, WORD_PROMPT);
+  await openMenu();
+  await clickExpr(menuItem("미리보기 패널"));
+  await waitFor(() => ev(`!!${PANEL}`), "패널");
+  let frame = await attachFrame();
+  await frameReady(frame);
+  const buttonsInPanel = await inFrame(frame, "[...document.querySelectorAll('#boxes button')].map((b) => b.textContent)");
+  check("패널에 보이는 입력창 목록", buttonsInPanel.length === stackedCount && buttonsInPanel[0] === "Prompt", buttonsInPanel);
+
+  const rect = await ev("(() => { const r = document.getElementById('tagorg-nai-panel').getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; })()");
+  const sideRight = await ev("[...document.querySelectorAll('.image-gen-panel-sidebar')].find((e) => e.getBoundingClientRect().width > 0).getBoundingClientRect().right");
+  check("패널이 입력창 옆에 놓임", rect.left >= sideRight, { rect, sideRight });
+  check("패널이 입력창을 가리지 않음", await ev(`(() => { const el = ${VISIBLE}[0]; const r = el.getBoundingClientRect(); const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return el.contains(top); })()`));
+  check("페이지는 패널 안을 읽을 수 없음", (await ev(`${PANEL}.querySelector('iframe').contentDocument === null`)) === true);
+
+  await sleep(200);
+  check("색 미리보기에 토큰이 그려짐", (await inFrame(frame, "document.querySelectorAll('#chips .token').length")) >= 6);
+  check("뺀 태그는 흐리게 남음", await inFrame(frame, "[...document.querySelectorAll('#chips .token.removed')].some((t) => t.textContent === 'shoes')"));
+  check("미리보기는 입력창을 바꾸지 않음", squeeze(await boxText(0)) === squeeze(WORD_PROMPT));
+  check("상태 줄에 처리 시간과 문법", /처리 .*ms.*문법/.test(await inFrame(frame, "document.getElementById('state').textContent")), await inFrame(frame, "document.getElementById('state').textContent"));
+  await screenshot("nai_panel.png");
+
+  // 살아 있는 미리보기: 입력하면 바로 바뀐다
+  await type(0, "blue eyes, 1girl");
+  await waitFor(async () => (await previewText(frame)).startsWith("1girl"), "입력 따라가기", 3000).catch(() => {});
+  check("입력하면 미리보기가 바뀜", (await previewText(frame)).includes("blue eyes"), await previewText(frame));
+
+  // 입력창을 누르면 패널 대상도 바뀐다
+  await type(1, "lowres, shoes");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로 전환", 3000).catch(() => {});
+  check("입력창을 누르면 패널 대상이 바뀜", await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"));
+  check("UC 에서는 크롭·시점을 숨김", await inFrame(frame, "document.getElementById('overrides').hidden"));
+  check("UC 는 구도 규칙 끔으로 시작", (await inFrame(frame, "document.getElementById('rules').value")) === "off");
+
+  await clickInFrame(frame, "document.querySelectorAll('#boxes button')[0]");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'Prompt'"), "Prompt 로 전환", 3000).catch(() => {});
+  check("패널에서 대상을 바꿈", await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'Prompt'"));
+
+  await type(0, WORD_PROMPT);
+  await sleep(300);
+
+  // 크롭 덮어쓰기: 미리보기에만, 저장하지 않음
+  await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === 'full body')");
+  await sleep(100);
+  let preview = await previewText(frame);
+  check("크롭 덮어쓰기가 미리보기에 들어감", preview.includes("full body") && !preview.includes("upper body") && preview.includes("shoes"), preview);
+  check("넣은 태그 표시", await inFrame(frame, "[...document.querySelectorAll('#chips .token.injected')].some((t) => t.textContent === 'full body')"));
+  await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === '자동')");
+  await sleep(100);
+  check("자동으로 돌리면 덮어쓰기 해제", (await previewText(frame)).includes("upper body"));
+
+  // 구도 규칙·추정·프리셋: 입력창 묶음별로 저장
+  await inFrame(frame, "(() => { const el = document.getElementById('rules'); el.value = 'off'; el.dispatchEvent(new Event('change')); })()");
+  await sleep(150);
+  check("구도 규칙을 끄면 shoes 가 남음", (await previewText(frame)).includes("shoes"));
+  check("묶음별로 저장", (await stored("nai_boxes"))?.prompt?.rules === "off", await stored("nai_boxes"));
+  await inFrame(frame, "(() => { const el = document.getElementById('rules'); el.value = 'remove'; el.dispatchEvent(new Event('change')); })()");
+  await sleep(150);
+  const presetCount = await inFrame(frame, "document.getElementById('preset').options.length");
+  check("프리셋 목록", presetCount >= 2, presetCount);
+  const before = await previewText(frame);
+  const changed = await inFrame(frame, `(async () => {
+    const el = document.getElementById('preset');
+    const out = [];
+    for (let i = 0; i < el.options.length; i++) {
+      el.selectedIndex = i;
+      el.dispatchEvent(new Event('change'));
+      await new Promise((r) => setTimeout(r, 30));
+      out.push(document.getElementById('text').value);
+    }
+    el.selectedIndex = 0;
+    el.dispatchEvent(new Event('change'));
+    return out;
+  })()`);
+  check("프리셋을 바꾸면 미리보기가 바뀜", new Set(changed).size > 1, changed.length);
+  check("처음 프리셋으로 돌아옴", changed.includes(before));
+
+  // 보기 전환
+  await clickInFrame(frame, "document.getElementById('show_text')");
+  check("텍스트 보기", await inFrame(frame, "!document.getElementById('text').hidden && document.getElementById('chips').hidden"));
+  await screenshot("nai_panel_text.png");
+  await clickInFrame(frame, "document.getElementById('show_chips')");
+
+  // 복사
+  await clickInFrame(frame, "document.getElementById('copy')");
+  await sleep(200);
+  check("결과 복사", (await inFrame(frame, "document.getElementById('notice').textContent")).includes("복사했습니다"), await inFrame(frame, "document.getElementById('notice').textContent"));
+
+  // 적용과 되돌리기
+  preview = await previewText(frame);
+  await clickInFrame(frame, "document.getElementById('apply')");
+  await sleep(500);
+  check("적용하면 입력창이 바뀜", squeeze(await boxText(0)) === squeeze(preview), await boxText(0));
+  check("적용 뒤 정렬됨 표시", await inFrame(frame, "document.getElementById('apply').disabled && document.getElementById('apply').textContent === '정렬됨'"), await inFrame(frame, "document.getElementById('apply').textContent"));
+  check("적용 안내", (await inFrame(frame, "document.getElementById('notice').textContent")).includes("Ctrl+Z"));
+  check("적용 뒤 포커스는 입력창", await ev(`document.activeElement === ${VISIBLE}[0]`));
+  await undo();
+  await sleep(200);
+  check("적용을 Ctrl+Z 로 되돌림", squeeze(await boxText(0)) === squeeze(WORD_PROMPT), await boxText(0));
+  check("되돌리면 다시 적용 가능", await inFrame(frame, "!document.getElementById('apply').disabled"));
+
+  // 패널을 연 채로 NovelAI 쪽 조작이 되는지 + 끌기·크기·접기
+  const title = await ev(`(() => { const r = ${PANEL}.querySelector('.title span').getBoundingClientRect(); return [r.x + 40, r.y + r.height / 2]; })()`);
+  const drag = async (from, to) => {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: from[0], y: from[1] }, page);
+    await send("Input.dispatchMouseEvent", { type: "mousePressed", x: from[0], y: from[1], button: "left", clickCount: 1 }, page);
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: (from[0] + to[0]) / 2, y: (from[1] + to[1]) / 2, button: "left", buttons: 1 }, page);
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: to[0], y: to[1], button: "left", buttons: 1 }, page);
+    await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: to[0], y: to[1], button: "left", clickCount: 1 }, page);
+    await sleep(200);
+  };
+  const panelBox = () => ev("(() => { const r = document.getElementById('tagorg-nai-panel').getBoundingClientRect(); return { left: Math.round(r.left), top: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) }; })()");
+  const start = await panelBox();
+  await drag(title, [title[0] + 60, title[1] + 40]);
+  const moved = await panelBox();
+  check("제목 줄을 끌면 옮겨짐", moved.left === start.left + 60 && moved.top === start.top + 40, { start, moved });
+  const grip = await ev(`(() => { const r = ${PANEL}.querySelector('.grip').getBoundingClientRect(); return [r.x + 7, r.y + 7]; })()`);
+  await drag(grip, [grip[0] - 80, grip[1] - 50]);
+  const sized = await panelBox();
+  check("모서리를 끌면 크기가 바뀜", sized.width === moved.width - 80 && sized.height === moved.height - 50, { moved, sized });
+  const remembered = await stored("nai_panel");
+  check("위치와 크기를 기억", Math.round(remembered?.left) === sized.left && Math.round(remembered?.width) === sized.width, remembered);
+  await clickExpr(`${PANEL}.querySelector('.fold')`);
+  const folded = await panelBox();
+  check("접으면 제목 줄만 남음", folded.height <= 34, folded);
+  check("접기 단추 글이 바뀜", (await ev(`${PANEL}.querySelector('.fold').textContent`)) === "펼치기");
+  await clickExpr(`${PANEL}.querySelector('.fold')`);
+  check("펼치면 크기가 돌아옴", (await panelBox()).height === sized.height);
+
+  // 폭 전환으로 입력창이 새로 만들어져도 패널이 따라감
+  await narrow();
+  const inside = await ev("(() => { const r = document.getElementById('tagorg-nai-panel').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; })()");
+  check("좁아져도 패널이 화면 안", inside);
+  await screenshot("nai_panel_narrow.png");
+  // 좁은 배치의 입력창은 접힌 시트 안에 있고 패널에 덮이므로 편집기 명령으로 넣는다
+  await ev(`(async () => {
+    const el = ${VISIBLE}[0];
+    el.focus();
+    getSelection().selectAllChildren(el);
+    await new Promise((r) => setTimeout(r, 100));
+    document.execCommand('insertText', false, 'pink eyes, 1girl');
+  })()`);
+  await waitFor(async () => (await previewText(frame)).includes("pink eyes"), "재구성 뒤 입력 따라가기", 3000).catch(() => {});
+  check("입력창이 새로 만들어져도 패널이 따라감", (await previewText(frame)).includes("pink eyes"), await previewText(frame));
+  await wide();
+
+  // Esc 와 닫기, 다시 열면 같은 자리
+  await clickInFrame(frame, "document.getElementById('state')");
+  await key("Escape", "Escape", 27);
+  await sleep(300);
+  check("Esc 로 패널 닫힘", !(await ev(`!!${PANEL}`)));
+  await openMenu();
+  await clickExpr(menuItem("미리보기 패널"));
+  await waitFor(() => ev(`!!${PANEL}`), "패널 다시 열기");
+  frame = await attachFrame();
+  await frameReady(frame);
+  const reopened = await panelBox();
+  check("다시 열면 같은 자리", reopened.left === sized.left && reopened.width === sized.width, { reopened, sized });
+  await clickExpr(`${PANEL}.querySelector('.close')`);
+  await sleep(200);
+  check("닫기 단추", !(await ev(`!!${PANEL}`)));
+
+  // ─── 배열 편집 ──────────────────────────────────────────────────
+  const openEditor = async () => {
+    await openMenu();
+    await clickExpr(menuItem("미리보기 패널"));
+    await waitFor(() => ev(`!!${PANEL}`), "패널");
+    const opened = await attachFrame();
+    await frameReady(opened);
+    return opened;
+  };
+  const closePanel = async () => {
+    await clickExpr(`${PANEL}.querySelector('.close')`);
+    await sleep(200);
+  };
+  const pagePoint = async (f, expression) => {
+    const at = await inFrame(f, `(() => { const el = ${expression}; el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`);
+    const offset = await frameOffset();
+    return [offset[0] + at[0], offset[1] + at[1]];
+  };
+  const dragTo = async (from, to, { release = true } = {}) => {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: from[0], y: from[1] }, page);
+    await send("Input.dispatchMouseEvent", { type: "mousePressed", x: from[0], y: from[1], button: "left", clickCount: 1, buttons: 1 }, page);
+    for (const t of [0.25, 0.5, 0.75, 1]) {
+      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: from[0] + (to[0] - from[0]) * t, y: from[1] + (to[1] - from[1]) * t, button: "left", buttons: 1 }, page);
+      await sleep(30);
+    }
+    if (release) await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: to[0], y: to[1], button: "left", clickCount: 1 }, page);
+    await sleep(200);
+  };
+  const rightClick = async (at) => {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: at[0], y: at[1] }, page);
+    await send("Input.dispatchMouseEvent", { type: "mousePressed", x: at[0], y: at[1], button: "right", clickCount: 1, buttons: 2 }, page);
+    await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: at[0], y: at[1], button: "right", clickCount: 1 }, page);
+    await sleep(200);
+  };
+  const chunkOfTag = (tag) => `document.querySelector('.bmk-to-chunk[data-cid="' + CSS.escape([...document.querySelectorAll('.bmk-to-tok')].find((t) => t.textContent === ${JSON.stringify(tag)}).closest('.bmk-to-grp').dataset.cid) + '"]')`;
+  const barButton = (label) => `[...document.querySelectorAll('.bmk-to-bar button')].find((b) => b.textContent === ${JSON.stringify(label)})`;
+  const menuEntry = (label) => `[...document.querySelectorAll('.bmk-to-menu .it')].find((i) => i.textContent.includes(${JSON.stringify(label)}))`;
+  const dialogButton = (label) => `[...document.querySelectorAll('.bmk-to-dialog button')].find((b) => b.textContent === ${JSON.stringify(label)})`;
+  const firstLine = async (f) => (await previewText(f)).split("\n")[0];
+  const stateOf = (f) => inFrame(f, "document.querySelector('.bmk-to-state').textContent");
+
+  await type(0, WORD_PROMPT);
+  await sleep(700);
+  let edit = await openEditor();
+  await clickInFrame(edit, "document.getElementById('edit_toggle')");
+  await waitFor(() => inFrame(edit, "document.querySelectorAll('.bmk-to-chunk').length > 3 && document.querySelectorAll('.bmk-to-tok').length > 3"), "청크와 미리보기");
+  check("배열 편집을 열면 청크가 보임", await inFrame(edit, "!document.getElementById('editor').hidden && document.getElementById('preview').hidden"));
+  check("넓으면 청크와 미리보기를 좌우로", await inFrame(edit, "document.querySelector('.bmk-to-body').classList.contains('side')"));
+  check("저장은 바꾸기 전에는 꺼짐", await inFrame(edit, `${barButton("저장")}.disabled`));
+  await screenshot("nai_editor.png");
+
+  const before3 = await previewText(edit);
+  const MOVED = "upper body";
+  const topEdge = async () => {
+    await inFrame(edit, "document.querySelector('.bmk-to-canvas').scrollTop = 0");
+    const at = await inFrame(edit, "(() => { const r = document.querySelector('.bmk-to-row').getBoundingClientRect(); return [r.x + 40, r.y + 1]; })()");
+    const off = await frameOffset();
+    return [off[0] + at[0], off[1] + at[1]];
+  };
+  const moveToTop = async (tag) => {
+    const to = await topEdge();
+    const from = await pagePoint(edit, chunkOfTag(tag));
+    await dragTo(from, to);
+  };
+  await moveToTop(MOVED);
+  await waitFor(async () => (await firstLine(edit)).startsWith(MOVED), "끌기 반영", 3000).catch(() => {});
+  check("청크를 맨 위로 끌면 첫 줄이 됨", (await firstLine(edit)).startsWith(MOVED), await previewText(edit));
+  check("미리보기 칸도 따라옴", await waitFor(() => inFrame(edit, "document.querySelector('.bmk-to-preview .bmk-to-line')?.textContent.startsWith('upper body')"), "미리보기", 3000).catch(() => false));
+  check("수정됨 표시", (await stateOf(edit)).includes("수정됨"), await stateOf(edit));
+  check("저장하지 않은 변경을 저장소에 남김", (await stored("nai_draft"))?.arr?.includes("chunks") === true);
+
+  await clickInFrame(edit, barButton("되돌리기"));
+  await sleep(150);
+  check("되돌리기 단추", squeeze(await previewText(edit)) === squeeze(before3), await previewText(edit));
+  await clickInFrame(edit, barButton("다시 실행"));
+  await sleep(150);
+  check("다시 실행 단추", (await firstLine(edit)).startsWith(MOVED));
+  await clickInFrame(edit, "document.querySelector('.bmk-to-status')");
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+  check("패널 안 Ctrl+Z 는 배열을 되돌림", squeeze(await previewText(edit)) === squeeze(before3) && squeeze(await boxText(0)) === squeeze(WORD_PROMPT));
+  await key("y", "KeyY", 89, { modifiers: 2 });
+  await sleep(150);
+  check("패널 안 Ctrl+Y 는 다시 실행", (await firstLine(edit)).startsWith(MOVED));
+
+  // 편집기 밖에서 놓아도 끌기가 끝난다
+  const outside = await ev("(() => { const r = document.getElementById('tagorg-nai-panel').getBoundingClientRect(); return [r.left - 30, r.top + 200]; })()");
+  await dragTo(await pagePoint(edit, chunkOfTag("smile")), outside);
+  const back = await pagePoint(edit, "document.querySelector('.bmk-to-status')");
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: back[0], y: back[1] }, page);
+  await sleep(150);
+  check("패널 밖에서 놓아도 끌기가 끝남", await inFrame(edit, "!document.querySelector('.bmk-to-ghost')"));
+  if ((await stored("nai_draft"))?.arr && !(await firstLine(edit)).startsWith(MOVED)) await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(100);
+
+  // 저장하지 않은 배열로 적용: 입력창에 들어가고, 입력창의 Ctrl+Z 는 입력창을 되돌린다
+  const previewDraft = await previewText(edit);
+  await clickInFrame(edit, "document.getElementById('apply')");
+  await sleep(500);
+  check("편집 중인 배열로 적용", squeeze(await boxText(0)) === squeeze(previewDraft) && (await boxText(0)).startsWith(MOVED), await boxText(0));
+  await undo();
+  await sleep(200);
+  check("입력창 Ctrl+Z 는 배열을 건드리지 않음", squeeze(await boxText(0)) === squeeze(WORD_PROMPT) && (await firstLine(edit)).startsWith(MOVED), await boxText(0));
+
+  await clearToast();
+  await clickExpr(part("main"));
+  await toastHas("개 정렬");
+  check("버튼은 저장한 프리셋을 씀(편집 중인 배열 아님)", !(await boxText(0)).startsWith(MOVED), await boxText(0));
+  await undo();
+  await sleep(200);
+
+  // 입력창을 옮겨도 편집 중인 배열은 그대로
+  await type(1, "lowres, upper body");
+  await waitFor(() => inFrame(edit, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로", 3000).catch(() => {});
+  check("입력창을 옮겨도 편집 중인 배열 유지", (await firstLine(edit)).startsWith(MOVED) && (await stateOf(edit)).includes("수정됨"), await previewText(edit));
+  await type(0, WORD_PROMPT);
+  await sleep(300);
+
+  // 우클릭 메뉴: 숨기기
+  await rightClick(await pagePoint(edit, chunkOfTag("smile")));
+  check("우클릭 메뉴가 뜸", await inFrame(edit, "!!document.querySelector('.bmk-to-menu')"));
+  await screenshot("nai_editor_menu.png");
+  await clickInFrame(edit, menuEntry("숨기기"));
+  await sleep(200);
+  check("숨기면 그 태그가 빠짐", !(await previewText(edit)).includes("smile"), await previewText(edit));
+  check("빠진 태그는 흐리게 남음", await inFrame(edit, "[...document.querySelectorAll('.bmk-to-tok.rm')].some((t) => t.textContent === 'smile')"));
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+
+  // 펼치기와 멤버 빼내기
+  const clothes = chunkOfTag("white shirt");
+  const clothesAt = await pagePoint(edit, clothes);
+  await click(clothesAt[0], clothesAt[1]);
+  await send("Input.dispatchMouseEvent", { type: "mousePressed", x: clothesAt[0], y: clothesAt[1], button: "left", clickCount: 2 }, page);
+  await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: clothesAt[0], y: clothesAt[1], button: "left", clickCount: 2 }, page);
+  await sleep(200);
+  const memberCount = await inFrame(edit, "document.querySelectorAll('.bmk-to-member').length");
+  check("더블클릭으로 펼침", memberCount > 0, memberCount);
+  if (memberCount) {
+    const chunksBefore = await inFrame(edit, "document.querySelectorAll('.bmk-to-chunk').length");
+    const from = await pagePoint(edit, "document.querySelector('.bmk-to-member')");
+    // 보이는 줄 중 청크가 없는 오른쪽 빈자리
+    const blank = await inFrame(edit, `(() => {
+      const c = document.querySelector('.bmk-to-canvas').getBoundingClientRect();
+      for (const row of document.querySelectorAll('.bmk-to-row')) {
+        const r = row.getBoundingClientRect();
+        const x = c.right - 14;
+        const y = r.y + r.height / 2;
+        if (y > c.top + 8 && y < c.bottom - 8 && !document.elementFromPoint(x, y)?.closest('.bmk-to-chunk')) return [x, y];
+      }
+      return null;
+    })()`);
+    const off = await frameOffset();
+    await dragTo(from, [off[0] + blank[0], off[1] + blank[1]]);
+    check("멤버를 밖으로 끌면 새 청크", (await inFrame(edit, "document.querySelectorAll('.bmk-to-chunk').length")) === chunksBefore + 1);
+    await key("z", "KeyZ", 90, { modifiers: 2 });
+    await sleep(150);
+  }
+
+  // 커스텀 청크
+  await clickInFrame(edit, "document.querySelector('[data-act=custom]')");
+  check("커스텀 청크 대화상자", await inFrame(edit, "!!document.querySelector('.bmk-to-dialog')"));
+  await screenshot("nai_editor_dialog.png");
+  await inFrame(edit, `(() => {
+    const fields = document.querySelectorAll('.bmk-to-dialog input[type=text], .bmk-to-dialog textarea');
+    fields[0].value = '내 묘사';
+    fields[1].value = 'long hair';
+    fields[2].value = 're:(';
+  })()`);
+  await clickInFrame(edit, dialogButton("확인"));
+  await sleep(200);
+  check("틀린 패턴은 대화상자에서 알림", (await inFrame(edit, "document.querySelector('.bmk-to-dialog .err')?.textContent || ''")).length > 0);
+  await inFrame(edit, "document.querySelectorAll('.bmk-to-dialog textarea')[1].value = ''");
+  await clickInFrame(edit, dialogButton("확인"));
+  await sleep(250);
+  check("커스텀 청크가 맨 위에 생김", (await firstLine(edit)).startsWith("long hair"), await previewText(edit));
+
+  // 추정 규칙
+  await clickInFrame(edit, "document.querySelector('[data-act=more]')");
+  await clickInFrame(edit, menuEntry("추정 규칙"));
+  await inFrame(edit, "document.querySelector('.bmk-to-dialog textarea').value = 'zzz * => 없는분류'");
+  await clickInFrame(edit, dialogButton("확인"));
+  await sleep(200);
+  check("틀린 추정 규칙은 알림", (await inFrame(edit, "document.querySelector('.bmk-to-dialog .err')?.textContent || ''")).length > 0);
+  await inFrame(edit, "document.querySelector('.bmk-to-dialog textarea').value = 'zzz * => clothes'");
+  await clickInFrame(edit, dialogButton("확인"));
+  await sleep(200);
+  check("추정 규칙이 배열에 들어감", JSON.parse((await stored("nai_draft")).arr).guess?.[0]?.pattern === "zzz *", (await stored("nai_draft")).arr.slice(0, 80));
+
+  // 저장: 레이아웃에서 시작했으므로 이름을 묻는다
+  await clickInFrame(edit, barButton("저장"));
+  await sleep(150);
+  check("레이아웃을 고쳐 저장하면 이름을 물음", await inFrame(edit, "!!document.querySelector('.bmk-to-dialog')"));
+  await inFrame(edit, "document.querySelector('.bmk-to-dialog input[type=text]').value = '시험 배열'");
+  await clickInFrame(edit, dialogButton("저장"));
+  await sleep(400);
+  let imported = await stored("imported_arrangements");
+  check("프리셋으로 저장", imported?.[0]?.label === "시험 배열" && imported[0].data.label === "시험 배열", imported?.map((x) => x.label));
+  check("저장 뒤 수정됨 표시가 사라짐", !(await stateOf(edit)).includes("수정됨") && (await stateOf(edit)).includes("시험 배열"), await stateOf(edit));
+  check("저장 뒤 저장소의 임시본이 사라짐", (await stored("nai_draft")) === null);
+  check("저장 안내", (await inFrame(edit, "document.getElementById('notice').textContent")).includes("저장했습니다"));
+  check("목록에서 저장한 배열이 골라짐", (await inFrame(edit, "document.getElementById('preset').selectedOptions[0].textContent")) === "시험 배열");
+  check("입력창 묶음의 프리셋으로 기억", (await stored("nai_boxes"))?.prompt?.preset === `imported:${imported[0].id}`, await stored("nai_boxes"));
+
+  const savedPreview = await previewText(edit);
+  await clearToast();
+  await clickExpr(part("main"));
+  await toastHas("시험 배열");
+  check("저장한 배열을 버튼이 씀", squeeze(await boxText(0)) === squeeze(savedPreview), await boxText(0));
+  await undo();
+  await sleep(200);
+
+  // 내 배열은 저장하면 그 자리에 덮어쓴다
+  await moveToTop("1girl");
+  await sleep(150);
+  await clickInFrame(edit, barButton("저장"));
+  await sleep(300);
+  imported = await stored("imported_arrangements");
+  check("내 배열은 묻지 않고 덮어씀", imported.length === 1 && !(await inFrame(edit, "!!document.querySelector('.bmk-to-dialog')")) && !(await stateOf(edit)).includes("수정됨"), imported.length);
+
+  // 저장하지 않고 닫아도 이어서 열림
+  await moveToTop(MOVED);
+  await sleep(150);
+  const unsaved = await previewText(edit);
+  await closePanel();
+  edit = await openEditor();
+  await waitFor(() => inFrame(edit, "document.querySelectorAll('.bmk-to-chunk').length > 0"), "다시 열기");
+  await sleep(200);
+  check("다시 열면 편집 상태와 변경이 이어짐", (await stateOf(edit)).includes("수정됨") && squeeze(await previewText(edit)) === squeeze(unsaved), { state: await stateOf(edit), text: await previewText(edit) });
+
+  // 변경이 있을 때 다른 배열을 고르면 묻는다
+  await inFrame(edit, "(() => { const el = document.getElementById('preset'); el.selectedIndex = 0; el.dispatchEvent(new Event('change')); })()");
+  await sleep(150);
+  check("변경이 있으면 버릴지 물음", await inFrame(edit, "!!document.querySelector('.bmk-to-dialog')"));
+  await clickInFrame(edit, dialogButton("취소"));
+  await sleep(150);
+  check("취소하면 그대로", (await stateOf(edit)).includes("수정됨") && (await inFrame(edit, "document.getElementById('preset').selectedOptions[0].textContent")) === "시험 배열");
+  await inFrame(edit, "(() => { const el = document.getElementById('preset'); el.selectedIndex = 0; el.dispatchEvent(new Event('change')); })()");
+  await sleep(150);
+  await clickInFrame(edit, dialogButton("버리고 열기"));
+  await sleep(300);
+  check("버리면 고른 배열이 열림", !(await stateOf(edit)).includes("수정됨") && (await stored("nai_draft")) === null, await stateOf(edit));
+
+  // JSON 보기·붙여넣기와 파일 내보내기
+  await clickInFrame(edit, "document.querySelector('[data-act=more]')");
+  await clickInFrame(edit, menuEntry("JSON"));
+  check("JSON 대화상자에 지금 배열", (await inFrame(edit, "document.querySelector('.bmk-to-dialog textarea').value")).includes("tagorg-arrangement"));
+  await inFrame(edit, "document.querySelector('.bmk-to-dialog textarea').value = '{ 틀린 JSON'");
+  await clickInFrame(edit, dialogButton("적용"));
+  await sleep(150);
+  check("틀린 JSON 은 알림", (await inFrame(edit, "document.querySelector('.bmk-to-dialog .err').textContent")).length > 0);
+  await inFrame(edit, `document.querySelector('.bmk-to-dialog textarea').value = ${JSON.stringify(JSON.stringify({ format: "tagorg-arrangement", version: 1, label: "붙인 배열", author: "시험", rows: [["all"]], chunks: { all: { members: ["*"] } } }))}`);
+  await clickInFrame(edit, dialogButton("적용"));
+  await sleep(250);
+  check("붙여 넣은 배열이 열림", (await inFrame(edit, "document.querySelectorAll('.bmk-to-chunk').length")) === 1);
+  await inFrame(edit, "(() => { const make = URL.createObjectURL; URL.createObjectURL = (blob) => { globalThis.__exported = blob; return make.call(URL, blob); }; })()");
+  await clickInFrame(edit, "document.querySelector('[data-act=export]')");
+  await sleep(200);
+  const exported = JSON.parse(await inFrame(edit, "globalThis.__exported.text()"));
+  check("파일로 내보내기(다른 툴의 키 유지)", exported.label === "붙인 배열" && exported.author === "시험" && exported.format === "tagorg-arrangement", exported);
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(200);
+
+  // 편집을 끄면 저장한 프리셋으로 돌아온다
+  await clickInFrame(edit, "document.getElementById('edit_toggle')");
+  await sleep(200);
+  check("편집을 끄면 미리보기로 돌아옴", await inFrame(edit, "document.getElementById('editor').hidden && !document.getElementById('preview').hidden && document.querySelectorAll('#chips .token').length > 0"));
+  await closePanel();
+  await evaluate(sw, "chrome.storage.local.remove(['nai_boxes', 'nai_draft', 'nai_editing', 'imported_arrangements'])");
+  await sleep(150);
+
+  // ─── 캐릭터 ─────────────────────────────────────────────────────
+  await clickExpr("(() => { const root = [...document.querySelectorAll('.image-gen-character-prompts')].find((e) => e.getBoundingClientRect().width > 0); return root.querySelector('.image-gen-character-prompts-header button') || root.querySelector('button'); })()");
+  await sleep(300);
+  await clickExpr("[...document.querySelectorAll('button')].filter((x) => x.getBoundingClientRect().width > 0).find((x) => /^female$/i.test(x.innerText.trim()))");
+  await sleep(900);
+  const characterIndex = await ev(`${VISIBLE}.findIndex((el) => el.closest('[class*="prompt-input-box-character-prompts"]'))`);
+  check("캐릭터 입력창을 찾음", characterIndex >= 0, characterIndex);
+  await type(characterIndex, "smile, 1girl, long hair, blue eyes");
+  await sleep(800);   // 편집기가 바로 앞 입력과 한 번의 되돌리기로 묶지 않게
+  message = await sortByButton("개 정렬");
+  check("캐릭터 입력창 정렬", message.startsWith("캐릭터 1") && (await boxText(characterIndex)).startsWith("1girl"), { message, text: await boxText(characterIndex) });
+  const characterSorted = await boxText(characterIndex);
+  await undo();
+  check("캐릭터 입력창 되돌리기", squeeze(await boxText(characterIndex)) === squeeze("smile, 1girl, long hair, blue eyes"), await boxText(characterIndex));
+  await clickExpr(part("main"));
+  await toastHas("개 정렬");
+  await narrow();
+  const narrowCharacter = await ev(`[...document.querySelectorAll('[class*="prompt-input-box-character-prompts"] .ProseMirror')].filter((e) => e.getBoundingClientRect().width > 0).map((e) => e.innerText)`);
+  check("캐릭터 입력창도 앱이 그 글을 앎", narrowCharacter.some((t) => squeeze(t) === squeeze(characterSorted)), narrowCharacter);
+  await wide();
+  check("Base Prompt 이름", (await ev("!!document.querySelector('.prompt-input-box-base-prompt')")));
+
+  // ─── 탭 배치(화면을 되돌릴 단추가 탭 안에 있어 뒤쪽에서 시험한다) ─
+  const tabButton = (name) => `[...document.querySelectorAll('.image-gen-prompt-main button')].find((x) => x.getBoundingClientRect().width > 0 && x.innerText.trim() === ${JSON.stringify(name)})`;
+  await clickExpr("[...document.querySelectorAll('.image-gen-prompt-main')].find((e) => e.getBoundingClientRect().width > 0).children[2]?.querySelector('button')");
+  await sleep(600);
+  check("탭 배치에서도 버튼이 붙음", await ev("!!document.getElementById('tagorg-nai-button')?.isConnected"));
+  check("탭 배치: 숨은 탭은 대상이 아님", await ev(`!${VISIBLE}.some((el) => el.closest('.prompt-input-box-undesired-content'))`));
+  const headerHeight = await ev("document.getElementById('tagorg-nai-button').parentElement.parentElement.getBoundingClientRect().height");
+  check("탭 배치 머리글이 두 줄로 밀리지 않음", headerHeight < 50, headerHeight);
+  await screenshot("nai_tabs.png");
+  await clickExpr(tabButton("Undesired Content"));
+  await sleep(300);
+  await type(0, "shoes, lowres");
+  message = await sortByButton("개 정렬");
+  check("탭을 바꾸면 그 입력창이 대상", message.startsWith("UC"), message);
+
+  // ─── 머리글을 못 찾을 때와 끄기 ─────────────────────────────────
+  await ev("document.querySelectorAll('.image-gen-prompt-main').forEach((e) => { e.classList.remove('image-gen-prompt-main'); e.classList.add('tagorg-test-main'); })");
+  await sleep(300);
+  check("머리글을 못 찾으면 구석에 띄움", await ev("document.getElementById('tagorg-nai-button')?.classList.contains('floating') && getComputedStyle(document.getElementById('tagorg-nai-button')).position === 'fixed'"));
+  await screenshot("nai_floating.png");
+  await ev("document.querySelectorAll('.tagorg-test-main').forEach((e) => { e.classList.remove('tagorg-test-main'); e.classList.add('image-gen-prompt-main'); })");
+  await sleep(300);
+  check("머리글이 돌아오면 다시 붙음", await ev("!!document.getElementById('tagorg-nai-button')?.closest('.image-gen-prompt-main')"));
+
+  await evaluate(sw, "chrome.storage.local.get('settings').then((x) => chrome.storage.local.set({ settings: { ...(x.settings || {}), nai_button: false } }))");
+  await sleep(300);
+  check("설정으로 끄면 버튼이 사라짐", !(await ev("!!document.getElementById('tagorg-nai-button')?.isConnected")));
+  await evaluate(sw, "chrome.storage.local.get('settings').then((x) => chrome.storage.local.set({ settings: { ...x.settings, nai_button: true } }))");
+  await sleep(300);
+  check("켜면 돌아옴", await ev("!!document.getElementById('tagorg-nai-button')?.isConnected"));
+
+  // ─── 다른 화면 ──────────────────────────────────────────────────
+  await ev("history.pushState({}, '', '/stories'); document.body.classList.toggle('tagorg-test-tick')");
+  await sleep(300);
+  check("이미지 화면이 아니면 버튼이 없음", !(await ev("!!document.getElementById('tagorg-nai-button')?.isConnected")));
+  await ev("history.pushState({}, '', '/image'); document.body.classList.toggle('tagorg-test-tick')");
+  await sleep(300);
+  check("이미지 화면으로 돌아오면 다시 붙음", await ev("!!document.getElementById('tagorg-nai-button')?.isConnected"));
+
+  // ─── 확장을 다시 불러온 뒤의 낡은 탭 ─────────────────────────────
+  await evaluate(sw, "setTimeout(() => chrome.runtime.reload(), 50), 1").catch(() => {});
+  await sleep(1500);
+  await clearToast();
+  await clickExpr(part("main"));
+  message = await toastHas("새로고침");
+  check("확장을 다시 불러온 탭은 새로고침 안내", message.includes("새로고침"), message);
+
+  check("확장 코드의 예외 없음", pageErrors.length === 0, pageErrors);
+} catch (e) {
+  failures++;
+  console.log(`FAIL 중단: ${e.message}`);
+} finally {
+  await browser.close();
+}
+
+console.log(failures ? `실패 ${failures}건` : "모두 통과");
+process.exit(failures ? 1 : 0);

@@ -1,16 +1,20 @@
-"""노드 팩 동기화 — 코어와 런타임 팩을 ComfyUI_BMK_Nodes 폴더에 복사한다.
+"""노드 팩 동기화 — 코어, 런타임 팩, 청크 편집기 모듈을 ComfyUI_BMK_Nodes 폴더에 복사한다.
 
-쓰는 파일은 아래 세 개뿐이고, 대상 폴더에서 아무것도 지우지 않는다.
+쓰는 파일은 아래 다섯 개뿐이고, 대상 폴더에서 아무것도 지우지 않는다.
     bmk_tag_organizer_core.py   → <노드 팩>/bmk_tag_organizer_core.py   (줄바꿈 LF 로 통일)
     build/tagpack.json.gz       → <노드 팩>/tag_organizer_data/tagpack.json.gz   (gzip 이 아니면 압축)
+    extension/editor/editor.js  → <노드 팩>/js/tag_organizer/editor.js   (줄바꿈 LF 로 통일)
+    extension/editor/model.js   → <노드 팩>/js/tag_organizer/model.js    (줄바꿈 LF 로 통일)
     (생성)                       → <노드 팩>/tag_organizer_data/pack_info.json
+
+ComfyUI 는 js/ 아래의 .js 를 전부 확장으로 import 하므로, 두 편집기 모듈은 import 만으로 아무 일도 하지 않아야 한다.
 
 안전장치
 - 대상이 ComfyUI_BMK_Nodes 폴더인지 __init__.py 로 확인한다. 쓰는 경로가 링크(junction·symlink)를
   거쳐 대상 밖으로 이어지면 쓰지 않는다.
 - 대상 파일이 지난 동기화 뒤 바뀌었으면(pack_info.json 에 적은 해시와 다르면) 멈춘다.
-  처음 보는 파일이 이미 있을 때도 멈춘다. --force 로만 덮어쓴다. 코어는 줄바꿈을 LF 로 맞춘 뒤
-  비교하므로 git 의 CRLF 변환은 변경으로 보지 않는다.
+  처음 보는 파일이 이미 있을 때도 멈춘다. --force 로만 덮어쓴다. 코어와 편집기 모듈은 줄바꿈을 LF 로
+  맞춘 뒤 비교하므로 git 의 CRLF 변환은 변경으로 보지 않는다.
 - 실행마다 고유한 임시 파일에 쓴 뒤 os.replace 로 바꿔치기한다. pack_info.json 은 마지막에 쓴다.
   동시에 두 번 실행하는 경우까지 막는 잠금은 없다(혼자 쓰는 CLI).
 """
@@ -36,7 +40,11 @@ PACK_REL = f"{DATA_REL}/tagpack.json.gz"
 INFO_REL = f"{DATA_REL}/pack_info.json"
 INFO_FORMAT = "tagorg-pack-info"
 PACKAGE_MARKER = "ComfyUI_BMK_Nodes"
-TEXT_FILES = frozenset({CORE_REL})          # 줄바꿈을 LF 로 맞춰 쓰고 비교하는 파일
+EDITOR_SRC = "extension/editor"             # 정본 저장소 안의 위치
+EDITOR_REL = "js/tag_organizer"             # 노드 팩 안의 위치
+EDITOR_FILES = ("editor.js", "model.js")
+TEXT_FILES = frozenset({CORE_REL, *(f"{EDITOR_REL}/{name}" for name in EDITOR_FILES)})   # 줄바꿈을 LF 로 맞춰 쓰고 비교하는 파일
+REPO_ROOT = Path(__file__).resolve().parent.parent
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
@@ -123,6 +131,18 @@ def load_pack_bytes(pack_path: Path) -> Tuple[bytes, Dict[str, Any]]:
     return gz, pack
 
 
+def load_editor_files(repo: Path) -> Dict[str, bytes]:
+    """노드 팩에 복사할 청크 편집기 모듈(상대 경로 → 내용)."""
+    files = {}
+    for name in EDITOR_FILES:
+        path = repo.joinpath(*EDITOR_SRC.split("/"), name)
+        if not path.is_file():
+            raise SyncError(f"편집기 모듈이 없습니다: {path}")
+        rel = f"{EDITOR_REL}/{name}"
+        files[rel] = normalize(rel, path.read_bytes())
+    return files
+
+
 def plan(root: Path, files: Mapping[str, bytes], previous: Mapping[str, str]) -> List[Action]:
     """files: 상대 경로 → 쓸 내용. previous: 지난 동기화 때 기록한 해시."""
     actions = []
@@ -151,7 +171,7 @@ def source_revision(repo: Path) -> Dict[str, Any]:
         except (OSError, subprocess.SubprocessError):
             return ""
     commit = git("rev-parse", "HEAD")
-    dirty = bool(git("status", "--porcelain", "--", CORE_REL, "data"))
+    dirty = bool(git("status", "--porcelain", "--", CORE_REL, "data", EDITOR_SRC))
     return {"commit": commit, "dirty": dirty}
 
 
@@ -186,11 +206,12 @@ def _write_atomic(dest: Path, data: bytes) -> None:
 
 
 def sync(target: Path, core_path: Path, pack_path: Path, *, repo: Optional[Path] = None,
-         force: bool = False, dry_run: bool = False) -> List[Action]:
+         editor_repo: Path = REPO_ROOT, force: bool = False, dry_run: bool = False) -> List[Action]:
     """동기화를 실행하고 파일별 동작을 돌려준다. 충돌이 있으면(그리고 force 가 아니면) 아무것도 쓰지 않는다."""
     root = validate_target(Path(target))
     pack_gz, pack = load_pack_bytes(Path(pack_path))
-    files = {CORE_REL: normalize(CORE_REL, Path(core_path).read_bytes()), PACK_REL: pack_gz}
+    files = {CORE_REL: normalize(CORE_REL, Path(core_path).read_bytes()), PACK_REL: pack_gz,
+             **load_editor_files(Path(editor_repo))}
 
     old_info = read_info(root)
     actions = plan(root, files, old_info.get("files", {}))
@@ -207,7 +228,7 @@ def sync(target: Path, core_path: Path, pack_path: Path, *, repo: Optional[Path]
     else:
         old_bytes = info_dest.read_bytes()
         same = all(a.state == "unchanged" for a in actions) and _without_source(old_info) == _without_source(info)
-        # 코어·팩·기록 내용이 그대로면 정본 커밋만 바뀌어도 다시 쓰지 않는다(노드 팩에 빈 변경이 생기지 않게).
+        # 복사한 파일·기록 내용이 그대로면 정본 커밋만 바뀌어도 다시 쓰지 않는다(노드 팩에 빈 변경이 생기지 않게).
         # --force 는 기록을 새로 쓴다.
         if (same and not force) or old_bytes == info_bytes:
             info_action = Action(INFO_REL, "unchanged", sha256_bytes(old_bytes), sha256_bytes(old_bytes))

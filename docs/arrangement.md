@@ -17,3 +17,5 @@ python tagorg.py organize --arrangement my-arrangement.json -t "blue sky, smile,
 ```
 
 코드에서 기본 배열을 만들 때는 `arrangement_from_layout(pack)`을 사용합니다. `organize()`의 `arrangement` 옵션으로 넘기면 결과의 `report["arranged"]`에서 줄·청크별 토큰을 읽을 수 있습니다.
+
+크롬 확장의 배열 편집기도 같은 JSON을 가져오고 내보냅니다. [크롬 확장](extension.md)

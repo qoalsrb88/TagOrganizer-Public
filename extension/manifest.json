@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "BMK Tag Organizer",
+  "version": "0.2.0",
+  "description": "입력창에서 선택한 프롬프트를 분류 팩과 배열 프리셋에 맞춰 정렬합니다. 모든 처리는 이 브라우저 안에서 합니다.",
+  "minimum_chrome_version": "116",
+  "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "BMK Tag Organizer", "default_popup": "panel/panel.html" },
+  "commands": {
+    "organize-selection": {
+      "suggested_key": { "default": "Alt+Shift+O" },
+      "description": "선택한 글을 기본 프리셋으로 정렬"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://novelai.net/*"],
+      "js": ["page/field.js", "nai/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    { "resources": ["nai/panel.html"], "matches": ["https://novelai.net/*"] }
+  ]
+}

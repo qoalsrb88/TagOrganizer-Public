@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TagOrganize 미리보기</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<header>
+  <div id="boxes" class="segments" role="group" aria-label="입력창"></div>
+  <label>프리셋 <select id="preset"></select></label>
+  <label>구도 규칙
+    <select id="rules">
+      <option value="remove">빼기</option><option value="report">알리기만</option><option value="off">끄기</option>
+    </select>
+  </label>
+  <label class="check"><input id="guess" type="checkbox"> 추정</label>
+  <button id="edit_toggle" type="button" aria-pressed="false">배열 편집</button>
+</header>
+<div id="overrides">
+  <div class="quick"><span>크롭</span><div id="framing" class="chips" role="group" aria-label="크롭 덮어쓰기"></div></div>
+  <div class="quick"><span>시점</span><div id="view" class="chips" role="group" aria-label="시점 덮어쓰기"></div></div>
+</div>
+<div id="state" role="status">팩 읽는 중…</div>
+<nav id="views" class="segments" role="group" aria-label="보기">
+  <button id="show_chips" type="button" aria-pressed="true">색 미리보기</button>
+  <button id="show_text" type="button" aria-pressed="false">텍스트</button>
+</nav>
+<main id="preview">
+  <div id="chips"></div>
+  <textarea id="text" readonly hidden aria-label="정렬 결과"></textarea>
+</main>
+<section id="editor" hidden aria-label="배열 편집"></section>
+<footer>
+  <span id="notice" role="status"></span>
+  <button id="copy" type="button">결과 복사</button>
+  <button id="apply" type="button" class="primary">적용</button>
+</footer>
+<script type="module" src="panel.js"></script>
+</body>
+</html>

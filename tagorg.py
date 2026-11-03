@@ -56,7 +56,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import bmk_tag_organizer_core as core  # noqa: E402
 from gui import arrangement  # noqa: E402  (Qt 없음)
-from tools import api_batch, batch, builder, calibration, e621, evidence, extra, fix, importer, lint, review, stats, sync, tagcomplete, tagdb  # noqa: E402,E501
+from tools import api_batch, batch, builder, calibration, e621, evidence, extension, extra, fix, importer, lint, review, stats, sync, tagcomplete, tagdb  # noqa: E402,E501
 
 WORK = tagdb.ROOT / "work"
 EVIDENCE_CACHE = WORK / "evidence" / "evidence.json"   # Danbooru 증거 캐시(git 제외, 다시 받을 수 있음)
@@ -892,7 +892,25 @@ def _cmd_sync(args: argparse.Namespace) -> int:
         SYNC_TARGET.write_text(json.dumps({"nodes_dir": str(target.resolve())}, ensure_ascii=False) + "\n",
                                encoding="utf-8")
         if any(a.state != "unchanged" for a in actions):
-            print(f"노드 팩에서 커밋할 파일: {sync.CORE_REL}, {sync.DATA_REL}/")
+            print(f"노드 팩에서 커밋할 파일: {sync.CORE_REL}, {sync.DATA_REL}/, {sync.EDITOR_REL}/")
+    return 0
+
+
+def _cmd_extension(args: argparse.Namespace) -> int:
+    pack_path = Path(args.pack) if args.pack else tagdb.PACK_PATH
+    if not args.no_build and not args.pack:
+        code = _cmd_build(argparse.Namespace(out=None))
+        if code:
+            return code
+    local = None if args.no_local else tagdb.ROOT / "local" / "arrangements"
+    warnings = extension.write_data(pack_path, local=local)
+    for w in warnings:
+        print(f"경고: {w}", file=sys.stderr)
+    print(f"확장 자료: {extension.EXTENSION / extension.DATA_REL}")
+    if args.zip:
+        out = Path(args.zip)
+        print(f"설치용 zip: {out} (파일 {extension.make_zip(out)}개)")
+    print("크롬 chrome://extensions → 개발자 모드 → '압축해제된 확장 프로그램 로드' → extension 폴더")
     return 0
 
 
@@ -1195,13 +1213,20 @@ def main(argv=None) -> int:
     a.add_argument("--out", help="출력 폴더 (기본 work/batches)")
     a.set_defaults(func=_cmd_api_sample)
 
-    s = sub.add_parser("sync", help="코어·팩을 ComfyUI_BMK_Nodes 폴더로 복사 (빌드 포함)")
+    s = sub.add_parser("sync", help="코어·팩·청크 편집기를 ComfyUI_BMK_Nodes 폴더로 복사 (빌드 포함)")
     s.add_argument("--to", help="ComfyUI_BMK_Nodes 폴더 (생략하면 지난번 대상)")
     s.add_argument("--dry-run", action="store_true", help="무엇을 쓸지 보여주기만 함")
     s.add_argument("--force", action="store_true", help="노드 팩에서 바뀐 파일도 덮어씀")
     s.add_argument("--no-build", action="store_true", help="빌드하지 않고 기존 build/tagpack.json.gz 사용")
     s.add_argument("--pack", help="다른 팩 파일 사용(빌드 생략)")
     s.set_defaults(func=_cmd_sync)
+
+    s = sub.add_parser("extension", help="크롬 확장 자료(팩·프리셋 목록)를 extension/data 에 만듦 (빌드 포함)")
+    s.add_argument("--no-build", action="store_true", help="빌드하지 않고 기존 build/tagpack.json.gz 사용")
+    s.add_argument("--pack", help="다른 팩 파일 사용(빌드 생략)")
+    s.add_argument("--no-local", action="store_true", help="내 배열(local/arrangements)을 넣지 않음")
+    s.add_argument("--zip", help="설치용 zip 도 이 경로에 만듦")
+    s.set_defaults(func=_cmd_extension)
 
     s = sub.add_parser("fetch", help="sources.json 의 현재 원본 CSV를 받아 sha256 확인 후 data/source 에 둠(다른 PC 처음)")
     s.set_defaults(func=_cmd_fetch)

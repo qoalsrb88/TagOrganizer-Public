@@ -27,6 +27,16 @@ GUI의 미리보기에서 기본 레이아웃을 고르거나 배열을 직접 �
 
 자세한 사용법은 `python tagorg.py --help`와 각 명령의 `--help`에서 확인하세요. [배열 파일 형식](docs/arrangement.md) · [태그 분류 지침](docs/classification-guide.md) · [선택 기능인 API 배치 분류](docs/api-batch.md)
 
+## 크롬 확장
+
+NovelAI 같은 웹 툴의 입력창에서 글을 고르고 오른쪽 클릭 → **프롬프트 정렬**로 정렬합니다. NovelAI 이미지 화면에서는 입력창 머리글의 버튼으로 바로 정렬하고, 미리보기 패널에서 결과를 확인하거나 청크를 끌어 배열을 편집할 수 있습니다. 프롬프트는 브라우저 밖으로 나가지 않습니다.
+
+```sh
+python tagorg.py extension
+```
+
+크롬의 `chrome://extensions`에서 개발자 모드를 켜고 **압축해제된 확장 프로그램 로드**로 `extension` 폴더를 고르세요. [크롬 확장 사용법](docs/extension.md)
+
 ## 데이터 출처와 라이선스
 
 프로그램 코드와 자체 작성 문서에는 MIT 라이선스를 적용합니다. [MIT 라이선스](LICENSE)

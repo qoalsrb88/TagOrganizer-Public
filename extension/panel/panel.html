@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>BMK Tag Organizer</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<main>
+  <section>
+    <h1>붙여넣고 정렬</h1>
+    <textarea id="input" rows="4" placeholder="프롬프트를 붙여 넣으세요" aria-label="정렬할 프롬프트"></textarea>
+    <div class="row">
+      <button id="run" type="button">정렬</button>
+      <button id="copy" type="button" class="quiet">복사</button>
+      <span id="status" role="status"></span>
+    </div>
+    <textarea id="output" rows="5" readonly aria-label="정렬 결과"></textarea>
+  </section>
+
+  <section>
+    <h1>설정</h1>
+    <label>단축키에 쓸 프리셋 <select id="default_preset"></select></label>
+    <label>필터 <select id="filter"></select></label>
+    <label>최대 등급
+      <select id="max_rating">
+        <option value="e">e (전부)</option><option value="q">q</option><option value="s">s</option><option value="g">g</option>
+      </select>
+    </label>
+    <label>구도 규칙
+      <select id="rules">
+        <option value="remove">빼기</option><option value="report">알리기만</option><option value="off">끄기</option>
+      </select>
+    </label>
+    <label>출력 문법
+      <select id="output_dialect">
+        <option value="auto">자동 (NovelAI 는 nai, 나머지는 입력과 같게)</option>
+        <option value="nai">nai</option><option value="comfyui">comfyui</option><option value="anima">anima</option>
+      </select>
+    </label>
+    <label>// 주석
+      <select id="comments"><option value="remove">빼기</option><option value="keep">남기기</option></select>
+    </label>
+    <label class="check"><input id="line_per_section" type="checkbox"> 분류마다 줄 바꾸기</label>
+    <label class="check"><input id="guess" type="checkbox"> DB에 없는 태그의 분류 추정</label>
+    <label class="check"><input id="nai_button" type="checkbox"> NovelAI 화면에 정렬 버튼 표시</label>
+  </section>
+
+  <section>
+    <h1>배열 가져오기</h1>
+    <p>관리 툴의 클립보드 복사로 얻은 배열 JSON 을 붙여 넣으면 오른쪽 클릭 메뉴에 추가됩니다.</p>
+    <textarea id="import_json" rows="3" aria-label="배열 JSON"></textarea>
+    <div class="row">
+      <button id="import" type="button">가져오기</button>
+      <span id="import_status" role="status"></span>
+    </div>
+    <ul id="imported"></ul>
+  </section>
+
+  <footer id="about"></footer>
+</main>
+<script type="module" src="panel.js"></script>
+</body>
+</html>

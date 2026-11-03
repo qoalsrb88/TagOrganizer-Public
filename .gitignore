@@ -9,6 +9,7 @@ __pycache__/
 /data/source/*.csv
 /data/source/*.part
 /data/arrangements/
+/extension/data/
 .env
 .env.*
 *.env

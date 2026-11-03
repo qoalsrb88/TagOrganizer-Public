@@ -6,6 +6,8 @@ import contextlib
 import gzip
 import io
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -28,6 +30,8 @@ class SyncTests(unittest.TestCase):
         self.pack = tmp / "tagpack.json.gz"
         builder.write_pack(build()[0], self.pack)
         self.core = ROOT / sync.CORE_REL
+        self.editor_rel = f"{sync.EDITOR_REL}/editor.js"
+        self.model_rel = f"{sync.EDITOR_REL}/model.js"
 
     def tearDown(self):
         self._tmp.cleanup()
@@ -58,6 +62,10 @@ class SyncTests(unittest.TestCase):
         self.assertIn("from behind", info["quick"]["view"])
         self.assertEqual(info["files"][sync.PACK_REL], sync.sha256_bytes(self.pack.read_bytes()))
         self.assertEqual(list(self.target.rglob("*.sync-tmp")), [])
+        for rel, source in ((self.editor_rel, "editor.js"), (self.model_rel, "model.js")):
+            expected = (ROOT / sync.EDITOR_SRC / source).read_bytes().replace(b"\r\n", b"\n")
+            self.assertEqual((self.target / rel).read_bytes(), expected)
+            self.assertEqual(info["files"][rel], sync.sha256_bytes(expected))
 
     def test_second_sync_is_noop(self):
         self.run_sync()
@@ -123,6 +131,82 @@ class SyncTests(unittest.TestCase):
         self.assertNotIn(b"\r\n", (self.target / sync.CORE_REL).read_bytes())
         self.assertEqual(sync.sync(self.target, self.core, self.pack)[0].state, "unchanged")
 
+    def editor_copy(self):
+        """고쳐 볼 수 있는 편집기 모듈 사본(정본 저장소 모양)."""
+        repo = Path(self._tmp.name) / "repo"
+        shutil.copytree(ROOT / sync.EDITOR_SRC, repo / sync.EDITOR_SRC)
+        return repo
+
+    def test_editor_change_updates_only_that_file(self):
+        repo = self.editor_copy()
+        self.run_sync(editor_repo=repo)
+        with (repo / sync.EDITOR_SRC / "model.js").open("ab") as f:
+            f.write(b"// x\n")
+        states = self.run_sync(editor_repo=repo)
+        self.assertEqual(states[self.model_rel], "update")
+        self.assertEqual(states[self.editor_rel], "unchanged")
+        self.assertEqual(states[sync.CORE_REL], "unchanged")
+        self.assertEqual(states[sync.INFO_REL], "update")
+        self.assertTrue((self.target / self.model_rel).read_bytes().endswith(b"// x\n"))
+
+    def test_editor_is_written_with_lf(self):
+        repo = self.editor_copy()
+        path = repo / sync.EDITOR_SRC / "editor.js"
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+        self.run_sync(editor_repo=repo)
+        self.assertNotIn(b"\r\n", (self.target / self.editor_rel).read_bytes())
+        self.assertEqual(self.run_sync()[self.editor_rel], "unchanged")   # 줄바꿈만 다른 정본은 같은 내용
+
+    def test_editor_crlf_checkout_is_not_a_conflict(self):
+        self.run_sync()
+        dest = self.target / self.editor_rel
+        dest.write_bytes(dest.read_bytes().replace(b"\n", b"\r\n"))     # git 이 CRLF 로 다시 체크아웃한 상태
+        self.assertEqual(self.run_sync()[self.editor_rel], "unchanged")
+
+    def test_manual_editor_edit_blocks_until_force(self):
+        self.run_sync()
+        edited = self.target / self.editor_rel
+        edited.write_text("// 노드 팩에서 직접 고침\n", encoding="utf-8")
+        before = (self.target / self.model_rel).read_bytes()
+        (self.target / self.model_rel).write_bytes(before + b"\n// x\n")
+        with self.assertRaises(sync.SyncConflict) as cm:
+            self.run_sync()
+        self.assertEqual(sorted(cm.exception.paths), sorted([self.editor_rel, self.model_rel]))
+        self.assertEqual(edited.read_text(encoding="utf-8"), "// 노드 팩에서 직접 고침\n")
+        states = self.run_sync(force=True)
+        self.assertEqual(states[self.editor_rel], "conflict")
+        self.assertEqual((self.target / self.model_rel).read_bytes(), before)
+
+    def test_unknown_existing_editor_is_conflict(self):
+        dest = self.target / self.model_rel
+        dest.parent.mkdir(parents=True)
+        dest.write_text("// 처음 보는 파일\n", encoding="utf-8")
+        with self.assertRaises(sync.SyncConflict) as cm:
+            self.run_sync()
+        self.assertEqual(cm.exception.paths, [self.model_rel])
+        self.assertFalse((self.target / sync.CORE_REL).exists())          # 충돌이 있으면 다른 파일도 쓰지 않는다
+
+    def test_missing_editor_is_rejected_before_writing(self):
+        repo = self.editor_copy()
+        (repo / sync.EDITOR_SRC / "model.js").unlink()
+        with self.assertRaises(sync.SyncError):
+            self.run_sync(editor_repo=repo)
+        self.assertEqual(sorted(p.name for p in self.target.iterdir()), ["__init__.py"])
+
+    def test_dirty_editor_is_recorded(self):
+        repo = self.editor_copy()
+
+        def git(*args):
+            subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.invalid", *args],
+                           check=True, capture_output=True)
+        git("init")
+        git("add", "-A")
+        git("commit", "-m", "x")
+        self.assertFalse(sync.source_revision(repo)["dirty"])
+        with (repo / sync.EDITOR_SRC / "editor.js").open("ab") as f:
+            f.write(b"// x\n")
+        self.assertTrue(sync.source_revision(repo)["dirty"])
+
     def test_plain_json_pack_is_compressed(self):
         plain = Path(self._tmp.name) / "tagpack.json"
         plain.write_bytes(gzip.decompress(self.pack.read_bytes()))
@@ -169,6 +253,36 @@ class SyncTests(unittest.TestCase):
         with self.assertRaises(sync.SyncError):
             self.run_sync()
         self.assertEqual(list(outside.iterdir()), [])
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction")
+    def test_link_out_of_target_for_js_is_refused(self):
+        import _winapi
+        outside = Path(self._tmp.name) / "outside_js"
+        outside.mkdir()
+        _winapi.CreateJunction(str(outside), str(self.target / "js"))
+        with self.assertRaises(sync.SyncError):
+            self.run_sync()
+        self.assertEqual(list(outside.iterdir()), [])
+
+
+class EditorModuleTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("node"), "Node 가 없음")
+    def test_import_does_nothing(self):
+        """ComfyUI 가 js/ 아래 .js 를 전부 import 하므로 두 모듈은 import 만으로 아무 일도 하지 않아야 한다."""
+        urls = [(ROOT / sync.EDITOR_SRC / name).as_uri() for name in sync.EDITOR_FILES]
+        script = """
+for (const name of ["setInterval", "setTimeout", "fetch", "addEventListener"]) {
+  globalThis[name] = () => { throw new Error(`import 중에 ${name} 호출`); };
+}
+const before = new Set(Reflect.ownKeys(globalThis));
+for (const url of %s) await import(url);
+const added = Reflect.ownKeys(globalThis).filter((k) => !before.has(k));
+if (added.length) throw new Error(`전역 추가: ${added.map(String)}`);
+""" % json.dumps(urls)
+        # document·window 를 건드리면 node 에는 없으므로 ReferenceError 로 실패한다
+        result = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 class SyncCliTests(unittest.TestCase):

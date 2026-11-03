@@ -724,7 +724,7 @@ class WorkPage(QWidget):
         layout.addLayout(line)
 
         # 노드 팩 반영
-        _section(layout, "노드 팩 반영", "ComfyUI_BMK_Nodes 에 코어·팩을 복사합니다(빌드 포함, 커밋은 노드 팩에서 따로) · "
+        _section(layout, "노드 팩 반영", "ComfyUI_BMK_Nodes 에 코어·팩·청크 편집기를 복사합니다(빌드 포함, 커밋은 노드 팩에서 따로) · "
                                          "python tagorg.py sync")
         form = _form(layout)
         self.target_edit = QLineEdit(str(ops.sync_target(self.env) or ""))
@@ -910,7 +910,7 @@ class WorkPage(QWidget):
         if not force:
             answer = QMessageBox.question(
                 self, "노드 팩 반영",
-                f"build/ 에 빌드한 뒤 다음 폴더에 코어·팩을 씁니다:\n{target}\n\n"
+                f"build/ 에 빌드한 뒤 다음 폴더에 코어·팩·청크 편집기를 씁니다:\n{target}\n\n"
                 "쓰는 파일: bmk_tag_organizer_core.py, tag_organizer_data/ (커밋은 노드 팩에서 따로)\n계속할까요?")
             if answer != QMessageBox.Yes:
                 return
