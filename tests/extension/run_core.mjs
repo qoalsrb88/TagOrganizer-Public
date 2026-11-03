@@ -2,7 +2,8 @@
 // 사용: node run_core.mjs <tagpack.json 또는 .gz> <cases.json> <out.json>
 import { readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
-import { TagPack, arrangementFromLayout, gazeToggle, organize, palette } from "../../extension/engine/core.js";
+import { gazeToggle } from "../../extension/editor/model.js";
+import { TagPack, arrangementFromLayout, organize, palette } from "../../extension/engine/core.js";
 
 const [packPath, casesPath, outPath] = process.argv.slice(2);
 const raw = readFileSync(packPath);

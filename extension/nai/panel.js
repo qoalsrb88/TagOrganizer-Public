@@ -2,8 +2,8 @@
 // 페이지는 이 iframe 안을 볼 수 없다. 패널을 닫으면 프레임째 사라져 팩이 차지한 메모리도 돌아간다.
 
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
-import { Model } from "../editor/model.js";
-import { arrangementFromLayout, gazeToggle, organize, palette, warningText } from "../engine/core.js";
+import { Model, gazeToggle, splitItems } from "../editor/model.js";
+import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadPack, loadSettings, putImported, saveBoxSetting } from "../engine/store.js";
 import { boxGroup, boxSettings, optionsFor, sameLines } from "../engine/text.js";
 
@@ -81,7 +81,7 @@ const quickChip = (label, pressed, onClick) => {
 
 // 시선은 여러 개를 고른다. 지금 크롭·시점이 막는 태그는 숨기되 선택은 두어, 시점을 되돌리면 다시 든다.
 function renderGaze(group, blocked) {
-  const selected = (overrides[group]?.gaze || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const selected = splitItems(overrides[group]?.gaze);
   const set = (tags) => {
     overrides[group] = { ...overrides[group], gaze: tags.join(", ") };
     render();
