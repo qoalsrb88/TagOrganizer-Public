@@ -30,7 +30,7 @@ const TYPE_GUESS = -2;
 const ARRANGEMENT_FORMAT = "tagorg-arrangement";
 const ARRANGEMENT_VERSION = 1;
 const PALETTE_FORMAT = "tagorg-palette";
-const OVERRIDE_TARGETS = [["framing", "composition/framing"], ["view", "composition/angle"]];
+const OVERRIDE_TARGETS = [["framing", "composition/framing"], ["view", "composition/angle"], ["gaze", "action/gaze"]];
 const REST_CHUNK = "rest";
 const DEFAULT_GUESS_HEADS = ["composition", "action", "clothes", "body", "object", "effect", "background"];
 
@@ -289,6 +289,7 @@ const OPTION_DEFAULTS = {
   arrangement: null,
   framing: "",
   view: "",
+  gaze: "",
   guess: false,
 };
 
@@ -1010,7 +1011,7 @@ function guessTokens(tokens, pack, rules, heads) {
   }
 }
 
-// ─── 크롭·시점 덮어쓰기 ───────────────────────────────────────────
+// ─── 크롭·시점·시선 덮어쓰기 ──────────────────────────────────────
 
 function overridesOf(pack, opts) {
   const out = [];
@@ -1029,9 +1030,15 @@ function overridesOf(pack, opts) {
   return out;
 }
 
-function applyOverrides(input, overrides, inject) {
+function applyOverrides(input, overrides, inject, pack, opts) {
   let tokens = input;
-  for (const [group, target, infos] of overrides) {
+  for (const [group, target, chosen] of overrides) {
+    let infos = chosen;
+    if (group === "gaze") {
+      const blocked = blockedTags(aliveKeys(tokens), pack, opts);
+      infos = infos.filter((i) => blocked.get(i.key)?.[1] !== "remove");
+      if (!infos.length) continue;
+    }
     const keys = new Set(infos.map((i) => i.key));
     let pos = null;
     tokens.forEach((t, idx) => {
@@ -1078,6 +1085,38 @@ function isMultiSubject(present, rules) {
   return (cfg.count_single || []).filter((x, i, a) => present.has(x) && a.indexOf(x) === i).length >= 2;
 }
 
+function aliveKeys(tokens) {
+  return new Set(tokens.filter((t) => t.kind === "tag" && !t.removed).map((t) => t.key));
+}
+
+function ruleGroups(present, pack, opts) {
+  const modes = ruleModes(opts);
+  const multi = isMultiSubject(present, pack.rules);
+  const out = [];
+  for (const group of ["framing", "view"]) {
+    const mode = modes[group];
+    const cfg = pack.rules[group] || {};
+    if (mode === "off" || anyIn(cfg.exempt, present)) continue;
+    if (group === "view" && multi && (cfg.multi_subject_exempt ?? true)) continue;
+    out.push([group, mode, cfg]);
+  }
+  return out;
+}
+
+// 크롭·시점이 막는 태그 → [그룹, 모드, 기준 태그]. 한 그룹의 기준 태그가 여럿이면 모두가 막는 것만 막고, 여러 명이면 쓰지 않는다.
+function blockedTags(present, pack, opts) {
+  const out = new Map();
+  if (isMultiSubject(present, pack.rules)) return out;
+  for (const [group, mode, cfg] of ruleGroups(present, pack, opts)) {
+    const active = (cfg.blocks || []).filter((b) => anyIn(b.tags, present));
+    if (!active.length) continue;
+    const blocks = active[0].block.filter((tag) => active.every((b) => b.block.includes(tag)));
+    const gates = sortedCp(new Set(active.flatMap((b) => b.tags).filter((tag) => present.has(tag)))).join(", ");
+    for (const tag of blocks) if (!out.has(tag)) out.set(tag, [group, mode, gates]);
+  }
+  return out;
+}
+
 function applyRules(tokens, pack, opts) {
   const rules = pack.rules;
   const modes = ruleModes(opts);
@@ -1086,11 +1125,7 @@ function applyRules(tokens, pack, opts) {
   const multi = isMultiSubject(present, rules);
 
   const hidden = new Map();
-  for (const group of ["framing", "view"]) {
-    const mode = modes[group];
-    const cfg = rules[group] || {};
-    if (mode === "off" || anyIn(cfg.exempt, present)) continue;
-    if (group === "view" && multi && (cfg.multi_subject_exempt ?? true)) continue;
+  for (const [group, mode, cfg] of ruleGroups(present, pack, opts)) {
     const active = (cfg.gates || []).filter((g) => anyIn(g.tags, present));
     if (!active.length) continue;
     let regions = new Set(active[0].hide || []);
@@ -1118,6 +1153,14 @@ function applyRules(tokens, pack, opts) {
         compareCp(a[0], b[0]) || compareCp(a[1], b[1]) || compareCp(a[2], b[2]));
       const mode = entries.every((e) => e[1] === "remove") ? "remove" : "report";
       act(t, mode, "rule:" + entries.map(([g, , gates]) => `${g}(${gates})`).join("; "));
+    }
+  }
+
+  const blocked = blockedTags(present, pack, opts);
+  for (const t of alive) {
+    if (t.kind === "tag" && blocked.has(t.key)) {
+      const [group, mode, gates] = blocked.get(t.key);
+      act(t, mode, `rule:${group}(${gates})`);
     }
   }
 
@@ -1459,6 +1502,7 @@ export function organize(text, pack, options = null) {
   let allTokens = [];
   const chunkTexts = [];
   const arranged = [];
+  let firstPresent = new Set();
   let taken = 0;
   body.split(new RegExp(BREAK_SRC, "u")).forEach((chunk, ci) => {
     const count = chunk.split(COMMENT_MARK).length - 1;
@@ -1468,7 +1512,7 @@ export function organize(text, pack, options = null) {
     let tokens = parsePrompt(chunk.replaceAll(COMMENT_MARK, ""), opts.input_dialect, pack, opts.sentences);
     classify(tokens, pack, opts);
     if (opts.guess) guessTokens(tokens, pack, guessRules, heads);
-    if (overrides.length) tokens = applyOverrides(tokens, overrides, ci === 0);
+    if (overrides.length) tokens = applyOverrides(tokens, overrides, ci === 0, pack, opts);
     [...notes, ...tokens].forEach((t, i) => {
       t.chunk = ci;
       t.order = allTokens.length + i;
@@ -1476,6 +1520,7 @@ export function organize(text, pack, options = null) {
     });
     if (opts.dedupe) dedupe(tokens);
     applyFilters(tokens, sels, opts);
+    if (ci === 0) firstPresent = aliveKeys(tokens);
     applyRules(tokens, pack, opts);
     place(tokens, plan, pack);
     const [lines, renderedRows] = render(tokens, plan, opts, outDialect);
@@ -1498,6 +1543,9 @@ export function organize(text, pack, options = null) {
   const report = makeReport(allTokens, pack, opts, outDialect, detected);
   report.arrangement = hasArrangement(opts.arrangement) ? plan.label : "";
   report.arranged = arranged;
+  // 시선 칩에서 지금 고를 수 없는 태그: 칩이 늘 넣는 첫 구간의 크롭·시점으로 판단한다
+  const blocked = blockedTags(firstPresent, pack, opts);
+  report.gaze_blocked = (pack.rules.quick?.gaze ?? []).filter((tag) => blocked.has(tag));
   return { text: chunkTexts.join(joiner), removed_text: removedText, report, tokens: allTokens };
 }
 
@@ -1558,7 +1606,25 @@ export function palette(pack) {
   const quick = pack.rules?.quick || {};
   return { format: PALETTE_FORMAT, categories: cats,
     quick: Object.fromEntries(OVERRIDE_TARGETS.map(([group]) => [group, [...(quick[group] ?? [])]])),
+    gaze_conflicts: Object.fromEntries(Object.entries(quick.gaze_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
     layouts: Object.fromEntries(Object.entries(pack.layouts).map(([lid, lay]) => [lid, lay.label ?? lid])) };
+}
+
+// 시선 칩을 눌렀을 때의 새 선택(퀵 목록 순서). 켜면 함께 쓸 수 없는 태그(gaze_conflicts, 양방향)를 끈다.
+export function gazeToggle(paletteData, selected, tag) {
+  let on = new Set(selected);
+  if (on.has(tag)) {
+    on.delete(tag);
+  } else {
+    const conflicts = paletteData.gaze_conflicts || {};
+    const off = new Set(conflicts[tag] || []);
+    for (const [other, tags] of Object.entries(conflicts)) if (tags.includes(tag)) off.add(other);
+    on = new Set([...on].filter((t) => !off.has(t)));
+    on.add(tag);
+  }
+  const order = paletteData.quick.gaze;
+  const rank = (t) => (order.includes(t) ? order.indexOf(t) : order.length);
+  return [...on].sort((a, b) => rank(a) - rank(b));
 }
 
 function categorySlots(taxonomy) {

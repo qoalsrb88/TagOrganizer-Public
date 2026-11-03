@@ -360,6 +360,51 @@ class PreviewArrangeTests(unittest.TestCase):
         chips = {b.property("tag"): b for b in self.panel._chips["framing"].buttons()}
         self.assertTrue(chips["full body"].property("present"))               # 프롬프트에 있던 크롭 표시
 
+    def test_gaze_chips_select_several_and_clear_conflicts(self):
+        self.run_page("1girl, looking down, smile")
+        chips = {b.property("tag"): b for b in self.panel._chips["gaze"].buttons()}
+        self.assertTrue(chips[""].isChecked())
+        self.assertTrue(chips["looking down"].property("present"))
+        chips["looking back"].click()
+        chips["looking at viewer"].click()
+        self.assertEqual(self.panel.gaze, "looking at viewer, looking back")
+        self.assertFalse(chips[""].isChecked())
+        self.assertTrue(chips["looking back"].text().startswith("✓"))
+        self.page.run()
+        self.assertIn("looking down  # override:gaze", self.page.removed.toPlainText())
+        self.assertIn("looking back", self.page.output.toPlainText())
+        chips["facing away"].click()
+        self.assertEqual(self.panel.gaze, "facing away")
+        self.assertFalse(chips["looking back"].isChecked())
+        self.assertEqual(chips["looking back"].text(), "looking back")
+        chips["facing away"].click()
+        self.assertEqual(self.panel.gaze, "")
+        self.assertTrue(chips[""].isChecked())
+        chips["looking up"].click()
+        chips[""].click()
+        self.assertEqual(self.panel.gaze, "")
+        self.assertTrue(chips[""].isChecked())
+        self.assertFalse(chips["looking up"].isChecked())
+
+    def test_gaze_chips_follow_view(self):
+        chips = {b.property("tag"): b for b in self.panel._chips["gaze"].buttons()}
+        self.panel.set_quick("gaze", "looking back, looking at viewer")
+        self.panel.set_quick("view", "straight-on")
+        self.run_page("1girl, smile")
+        self.assertTrue(chips["looking back"].isHidden())
+        self.assertFalse(chips["looking at viewer"].isHidden())
+        self.assertTrue(chips["looking back"].isChecked())                     # 숨겨도 선택은 남는다
+        self.assertNotIn("looking back", self.page.output.toPlainText())
+        self.panel.set_quick("view", "from behind")
+        self.page.run()
+        self.assertFalse(chips["looking back"].isHidden())
+        self.assertIn("looking back", self.page.output.toPlainText())
+        self.assertIn("smile", self.page.output.toPlainText())
+        self.run_page("1girl, straight-on, looking back")                      # 프롬프트의 시점도 따른다
+        self.panel.set_quick("view", "")
+        self.page.run()
+        self.assertTrue(chips["looking back"].isHidden())
+
     def test_filter_and_custom_chunk_from_tokens(self):
         self.page.preset.setCurrentIndex(self.page.preset.findData("sort_only"))
         self.run_page("smile, my odd phrase, holding chainsword, 1girl")

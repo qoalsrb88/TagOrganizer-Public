@@ -6,6 +6,7 @@ import json
 import unittest
 
 from fixtures import core, pack
+from tools import tagdb
 
 S2 = ("park, leaf, white shirt, sagisawa fumika, dappled sunlight, autumn leaves, shirt, on bench, black hair, smile, "
       "autumn, maple leaf, long skirt, looking at viewer, holding, reflection, hairband, blush, collarbone, "
@@ -210,7 +211,7 @@ class OverrideTests(unittest.TestCase):
         self.assertFalse(any(row.get("injected") for row in r.report["tokens"]))
 
     def test_view_override(self):
-        r = run("1girl, from above, smile, navel, looking at viewer", view="from behind")
+        r = run("1girl, from above, smile, navel", view="from behind")
         self.assertEqual(reasons(r), {"from above": "override:view", "smile": "rule:view(from behind)",
                                       "navel": "rule:view(from behind)"})
         self.assertIn("from behind", r.text)
@@ -230,6 +231,127 @@ class OverrideTests(unittest.TestCase):
             with self.subTest(opts=opts), self.assertRaises(ValueError) as cm:
                 run("1girl", **opts)
             self.assertIn(part, str(cm.exception))
+
+
+class GazeTests(unittest.TestCase):
+    def test_replaces_gaze_tags_with_several_chosen(self):
+        r = run("1girl, looking down, smile", gaze="looking back, looking at viewer")
+        self.assertEqual(reasons(r), {"looking down": "override:gaze"})
+        injected = [(row["text"], row["injected"]) for row in r.report["tokens"] if row.get("injected")]
+        self.assertEqual(injected, [("looking back", "gaze"), ("looking at viewer", "gaze")])
+
+    def test_must_be_gaze_tag(self):
+        with self.assertRaises(ValueError) as cm:
+            run("1girl", gaze="smile")
+        self.assertIn("action/gaze", str(cm.exception))
+
+    def test_from_behind_keeps_face_only_when_head_turned(self):
+        for gaze in ("looking back", "looking at viewer", "looking back, sideways glance", "facing back"):
+            with self.subTest(gaze=gaze):
+                r = run("1girl, smile, navel", view="from behind", gaze=gaze)
+                self.assertEqual(reasons(r), {"navel": "rule:view(from behind)"})
+        r = run("1girl, smile, navel", view="from behind", gaze="facing away")
+        self.assertEqual(reasons(r), {"smile": "rule:view(from behind)", "navel": "rule:view(from behind)"})
+
+    def test_straight_on_removes_turned_head_tags(self):
+        r = run("1girl, straight-on, looking back, facing away, looking at viewer")
+        self.assertEqual(reasons(r), {"looking back": "rule:view(straight-on)", "facing away": "rule:view(straight-on)"})
+        self.assertEqual(r.report["gaze_blocked"], ["looking back", "facing away", "facing back", "facing to the side"])
+
+    def test_view_chip_also_drives_blocks(self):
+        r = run("1girl, from behind, looking back", view="straight-on")
+        self.assertEqual(reasons(r), {"from behind": "override:view", "looking back": "rule:view(straight-on)"})
+        self.assertIn("looking back", r.report["gaze_blocked"])
+
+    def test_blocked_choice_is_ignored_and_prompt_gaze_stays(self):
+        r = run("1girl, looking up", view="straight-on", gaze="looking back")
+        self.assertEqual(reasons(r), {})
+        self.assertNotIn("looking back", r.text)
+        self.assertIn("looking up", r.text)
+
+    def test_only_allowed_choices_replace(self):
+        r = run("1girl, looking up", view="straight-on", gaze="looking back, looking at viewer")
+        self.assertEqual(reasons(r), {"looking up": "override:gaze"})
+        self.assertIn("looking at viewer", r.text)
+        self.assertNotIn("looking back", r.text)
+
+    def test_side_and_behind_block_nothing(self):
+        for view in ("from side", "from behind"):
+            with self.subTest(view=view):
+                r = run("1girl, looking back, sideways glance", view=view)
+                self.assertEqual(reasons(r), {})
+                self.assertEqual(r.report["gaze_blocked"], [])
+
+    def test_several_view_tags_block_only_what_all_block(self):
+        r = run("1girl, from behind, straight-on, facing away")
+        self.assertEqual(reasons(r), {})
+        self.assertEqual(r.report["gaze_blocked"], [])
+        r = run("1girl, profile, straight-on, facing viewer, facing away")
+        self.assertEqual(reasons(r), {"facing away": "rule:view(profile, straight-on)"})
+
+    def test_profile_blocks_frontal_faces(self):
+        r = run("1girl, profile, facing viewer, looking at viewer")
+        self.assertEqual(reasons(r), {"facing viewer": "rule:view(profile)"})
+
+    def test_head_out_of_frame_blocks_only_eyes_visible_tags(self):
+        for framing in ("head out of frame", "lower body"):
+            with self.subTest(framing=framing):
+                r = run(f"1girl, {framing}, looking at viewer, facing viewer")
+                self.assertEqual(reasons(r), {"looking at viewer": f"rule:framing({framing})"})
+                self.assertFalse(any(t.startswith("facing") for t in r.report["gaze_blocked"]))
+                self.assertEqual(len(r.report["gaze_blocked"]), 8)
+
+    def test_exempt_scenes_block_nothing(self):
+        for text in ("2girls, straight-on, looking back", "2girls, head out of frame, looking at viewer",
+                     "1girl, 1boy, straight-on, looking back", "1girl, multiple views, straight-on, looking back"):
+            with self.subTest(text=text):
+                r = run(text)
+                self.assertEqual(reasons(r), {})
+                self.assertEqual(r.report["gaze_blocked"], [])
+
+    def test_rule_modes(self):
+        r = run("1girl, straight-on", rules="off", gaze="looking back")
+        self.assertEqual(reasons(r), {})
+        self.assertIn("looking back", r.text)
+        self.assertEqual(r.report["gaze_blocked"], [])
+        r = run("1girl, straight-on", rules="report", gaze="looking back")
+        self.assertIn("looking back", r.text)
+        self.assertEqual(r.report["flagged"], [{"tag": "looking back", "reason": "rule:view(straight-on)"}])
+
+    def test_only_first_break_segment_decides_chips(self):
+        r = run("1girl, straight-on BREAK 1boy, looking back")
+        self.assertEqual(reasons(r), {})
+        self.assertIn("looking back", r.report["gaze_blocked"])
+        r = run("1girl BREAK 1boy, straight-on, looking back")
+        self.assertEqual(reasons(r), {"looking back": "rule:view(straight-on)"})
+        self.assertEqual(r.report["gaze_blocked"], [])
+
+    def test_view_chip_keeps_facing_tags(self):
+        r = run("1girl, from above, facing away", view="from side")
+        self.assertEqual(reasons(r), {"from above": "override:view"})
+
+    def test_toggle_turns_off_conflicts_both_ways(self):
+        pal = core.palette(pack())
+        toggle = core.gaze_toggle
+        self.assertEqual(toggle(pal, [], "looking back"), ["looking back"])
+        self.assertEqual(toggle(pal, ["looking back"], "looking at viewer"), ["looking at viewer", "looking back"])
+        self.assertEqual(toggle(pal, ["looking back", "looking at viewer"], "looking back"), ["looking at viewer"])
+        self.assertEqual(toggle(pal, ["looking up"], "looking down"), ["looking down"])
+        self.assertEqual(toggle(pal, ["looking down"], "looking up"), ["looking up"])
+        self.assertEqual(toggle(pal, ["looking back", "looking at viewer"], "facing away"), ["facing away"])
+        self.assertEqual(toggle(pal, ["facing away"], "looking back"), ["looking back"])
+        self.assertEqual(toggle(pal, ["looking back"], "sideways glance"), ["looking back", "sideways glance"])
+
+    def test_rule_tags_are_real_gaze_tags(self):
+        rows = tagdb.read_overlay()
+        rules = tagdb.load_config()["rules"]
+        quick = rules["quick"]
+        for tag in quick["gaze"]:
+            self.assertEqual(rows[tag.replace(" ", "_")]["primary"], "action/gaze", tag)
+        named = {name for tag, others in quick["gaze_conflicts"].items() for name in (tag, *others)}
+        for group in ("framing", "view"):
+            named |= {tag for block in rules[group]["blocks"] for tag in block["block"]}
+        self.assertEqual(named - set(quick["gaze"]), set())
 
 
 class GuessTests(unittest.TestCase):
@@ -320,6 +442,8 @@ class PaletteTests(unittest.TestCase):
         self.assertTrue(any(c.get("system") and c["id"] == "unknown" for c in pal["categories"]))
         self.assertIn("upper body", pal["quick"]["framing"])
         self.assertIn("from behind", pal["quick"]["view"])
+        self.assertIn("looking back", pal["quick"]["gaze"])
+        self.assertIn("facing back", pal["gaze_conflicts"]["looking back"])
         self.assertIn("default", pal["layouts"])
         self.assertEqual(core.selector_label("subject/count", pack().taxonomy), "인원")
         self.assertEqual(core.selector_label("clothes", pack().taxonomy), "의상")

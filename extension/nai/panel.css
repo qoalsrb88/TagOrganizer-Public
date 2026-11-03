@@ -73,6 +73,7 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .quick > span { flex: 0 0 auto; color: var(--muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 3px; }
 .chips button { padding: 0 8px; border-radius: 10px; font-size: 12px; }
+.chips.multi button[aria-pressed="true"]:not(:first-child)::before { content: "✓ "; }
 
 #state { padding: 4px 10px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 #state.warn { color: var(--warn); }

@@ -60,6 +60,7 @@ class SyncTests(unittest.TestCase):
         self.assertIn("default", info["layouts"])
         self.assertIn("upper body", info["quick"]["framing"])     # 노드의 크롭/시점 콤보(팩을 읽지 않고)
         self.assertIn("from behind", info["quick"]["view"])
+        self.assertIn("looking back", info["quick"]["gaze"])
         self.assertEqual(info["files"][sync.PACK_REL], sync.sha256_bytes(self.pack.read_bytes()))
         self.assertEqual(list(self.target.rglob("*.sync-tmp")), [])
         for rel, source in ((self.editor_rel, "editor.js"), (self.model_rel, "model.js")):

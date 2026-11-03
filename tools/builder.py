@@ -261,6 +261,9 @@ def build_pack(
                     errors.append(f"rules.{group} hide 에 없는 부위입니다: {reg}")
             _check_rule_tags(f"rules.{group}", gate.get("tags", ()), rows, aliases, warnings)
             _check_rule_tags(f"rules.{group}.reveal", (gate.get("reveal") or {}).keys(), rows, aliases, warnings)
+        for block in cfg.get("blocks", ()):
+            _check_rule_tags(f"rules.{group}.blocks", list(block.get("tags", ())) + list(block.get("block", ())),
+                             rows, aliases, warnings)
         _check_rule_tags(f"rules.{group}.exempt", cfg.get("exempt", ()), rows, aliases, warnings)
     ms = rules.get("multi_subject") or {}
     _check_rule_tags("rules.multi_subject", list(ms.get("any", ())) + list(ms.get("count_single", ())),
@@ -297,6 +300,10 @@ def build_pack(
         for tag in quick.get(group, ()):
             if tag in rows and rows[tag][3] != target:
                 warnings.append(f"rules.quick.{group} '{tag}' 는 {target} 가 아닙니다({rows[tag][3]}) — 덮어쓸 수 없음")
+    for tag, others in (quick.get("gaze_conflicts") or {}).items():
+        for name in (tag, *others):
+            if name not in quick.get("gaze", ()):
+                warnings.append(f"rules.quick.gaze_conflicts '{name}' 는 시선 퀵 목록에 없습니다")
     guess = dict(config.get("guess") or {})
     try:
         core.compile_guess_rules(guess.get("patterns", ()), SimpleNamespace(rules=rules, categories=cats), "guess")

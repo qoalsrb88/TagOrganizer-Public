@@ -39,13 +39,15 @@ test("NovelAI 는 nai 로 내보내고 다른 곳은 입력과 같게", () => {
   assert.equal(optionsFor({ ...DEFAULT_SETTINGS, output: "anima" }, null, "default", "novelai.net").output_dialect, "anima");
 });
 
-test("크롭·시점 덮어쓰기는 준 때만 옵션에 들어간다", () => {
+test("크롭·시점·시선 덮어쓰기는 준 때만 옵션에 들어간다", () => {
   const plain = optionsFor(DEFAULT_SETTINGS, null, "default", "novelai.net");
   assert.equal("framing" in plain, false);
   assert.equal("view" in plain, false);
-  const set = optionsFor({ ...DEFAULT_SETTINGS, framing: "upper body", view: "pov" }, null, "default", "novelai.net");
+  assert.equal("gaze" in plain, false);
+  const set = optionsFor({ ...DEFAULT_SETTINGS, framing: "upper body", view: "pov", gaze: "looking back, looking down" }, null, "default", "novelai.net");
   assert.equal(set.framing, "upper body");
   assert.equal(set.view, "pov");
+  assert.equal(set.gaze, "looking back, looking down");
 });
 
 test("입력창 묶음: UC 는 구도 규칙을 끄고, 저장값이 이긴다", () => {

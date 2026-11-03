@@ -80,6 +80,7 @@ export function optionsFor(settings, arrangement, layout, hostname) {
   else if (layout) options.layout = layout;
   if (settings.framing) options.framing = settings.framing;
   if (settings.view) options.view = settings.view;
+  if (settings.gaze) options.gaze = settings.gaze;
   return options;
 }
 

@@ -183,7 +183,7 @@ def build_info(pack: Mapping[str, Any], hashes: Mapping[str, str], revision: Map
         "source": pack.get("source", {}),
         "presets": {pid: p.get("label", pid) for pid, p in pack["presets"].items()},
         "layouts": {lid: l.get("label", lid) for lid, l in pack["layouts"].items()},
-        "quick": {g: list(((pack.get("rules") or {}).get("quick") or {}).get(g, ())) for g in ("framing", "view")},
+        "quick": {g: list(((pack.get("rules") or {}).get("quick") or {}).get(g, ())) for g in ("framing", "view", "gaze")},
         "synced_from": {"repo": "TagOrganizer", **revision},
         "files": dict(hashes),
     }

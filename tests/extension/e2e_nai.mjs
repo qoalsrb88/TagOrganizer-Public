@@ -303,6 +303,31 @@ try {
   await sleep(100);
   check("자동으로 돌리면 덮어쓰기 해제", (await previewText(frame)).includes("upper body"));
 
+  // 시선 덮어쓰기: 여러 개, 함께 못 쓰는 태그는 꺼지고, 시점이 막는 태그는 사라진다
+  const gazeChip = (text) => `[...document.querySelectorAll('#gaze button')].find((b) => b.textContent === '${text}')`;
+  const pressed = (text) => inFrame(frame, `${gazeChip(text)}?.getAttribute('aria-pressed') === 'true'`);
+  await clickInFrame(frame, gazeChip("looking back"));
+  await sleep(100);
+  await clickInFrame(frame, gazeChip("looking at viewer"));
+  await sleep(100);
+  preview = await previewText(frame);
+  check("시선을 여러 개 고름", preview.includes("looking back") && preview.includes("looking at viewer"), preview);
+  await clickInFrame(frame, gazeChip("facing away"));
+  await sleep(100);
+  check("함께 못 쓰는 시선은 꺼짐", (await pressed("facing away")) && !(await pressed("looking back")));
+  await clickInFrame(frame, gazeChip("looking back"));
+  await sleep(100);
+  await clickInFrame(frame, "[...document.querySelectorAll('#view button')].find((b) => b.textContent === 'straight-on')");
+  await sleep(100);
+  check("시점이 막는 시선은 목록에서 사라짐", await inFrame(frame, `!${gazeChip("looking back")}`));
+  check("막힌 시선은 프롬프트에 넣지 않음", !(await previewText(frame)).includes("looking back"));
+  await clickInFrame(frame, "[...document.querySelectorAll('#view button')].find((b) => b.textContent === '자동')");
+  await sleep(100);
+  check("시점을 되돌리면 선택이 돌아옴", await pressed("looking back"));
+  await clickInFrame(frame, gazeChip("자동"));
+  await sleep(100);
+  check("시선 자동으로 해제", !(await previewText(frame)).includes("looking back"));
+
   // 구도 규칙·추정·프리셋: 입력창 묶음별로 저장
   await inFrame(frame, "(() => { const el = document.getElementById('rules'); el.value = 'off'; el.dispatchEvent(new Event('change')); })()");
   await sleep(150);

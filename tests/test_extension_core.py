@@ -69,12 +69,15 @@ OPTIONS: List[Dict[str, Any]] = [
     {"rules": "off", "order": "alpha", "dedupe": False, "resolve_aliases": False, "comments": "keep"},
     {"rules": {"framing": "off", "view": "report"}, "match_secondary": True, "sentences": False},
     {"framing": "upper body", "view": "from behind", "guess": True, "input_dialect": "auto", "comments": "keep"},
+    {"view": "straight-on", "gaze": "looking back, looking at viewer"},
+    {"framing": "head out of frame", "gaze": "facing viewer, looking at viewer", "rules": "report"},
+    {"view": "from side", "gaze": "looking back, sideways glance", "rules": {"view": "off"}},
 ]
 
 INVALID_OPTIONS: List[Dict[str, Any]] = [
     {"preset": "nope"}, {"layout": "nope"}, {"max_rating": "x"}, {"input_dialect": "x"}, {"output_dialect": "x"},
     {"comments": "x"}, {"order": "x"}, {"rules": "x"}, {"exclude": "nope"}, {"exclude": "clothes/nope"},
-    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"nope": 1},
+    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"gaze": "smile"}, {"nope": 1},
     {"arrangement": "{"}, {"arrangement": []}, {"arrangement": {"format": "x", "rows": [["a"]]}},
     {"arrangement": {"rows": [["a"]], "chunks": {}}},
     {"arrangement": {"rows": [["a"], ["a"]], "chunks": {"a": {"members": ["body"]}}}},
@@ -221,6 +224,12 @@ class ParityTest(unittest.TestCase):
             [js_palette] = self.run_js(path, [{"want": "palette"}])
             self.assertEqual(list(diff(core.palette(pack), js_palette)), [])
             self.assertTrue(js_palette["quick"]["framing"], "크롭 퀵 목록이 비었음")
+            self.assertTrue(js_palette["quick"]["gaze"], "시선 퀵 목록이 비었음")
+            pal = core.palette(pack)
+            selections = [[], ["looking back"], ["looking back", "looking at viewer"], ["facing away"], ["looking up", "sideways glance"]]
+            toggles = [{"want": "gaze_toggle", "selected": s, "tag": t} for s in selections for t in pal["quick"]["gaze"]]
+            self.assertEqual(self.run_js(path, toggles),
+                             [core.gaze_toggle(pal, c["selected"], c["tag"]) for c in toggles])
             self.compare_layouts(path, pack)
 
     def test_layout_with_identity_and_except(self):

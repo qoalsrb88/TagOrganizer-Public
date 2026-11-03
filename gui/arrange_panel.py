@@ -1,4 +1,4 @@
-"""미리보기 탭의 배열 세팅 패널 — 배열 고르기·저장, 크롭/시점 퀵 덮어쓰기, 청크 화면, 커스텀 청크·추정 규칙.
+"""미리보기 탭의 배열 세팅 패널 — 배열 고르기·저장, 크롭/시점/시선 퀵 덮어쓰기, 청크 화면, 커스텀 청크·추정 규칙.
 
 - 배열: 레이아웃 프리셋(기본·간단히), 공유 프리셋(data/arrangements, git 으로 배포), 내 배열(local/arrangements,
   이 PC 전용) 중에서 고른다. 저장은 언제나 내 배열로(공유 프리셋을 고쳐도) — 공유본은 "공유로 올리기"로만 쓴다.
@@ -7,6 +7,8 @@
 - 다른 PC·옛 분류 체계의 배열은 지금 없는 분류만 빼고 연다(빠진 칸의 태그는 '나머지' 줄로, 무엇을 뺐는지 알림).
 - 크롭/시점: 고르면 프롬프트의 크롭·시점 태그를 그 태그로 바꿔 미리보기에 바로 반영한다(organize 의 framing·view).
   "자동"은 프롬프트 그대로. 프롬프트에 있는 태그는 테두리로 표시한다.
+- 시선: 여러 개를 고른다(organize 의 gaze). 함께 쓸 수 없는 태그는 켜는 순간 꺼지고, 지금 크롭·시점과 맞지 않는 태그는
+  숨긴다(report 의 gaze_blocked). 숨겨도 선택은 남아 시점을 되돌리면 다시 든다.
 - 팩에 없는 토큰 추정(guess)은 켜고 끄는 미리보기 옵션이고, 추정 규칙(내 패턴)은 배열에 저장된다.
 되돌리기(Ctrl+Z, 청크 화면에서)는 이 패널의 기록이다 — 분류 편집의 되돌리기와 따로 간다.
 """
@@ -84,6 +86,8 @@ class FlowLayout(QLayout):
     def _place(self, rect, apply: bool) -> int:
         x, y, line_h = rect.x(), rect.y(), 0
         for item in self._items:
+            if item.isEmpty():          # 숨긴 칩은 자리를 차지하지 않는다
+                continue
             hint = item.sizeHint()
             if x > rect.x() and x + hint.width() > rect.right():
                 x, y, line_h = rect.x(), y + line_h + self.spacing(), 0
@@ -323,6 +327,7 @@ class ArrangementPanel(QWidget):
         self.settings = settings
         self.framing = ""
         self.view = ""
+        self.gaze = ""                          # 고른 시선 태그(쉼표로 여럿)
         self.source = "layout:default"          # layout:<id> / 파일 경로 / ""(가져왔고 아직 저장 안 함)
         self.undo_stack: List[str] = []
         self.redo_stack: List[str] = []
@@ -407,6 +412,7 @@ class ArrangementPanel(QWidget):
             holder = QWidget()
             holder.setLayout(flow)
             layout.addWidget(holder)
+        self._build_gaze(layout)
 
         opts = QHBoxLayout()
         self.sub_order_box = QCheckBox("청크 안은 서브 순서대로")
@@ -456,10 +462,36 @@ class ArrangementPanel(QWidget):
         self.warning.hide()
         self.canvas.set_model(self.model, self.config["taxonomy"])
 
+    def _build_gaze(self, layout) -> None:
+        """시선 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
+        tags = self.palette["quick"].get("gaze") or ()
+        if not tags:
+            return
+        flow = FlowLayout(spacing=theme.SPACE[0])
+        label = theme.caption("시선", "field")
+        label.setMinimumWidth(28)
+        flow.addWidget(label)
+        buttons = QButtonGroup(self)
+        buttons.setExclusive(False)
+        auto = _chip("자동", "", "프롬프트 그대로")
+        auto.setChecked(True)
+        buttons.addButton(auto)
+        flow.addWidget(auto)
+        for tag in tags:
+            what = "눈을 감거나 가렸을 때" if tag.startswith("facing") else "눈이 보일 때"
+            chip = _chip(tag, tag, f"프롬프트의 시선 태그를 고른 태그들로 바꿉니다({what}) — 여러 개 고를 수 있음")
+            buttons.addButton(chip)
+            flow.addWidget(chip)
+        buttons.buttonClicked.connect(lambda b: self._gaze_clicked(b.property("tag")))
+        self._chips["gaze"] = buttons
+        holder = QWidget()
+        holder.setLayout(flow)
+        layout.addWidget(holder)
+
     # ---- 바깥에서 ----
 
     def options(self) -> Dict[str, Any]:
-        return {"arrangement": self.model.to_json(), "framing": self.framing, "view": self.view,
+        return {"arrangement": self.model.to_json(), "framing": self.framing, "view": self.view, "gaze": self.gaze,
                 "guess": self.guess_box.isChecked()}
 
     def set_report(self, report: Mapping[str, Any]) -> None:
@@ -480,6 +512,10 @@ class ArrangementPanel(QWidget):
                 if b.property("present") != mark:
                     b.setProperty("present", mark)
                     theme.repolish(b)
+        if "gaze" in self._chips:
+            blocked = set(report.get("gaze_blocked", ()))
+            for b in self._chips["gaze"].buttons():
+                b.setVisible(b.property("tag") not in blocked)
 
     def custom_chunks(self) -> List[Tuple[str, str]]:
         return [(cid, self.canvas.chunk_label(cid)) for cid in self.model.custom_ids()]
@@ -494,17 +530,32 @@ class ArrangementPanel(QWidget):
         self.canvas.set_model(self.model, self.config["taxonomy"])
         self._update_state()
 
-    # ---- 크롭·시점·옵션 ----
+    # ---- 크롭·시점·시선·옵션 ----
 
     def _quick(self, group: str, tag: str) -> None:
         setattr(self, group, tag or "")
         self.changed.emit()
 
     def set_quick(self, group: str, tag: str) -> None:
+        if group == "gaze":
+            self._set_gaze(split_items(tag))
+            return
         for b in self._chips[group].buttons():
             if (b.property("tag") or "") == tag:
                 b.setChecked(True)
         self._quick(group, tag)
+
+    def _gaze_clicked(self, tag: str) -> None:
+        selected = split_items(self.gaze)
+        self._set_gaze(core.gaze_toggle(self.palette, selected, tag) if tag else [])
+
+    def _set_gaze(self, tags: Sequence[str]) -> None:
+        for b in self._chips["gaze"].buttons():
+            tag = b.property("tag")
+            on = tag in tags if tag else not tags
+            b.setChecked(on)
+            b.setText(("✓ " if on else "") + tag if tag else "자동")
+        self._quick("gaze", ", ".join(tags))
 
     def _sub_order(self, on: bool) -> None:
         if on != self.model.sub_order:

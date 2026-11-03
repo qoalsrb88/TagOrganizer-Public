@@ -3,7 +3,7 @@
 
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
 import { Model } from "../editor/model.js";
-import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
+import { arrangementFromLayout, gazeToggle, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadPack, loadSettings, putImported, saveBoxSetting } from "../engine/store.js";
 import { boxGroup, boxSettings, optionsFor, sameLines } from "../engine/text.js";
 
@@ -25,14 +25,15 @@ const FALLBACK_COLOR = "#7a7c99";
 const $ = (id) => document.getElementById(id);
 
 let pack = null;
-let quick = { framing: [], view: [] };
+let quick = { framing: [], view: [], gaze: [] };
+let gazePalette = { quick, gaze_conflicts: {} };
 let settings = null;
 let stored = {};
 let presets = [];
 let boxes = [];
 let activeId = null;
 let result = null;              // 지금 보이는 정렬 결과 {box, output, unchanged}
-const overrides = {};           // 묶음별 크롭·시점 덮어쓰기. 패널을 닫으면 사라진다(버튼 정렬에는 쓰지 않는다)
+const overrides = {};           // 묶음별 크롭·시점·시선 덮어쓰기. 패널을 닫으면 사라진다(버튼 정렬에는 쓰지 않는다)
 
 // 배열 편집: 편집 중인 배열은 입력창 묶음과 상관없이 하나다. 입력창을 옮겨 다니며 같은 배열로 미리 보고 적용한다.
 let editor = null;
@@ -69,22 +70,39 @@ function renderBoxButtons() {
   $("boxes").replaceChildren(...buttons);
 }
 
-function renderOverrides(box) {
+const quickChip = (label, pressed, onClick) => {
+  const chip = document.createElement("button");
+  chip.type = "button";
+  chip.textContent = label;
+  chip.setAttribute("aria-pressed", String(pressed));
+  chip.addEventListener("click", onClick);
+  return chip;
+};
+
+// 시선은 여러 개를 고른다. 지금 크롭·시점이 막는 태그는 숨기되 선택은 두어, 시점을 되돌리면 다시 든다.
+function renderGaze(group, blocked) {
+  const selected = (overrides[group]?.gaze || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const set = (tags) => {
+    overrides[group] = { ...overrides[group], gaze: tags.join(", ") };
+    render();
+  };
+  const chips = quick.gaze.filter((tag) => !blocked.includes(tag)).map((tag) =>
+    quickChip(tag, selected.includes(tag), () => set(gazeToggle(gazePalette, selected, tag))));
+  $("gaze").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
+  $("gaze").parentElement.hidden = !quick.gaze.length;
+}
+
+function renderOverrides(box, blocked = []) {
   const group = boxGroup(box.kind);
   $("overrides").hidden = group === "uc";
+  renderGaze(group, blocked);
   for (const name of OVERRIDES) {
     const current = overrides[group]?.[name] || "";
-    const chips = [["", "자동"], ...quick[name].map((tag) => [tag, tag])].map(([value, label]) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.textContent = label;
-      chip.setAttribute("aria-pressed", String(value === current));
-      chip.addEventListener("click", () => {
+    const chips = [["", "자동"], ...quick[name].map((tag) => [tag, tag])].map(([value, label]) =>
+      quickChip(label, value === current, () => {
         overrides[group] = { ...overrides[group], [name]: value };
         render();
-      });
-      return chip;
-    });
+      }));
     $(name).replaceChildren(...chips);
   }
 }
@@ -202,6 +220,7 @@ function render() {
   const ms = performance.now() - started;
   const unchanged = sameLines(box.text, sorted.text);
   result = { box, output: sorted.text, unchanged };
+  renderOverrides(box, sorted.report.gaze_blocked);
   renderChips(sorted.report);
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));
@@ -512,7 +531,8 @@ try {
   [settings, stored, presets] = await Promise.all([loadSettings(), loadBoxSettings(), listPresets()]);
   fillPresets();
   pack = await loadPack();
-  ({ quick } = palette(pack));
+  gazePalette = palette(pack);
+  ({ quick } = gazePalette);
   const saved = await chrome.storage.local.get([DRAFT_KEY, EDITING_KEY]);
   draft = saved[DRAFT_KEY] || null;     // 저장하지 않고 닫은 변경을 잇는다
   render();
