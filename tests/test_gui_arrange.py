@@ -394,12 +394,20 @@ class PreviewArrangeTests(unittest.TestCase):
         self.assertTrue(chips["looking back"].isHidden())
         self.assertFalse(chips["looking at viewer"].isHidden())
         self.assertTrue(chips["looking back"].isChecked())                     # 숨겨도 선택은 남는다
+        self.assertFalse(chips[""].isChecked())                                # looking at viewer 는 살아 있다
         self.assertNotIn("looking back", self.page.output.toPlainText())
         self.panel.set_quick("view", "from behind")
         self.page.run()
         self.assertFalse(chips["looking back"].isHidden())
         self.assertIn("looking back", self.page.output.toPlainText())
         self.assertIn("smile", self.page.output.toPlainText())
+        self.panel.set_quick("gaze", "looking back")
+        self.panel.set_quick("view", "straight-on")
+        self.page.run()
+        self.assertTrue(chips[""].isChecked())                                 # 고른 것이 모두 막히면 자동
+        self.panel.set_quick("view", "from behind")
+        self.page.run()
+        self.assertFalse(chips[""].isChecked())
         self.run_page("1girl, straight-on, looking back")                      # 프롬프트의 시점도 따른다
         self.panel.set_quick("view", "")
         self.page.run()

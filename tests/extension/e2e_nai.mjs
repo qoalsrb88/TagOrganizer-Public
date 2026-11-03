@@ -320,6 +320,7 @@ try {
   await clickInFrame(frame, "[...document.querySelectorAll('#view button')].find((b) => b.textContent === 'straight-on')");
   await sleep(100);
   check("시점이 막는 시선은 목록에서 사라짐", await inFrame(frame, `!${gazeChip("looking back")}`));
+  check("고른 시선이 모두 막히면 자동으로 보임", await pressed("자동"));
   check("막힌 시선은 프롬프트에 넣지 않음", !(await previewText(frame)).includes("looking back"));
   await clickInFrame(frame, "[...document.querySelectorAll('#view button')].find((b) => b.textContent === '자동')");
   await sleep(100);

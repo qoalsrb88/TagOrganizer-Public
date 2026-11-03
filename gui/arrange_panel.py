@@ -514,8 +514,12 @@ class ArrangementPanel(QWidget):
                     theme.repolish(b)
         if "gaze" in self._chips:
             blocked = set(report.get("gaze_blocked", ()))
+            active = set(split_items(self.gaze)) - blocked
             for b in self._chips["gaze"].buttons():
-                b.setVisible(b.property("tag") not in blocked)
+                tag = b.property("tag")
+                b.setVisible(tag not in blocked)
+                if not tag:
+                    b.setChecked(not active)            # 고른 것이 모두 막히면 프롬프트 그대로다
 
     def custom_chunks(self) -> List[Tuple[str, str]]:
         return [(cid, self.canvas.chunk_label(cid)) for cid in self.model.custom_ids()]

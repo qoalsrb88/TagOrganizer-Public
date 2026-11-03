@@ -88,7 +88,9 @@ function renderGaze(group, blocked) {
   };
   const chips = quick.gaze.filter((tag) => !blocked.includes(tag)).map((tag) =>
     quickChip(tag, selected.includes(tag), () => set(gazeToggle(gazePalette, selected, tag))));
-  $("gaze").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
+  // 고른 것이 모두 막히면 프롬프트 그대로이므로 자동으로 보인다
+  const auto = !selected.some((tag) => !blocked.includes(tag));
+  $("gaze").replaceChildren(quickChip("자동", auto, () => set([])), ...chips);
   $("gaze").parentElement.hidden = !quick.gaze.length;
 }
 
