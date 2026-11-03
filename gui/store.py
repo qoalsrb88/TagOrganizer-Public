@@ -25,8 +25,8 @@ from tools.tagdb import OVERLAY_FIELDS, SITE_FIELDS, SourceTag
 
 EXTRA_TYPE = -2         # 확장 DB 행(Entry.db 에 DB ID)
 TYPE_LABELS = {0: "일반", 1: "작가", 3: "작품", 4: "캐릭터", 5: "메타", -1: "원본에 없음", EXTRA_TYPE: "확장 DB"}
-EXTRA_LABELS = {"model": "모델 태그", "deprecated": "폐기 태그", "user": "내 태그"}
-EXTRA_SHORT = {"model": "모델", "deprecated": "폐기", "user": "내 태그"}      # 표의 좁은 종류 칸
+EXTRA_LABELS = {"model": "모델 태그", "deprecated": "폐기 태그", "community": "커뮤니티 태그", "user": "내 태그"}
+EXTRA_SHORT = {"model": "모델", "deprecated": "폐기", "community": "커뮤니티", "user": "내 태그"}      # 표의 좁은 종류 칸
 UNCLASSIFIED = "-"      # 분류 필터: overlay 에 분류가 없는 general(새 원본을 import 한 뒤 생긴다)
 AUTO = "auto"           # 상태: overlay 행이 없어 type 으로 자동 분류되는 태그(작가·작품·캐릭터·메타)
 MAX_EDIT = 500          # 한 번에 고칠 수 있는 태그 수(전체 선택으로 22만 개를 고치는 실수 방지)

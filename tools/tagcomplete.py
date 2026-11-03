@@ -23,7 +23,7 @@ import bmk_tag_organizer_core as core
 
 from .tagdb import Site, split_list
 
-DB_LABELS = {"model": "모델 태그", "deprecated": "폐기 태그", "user": "내 태그", "e621": "e621 태그"}
+DB_LABELS = {"model": "모델 태그", "deprecated": "폐기 태그", "community": "커뮤니티 태그", "user": "내 태그", "e621": "e621 태그"}
 CATEGORY = {"style/artist": 1, "series": 3, "subject/character": 4}     # 그 밖에 meta 는 5, 나머지 0
 
 

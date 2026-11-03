@@ -1,6 +1,6 @@
 # 확장 태그
 
-`model.csv`는 모델별 태그, `deprecated.csv`는 Danbooru의 폐기 태그, `user.csv`는 직접 추가한 태그를 보관합니다. 배포본의 `user.csv`에는 열 이름만 들어 있습니다.
+`model.csv`는 모델별 태그, `deprecated.csv`는 Danbooru의 폐기 태그, `community.csv`는 커뮤니티 프롬프트에서 자주 쓰는 문구, `user.csv`는 직접 추가한 태그를 보관합니다. 배포본의 `user.csv`에는 열 이름만 들어 있습니다.
 
 | 열 | 용도 |
 |---|---|
