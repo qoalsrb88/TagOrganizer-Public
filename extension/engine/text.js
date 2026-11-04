@@ -26,10 +26,13 @@ export function boxSettings(settings, stored, kind) {
   return { ...settings, preset: settings.default_preset, ...BOX_DEFAULTS[group], ...stored?.[group] };
 }
 
-// 줄바꿈 표기만 다른 글인지(입력창은 문단 사이를 빈 줄로 읽는다).
-export function sameLines(a, b) {
-  const lines = (text) => text.replace(/\s*\n\s*/g, "\n").trim();
-  return lines(a) === lines(b);
+// 입력창 글과 정렬 결과가 줄 구성까지 같은지. 입력창(문단 편집기)의 글은 문단 사이가 \n 두 개이고 빈 문단마다
+// \n 세 개가 더 붙는다. 결과 글은 \n 하나가 줄바꿈이고 하나 더 붙으면 빈 줄이다.
+export function sameLines(fieldText, output) {
+  const newlines = (run) => run.split("\n").length - 1;
+  const field = fieldText.replace(/\s*\n\s*/g, (run) => "\n".repeat(1 + Math.max(0, Math.floor((newlines(run) - 2) / 3)))).trim();
+  const result = output.replace(/\s*\n\s*/g, (run) => "\n".repeat(newlines(run))).trim();
+  return field === result;
 }
 
 // 구분 표기 없는 조각 하나는 정렬할 것이 없다(오른쪽 클릭이 단어를 잡는 경우도 있다). 이때는 입력창 전체를 정렬한다.

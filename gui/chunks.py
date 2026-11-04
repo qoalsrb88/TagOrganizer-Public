@@ -33,6 +33,7 @@ MH = 22            # 서브 알약 높이
 PAD = 10
 GAP = 6            # 청크 사이
 ROW_GAP = 12       # 줄 사이
+GAP_H = 20         # 빈 줄 표시 띠
 WRAP_GAP = 4       # 한 줄이 넘쳐 접힐 때
 WRAP_INDENT = 16
 MGAP = 4           # 서브 사이
@@ -68,6 +69,7 @@ class ChunkCanvas(QWidget):
         self.sel: Optional[Tuple[str, int]] = None
         self._boxes: List[_Box] = []
         self._bands: List[Tuple[float, float]] = []
+        self._gap_bands: Dict[int, QRectF] = {}
         self._press: Optional[Tuple[QPointF, Optional[_Box]]] = None
         self._drag: Optional[_Box] = None
         self._drop: Optional[tuple] = None
@@ -117,6 +119,12 @@ class ChunkCanvas(QWidget):
         label = core.chunk_label(self.model.chunks[cid], self.taxonomy) or cid
         return ("★ " + label) if self.model.is_custom(cid) else label
 
+    def _chip_label(self, cid: str) -> str:
+        """청크 칩에 쓰는 이름. 줄 중간 청크의 빈 줄은 띠로 그릴 수 없어 ↵ 로 표시한다."""
+        r, p = self.model.where(cid)
+        mid_gap = self.model.chunks[cid].get("gap_after") and p < len(self.model.rows[r]) - 1
+        return self.chunk_label(cid) + (" ↵" if mid_gap else "")
+
     def member_label(self, cid: str, member: str) -> str:
         label = core.selector_label(member, self.taxonomy)
         sel = core.Selector.parse(member)
@@ -146,7 +154,7 @@ class ChunkCanvas(QWidget):
             self._relayout()
 
     def _measure(self, cid: str, fm: QFontMetricsF, fms: QFontMetricsF, max_w: float):
-        label = self.chunk_label(cid)
+        label = self._chip_label(cid)
         count = self.counts.get(cid)
         badge = str(count[0]) if count else ""
         x = PAD + fm.horizontalAdvance(label)
@@ -173,6 +181,7 @@ class ChunkCanvas(QWidget):
     def _relayout(self) -> None:
         self._width = self.width()
         self._boxes, self._bands = [], []
+        self._gap_bands = {}
         if self.model is None:
             self.setMinimumHeight(0)
             return
@@ -190,8 +199,13 @@ class ChunkCanvas(QWidget):
                     self._boxes.append(_Box(cid, mi, rect.translated(x, y), ri, pi))
                 x += w + GAP
                 line_h = max(line_h, h)
-            self._bands.append((top, y + line_h))
-            y += line_h + ROW_GAP
+            y += line_h
+            if self.model.chunks[row[-1]].get("gap_after"):
+                y += WRAP_GAP
+                self._gap_bands[ri] = QRectF(GUTTER, y, right_edge - GUTTER, GAP_H)
+                y += GAP_H
+            self._bands.append((top, y))
+            y += ROW_GAP
         self.setMinimumHeight(int(y + H))                 # 맨 아래에 새 줄로 놓을 자리
 
     def sizeHint(self):
@@ -229,6 +243,9 @@ class ChunkCanvas(QWidget):
 
     def _row_target(self, pos: QPointF) -> tuple:
         for ri, (top, bottom) in enumerate(self._bands):
+            gap = self._gap_bands.get(ri)
+            if gap is not None and gap.top() <= pos.y() <= gap.bottom():
+                return ("row", ri, len(self.model.rows[ri]))
             if pos.y() < top + EDGE:
                 return ("newrow", ri)
             if pos.y() <= bottom - EDGE:
@@ -312,6 +329,10 @@ class ChunkCanvas(QWidget):
         p.setPen(QColor(t["muted"]))
         for ri, (top, _bottom) in enumerate(self._bands):
             p.drawText(QRectF(0, top, GUTTER - 8, H), Qt.AlignRight | Qt.AlignVCenter, str(ri + 1))
+        for rect in self._gap_bands.values():
+            p.setPen(QPen(QColor(t["muted"]), 1, Qt.DashLine))
+            p.drawLine(rect.topLeft(), rect.topRight())
+            p.drawText(rect, Qt.AlignCenter, "빈 줄")
         for b in self._boxes:
             faded = self._drag is not None and self._drag.cid == b.cid and self._drag.mi in (-1, b.mi)
             if b.mi < 0:
@@ -348,7 +369,7 @@ class ChunkCanvas(QWidget):
         p.setPen(pen)
         p.drawPath(path)
         fm = QFontMetricsF(self.font())
-        label = self.chunk_label(b.cid)
+        label = self._chip_label(b.cid)
         lw = fm.horizontalAdvance(label)
         label_rect = QRectF(rect.left() + PAD, rect.top(), lw + 2, H)
         p.setFont(self.font())
@@ -620,17 +641,27 @@ class ChunkCanvas(QWidget):
     # ---- 메뉴·도움말 ----
 
     def contextMenuEvent(self, event) -> None:
-        if self.model is None:
-            return
-        box = self._hit(QPointF(event.pos()))
+        if self.model is not None:
+            self._context_menu(QPointF(event.pos())).exec(event.globalPos())
+
+    def _context_menu(self, pos: QPointF) -> QMenu:
+        box = self._hit(pos)
         menu = QMenu(self)
         if box is None:
+            row = next((ri for ri, (top, bottom) in enumerate(self._bands) if top <= pos.y() <= bottom), None)
+            if row is not None:
+                cid = self.model.rows[row][-1]
+                gap = self._gap_bands.get(row)
+                label = ("빈 줄 빼기" if gap is not None and gap.contains(pos) else
+                         "이 줄 아래에 빈 줄 빼기" if self.model.chunks[cid].get("gap_after") else
+                         "이 줄 아래에 빈 줄 넣기")
+                menu.addAction(label, lambda: self._edit(self.model.toggle_gap_after, cid))
+                menu.addSeparator()
             menu.addAction("새 커스텀 청크…", self.new_custom.emit)
             menu.addSeparator()
             menu.addAction("모두 펼치기", lambda: self.set_all_expanded(True))
             menu.addAction("모두 접기", lambda: self.set_all_expanded(False))
-            menu.exec(event.globalPos())
-            return
+            return menu
         cid = box.cid
         others = [c for c in self.model.flat() if c != cid]
         if box.mi >= 0:
@@ -641,14 +672,18 @@ class ChunkCanvas(QWidget):
                 move.addAction(self.chunk_label(other),
                                lambda o=other: self._edit(self.model.move_member, cid, mi, o,
                                                           len(self.model.members(o))))
-            menu.exec(event.globalPos())
-            return
+            return menu
         spec = self.model.chunks[cid]
         if self.model.members(cid):
             menu.addAction("접기 (Space)" if cid in self.expanded else "펼치기 (Space)",
                            lambda: self.toggle_expanded(cid))
         menu.addAction("앞에서 줄바꿈 (Enter)", lambda: self._edit(self.model.break_before, cid))
         menu.addAction("뒤에서 줄바꿈 (Shift+Enter)", lambda: self._edit(self.model.break_after, cid))
+        menu.addAction("아래 빈 줄 빼기" if spec.get("gap_after") else "아래에 빈 줄 넣기",
+                       lambda: self._edit(self.model.toggle_gap_after, cid))
+        if self.model.flat()[0] != cid:
+            menu.addAction("위 빈 줄 빼기" if self.model.has_gap_before(cid) else "위에 빈 줄 넣기",
+                           lambda: self._edit(self.model.toggle_gap_before, cid))
         menu.addAction("앞 줄과 합치기 (Backspace)", lambda: self._edit(self.model.join_previous, cid))
         menu.addSeparator()
         menu.addAction("보이기" if spec.get("hidden") else "숨기기 — 이 청크의 태그를 뺌 (Delete)",
@@ -666,7 +701,7 @@ class ChunkCanvas(QWidget):
             menu.addAction("커스텀 청크 지우기", lambda: self._edit(self.model.delete_chunk, cid))
         menu.addSeparator()
         menu.addAction("새 커스텀 청크…", self.new_custom.emit)
-        menu.exec(event.globalPos())
+        return menu
 
     def _tooltip(self, event) -> None:
         box = self._hit(QPointF(event.pos()))

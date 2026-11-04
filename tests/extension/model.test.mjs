@@ -3,6 +3,51 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { Model, formatGuessRule, parseGuessRules } from "../../extension/editor/model.js";
+import { ArrangementEditor } from "../../extension/editor/editor.js";
+
+test("빈 줄 표시는 앞 청크에 저장하고 줄을 나눈다", () => {
+  const m = new Model({ rows: [["a", "b", "c"]], chunks: {
+    a: { members: ["body/hair"] }, b: { members: ["body/eyes"] }, c: { custom: true },
+  } });
+  assert.equal(m.toggleGapBefore("a"), false);
+  assert.equal(m.hasGapBefore("a"), false);
+  assert.equal(m.toggleGapBefore("b"), true);
+  assert.equal(m.hasGapBefore("b"), true);
+  assert.deepEqual(m.rows, [["a"], ["b", "c"]]);
+  assert.deepEqual(new Model(m.toJSON()).toJSON(), m.toJSON());
+  m.toggleGapAfter("a");
+  assert.equal(m.hasGapBefore("b"), false);
+  assert.deepEqual(m.rows, [["a"], ["b", "c"]]);
+  m.toggleGapAfter("a");
+  m.joinPrevious("b");
+  assert.equal(m.hasGapBefore("b"), false);
+  assert.deepEqual(m.rows, [["a", "b", "c"]]);
+  m.toggleGapAfter("b");
+  m.moveChunk("c", 0, 1);
+  assert.equal(m.hasGapBefore("b"), false);
+  assert.equal(m.chunks.get("b").gap_after, true);
+  m.mergeInto("b", "a");
+  assert.equal(m.hasGapBefore("c"), false);
+  m.toggleGapAfter("c");
+  m.deleteChunk("c");
+  assert.equal(m.chunks.has("c"), false);
+});
+
+test("빈 줄 띠에 놓으면 그 줄의 끝으로 옮긴다", () => {
+  const row = {
+    getBoundingClientRect: () => ({ top: 10, bottom: 60, height: 50 }),
+    querySelector: () => ({ getBoundingClientRect: () => ({ top: 40, bottom: 60 }) }),
+  };
+  const editor = {
+    drag: { src: { mi: -1 } }, model: { rows: [["a", "b"]] },
+    canvasEl: { querySelectorAll: () => [row] },
+    root: { getBoundingClientRect: () => ({ width: 400 }), offsetWidth: 400 },
+  };
+  for (const y of [40, 50, 60]) {
+    assert.deepEqual(ArrangementEditor.prototype.dropTarget.call(editor, 100, y), { kind: "row", row: 0, pos: 2 });
+  }
+  assert.deepEqual(ArrangementEditor.prototype.dropTarget.call(editor, 100, 64), { kind: "newrow", row: 1 });
+});
 
 test("추정 규칙 글을 읽고 쓴다", () => {
   const text = "holding * => action/holding\n\n# 메모\n* gloves => clothes/handwear | hands, feet | identity | rating=q\n";

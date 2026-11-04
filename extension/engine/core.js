@@ -1227,7 +1227,7 @@ const COLOR = /^#[0-9a-fA-F]{6}$/;
 const CHUNK_ID = new RegExp("^[\\p{L}\\p{N}_.\\-]+$", "u");
 
 function makeChunk(id, label, color, extra = {}) {
-  return { id, label, color, members: [], tags: new Set(), patterns: [], hidden: false, excepts: [], ...extra };
+  return { id, label, color, members: [], tags: new Set(), patterns: [], hidden: false, excepts: [], gap_after: false, ...extra };
 }
 
 function categoryMeta(taxonomy) {
@@ -1355,7 +1355,7 @@ function loadChunk(cid, spec, pack, errors) {
   if (color && !COLOR.test(color)) errors.push(`${where} color 는 #rrggbb 여야 합니다: ${color}`);
   const label = String(spec.label || "") || defaultLabel(members, pack.taxonomy) || cid;
   return makeChunk(cid, label, color || defaultColor(members, pack.taxonomy),
-    { members, tags, patterns, hidden: Boolean(spec.hidden) });
+    { members, tags, patterns, hidden: Boolean(spec.hidden), gap_after: Boolean(spec.gap_after) });
 }
 
 function layoutPlan(pack, name) {
@@ -1465,23 +1465,44 @@ function render(tokens, plan, opts, outDialect) {
   rows.push([[-1, plan.rest]]);
   const lines = [];
   const arranged = [];
+  const parts = [];
+  const chunks = [];
+  let textGap = false;
+  let structureGap = false;
+  const flush = () => {
+    if (parts.length) {
+      // 빈 줄 뒤에는 쉼표 없이 줄바꿈만 잇는다.
+      if (textGap && lines.length) lines.push(["", true]);
+      lines.push([join(parts, ", "), parts.at(-1)[1]]);
+      parts.length = 0;
+      textGap = false;
+    }
+    if (chunks.length) {
+      if (structureGap && arranged.length) arranged.push([]);
+      arranged.push([...chunks]);
+      chunks.length = 0;
+      structureGap = false;
+    }
+  };
   for (const row of rows) {
-    const parts = [];
-    const chunks = [];
     for (const [slot, c] of row) {
       const found = bySlot.get(slot);
-      if (!found || !found.length) continue;
-      const items = sortedChunk(found, plan, opts);
-      const kept = items.filter((t) => !t.removed);
-      if (kept.length) {
-        const text = join(kept.map((t) => [formatToken(t, opts, outDialect), t.kind === "natural"]), ", ");
-        parts.push([text, kept.at(-1).kind === "natural"]);
+      if (found?.length) {
+        const items = sortedChunk(found, plan, opts);
+        const kept = items.filter((t) => !t.removed);
+        if (kept.length) {
+          const text = join(kept.map((t) => [formatToken(t, opts, outDialect), t.kind === "natural"]), ", ");
+          parts.push([text, kept.at(-1).kind === "natural"]);
+        }
+        chunks.push({ id: c.id, label: c.label, color: c.color, hidden: c.hidden,
+          custom: Boolean(c.tags.size || c.patterns.length), tokens: items.map((t) => t.index) });
       }
-      chunks.push({ id: c.id, label: c.label, color: c.color, hidden: c.hidden,
-        custom: Boolean(c.tags.size || c.patterns.length), tokens: items.map((t) => t.index) });
+      if (c.gap_after && opts.line_per_section) {
+        flush();
+        textGap = structureGap = true;
+      }
     }
-    if (parts.length) lines.push([join(parts, ", "), parts.at(-1)[1]]);
-    if (chunks.length) arranged.push(chunks);
+    flush();
   }
   return [lines, arranged];
 }

@@ -144,11 +144,31 @@ class Model:
         self.rows[r:r + 1] = [self.rows[r][:p + 1], self.rows[r][p + 1:]]
         return True
 
+    def toggle_gap_after(self, cid: str) -> bool:
+        spec = self.chunks[cid]
+        if spec.get("gap_after"):
+            spec.pop("gap_after")
+        else:
+            spec["gap_after"] = True
+            self.break_after(cid)
+        return True
+
+    def toggle_gap_before(self, cid: str) -> bool:
+        flat = self.flat()
+        i = flat.index(cid)
+        return self.toggle_gap_after(flat[i - 1]) if i else False
+
+    def has_gap_before(self, cid: str) -> bool:
+        flat = self.flat()
+        i = flat.index(cid)
+        return bool(i and self.chunks[flat[i - 1]].get("gap_after"))
+
     def join_previous(self, cid: str) -> bool:
         """cid 의 줄을 앞 줄 끝에 붙인다(줄 맨 앞에서 Backspace)."""
         r, _ = self.where(cid)
         if r == 0:
             return False
+        self.chunks[self.rows[r - 1][-1]].pop("gap_after", None)
         self.rows[r - 1] += self.rows.pop(r)
         return True
 

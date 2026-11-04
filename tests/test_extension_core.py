@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import gzip
 import json
 import math
@@ -103,6 +104,10 @@ CUSTOM_ARRANGEMENT = {
     },
     "guess": [{"pattern": "my *", "primary": "object", "rating": "s", "identity": True}],
 }
+
+GAP_ARRANGEMENT = copy.deepcopy(CUSTOM_ARRANGEMENT)
+for _cid in ("mine", "count", "hair", "hidden", "rest"):
+    GAP_ARRANGEMENT["chunks"][_cid]["gap_after"] = True
 
 
 def literal_prompts() -> List[str]:
@@ -209,12 +214,15 @@ class ParityTest(unittest.TestCase):
         cases = [{"text": p, "options": o} for p in prompts for o in OPTIONS]
         random_prompts = fuzz_prompts(names, fuzz, seed=20261102)
         cases += [{"text": p, "options": OPTIONS[i % len(OPTIONS)]} for i, p in enumerate(random_prompts)]
-        arrangements = [CUSTOM_ARRANGEMENT] + shared_arrangements()
+        arrangements = [CUSTOM_ARRANGEMENT, GAP_ARRANGEMENT] + shared_arrangements()
         for arrangement in arrangements:
             for p in HANDWRITTEN + random_prompts[:40]:
                 cases.append({"text": p, "options": {"arrangement": arrangement, "guess": True}})
                 cases.append({"text": p, "options": {"arrangement": json.dumps(arrangement), "input_dialect": "auto",
                                                      "output_dialect": "nai", "order": "popular"}})
+                if arrangement is GAP_ARRANGEMENT:
+                    for opts in ({"line_per_section": False}, {"trailing_comma": False}, {"exclude": "body/hair"}):
+                        cases.append({"text": p, "options": {"arrangement": arrangement, **opts}})
         cases += [{"text": "1girl, smile", "options": o} for o in INVALID_OPTIONS]
         return cases
 
@@ -257,6 +265,27 @@ class ParityTest(unittest.TestCase):
             self.compare_layouts(path, pack)
         members = core.arrangement_from_layout(pack, "edge")["chunks"]["looks"]["members"]
         self.assertTrue(members and all(m.endswith("@identity") for m in members), members)
+
+    def test_gap_boundaries(self):
+        data, _ = fixtures.build()
+        chunks = {
+            "sentence": {"members": ["natural"], "gap_after": True},
+            "count": {"members": ["subject/count"], "gap_after": True},
+            "empty": {"custom": True, "gap_after": True},
+            "hair": {"members": ["body/hair"], "hidden": True, "gap_after": True},
+            "eyes": {"members": ["body/eyes"], "gap_after": True},
+        }
+        cases = []
+        for rows in ([list(chunks)], [[cid] for cid in chunks]):
+            arr = {"format": "tagorg-arrangement", "version": 1, "rows": rows, "chunks": chunks}
+            for text in ("She holds an umbrella. 1girl, long hair, blue eyes, smile",
+                         "1girl BREAK blue eyes BREAK 1boy, smile", "long hair", "", "blue eyes, smile"):
+                for opts in ({}, {"trailing_comma": False}, {"line_per_section": False}, {"exclude": "body/eyes"}):
+                    cases.append({"text": text, "options": {"arrangement": arr, **opts}})
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pack.json"
+            path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+            self.compare(path, core.TagPack(data), cases)
 
     def compare_layouts(self, pack_arg: Path, pack: core.TagPack) -> None:
         [js_layouts] = self.run_js(pack_arg, [{"want": "layouts"}])
@@ -304,6 +333,7 @@ def random_ops(data: Dict[str, Any], rng: random.Random, count: int) -> Iterable
                 ["move_chunk", cid, row, rng.randint(0, len(model.rows[row]))],
                 ["move_chunk_new_row", cid, rng.randint(0, len(model.rows))],
                 ["break_before", cid], ["break_after", cid], ["join_previous", cid],
+                ["toggle_gap_after", cid], ["toggle_gap_before", cid], ["has_gap_before", cid],
                 ["toggle_hidden", cid],
                 ["set_label", cid, rng.choice(["", "새 이름", "  여백  "])],
                 ["set_color", cid, rng.choice(["", "#112233"])],
@@ -341,7 +371,7 @@ class ModelParityTest(unittest.TestCase):
                 "chunks": {cid: {"members": [f"{main}/{cid}" for main in ("body", "clothes", "action", "object")]}
                            for cid in "abcdefgh"}}
         starts = [core.arrangement_from_layout(pack, lid) for lid in pack.layouts]
-        return starts + [CUSTOM_ARRANGEMENT, messy, wide, wide, {"rows": [], "chunks": {}}] + shared_arrangements()
+        return starts + [CUSTOM_ARRANGEMENT, GAP_ARRANGEMENT, messy, wide, wide, {"rows": [], "chunks": {}}] + shared_arrangements()
 
     def test_same_results(self):
         pack = fixtures.pack()
@@ -379,6 +409,7 @@ class ModelParityTest(unittest.TestCase):
                              js["selectors"])
             self.assertEqual(core.uncovered_slots(last, taxonomy), js["uncovered"])
         self.assertGreaterEqual(len(kinds), 15, kinds)
+        self.assertTrue({"toggle_gap_after", "toggle_gap_before", "has_gap_before"} <= kinds)
 
 
 class TextHelpersTest(unittest.TestCase):

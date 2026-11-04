@@ -196,6 +196,115 @@ class ArrangementTests(unittest.TestCase):
         self.assertTrue(r.report["tokens"][0]["removed"])
 
 
+class GapTests(unittest.TestCase):
+    def arr(self, rows=None, gaps=("hair",)):
+        chunks = {"count": {"members": ["subject/count"]}, "hair": {"members": ["body/hair"]},
+                  "eyes": {"members": ["body/eyes"]}}
+        for cid in gaps:
+            chunks[cid]["gap_after"] = True
+        return arrangement(rows or [["count"], ["hair"], ["eyes"]], chunks)
+
+    def row_ids(self, result, section=0):
+        return [[c["id"] for c in row] for row in result.report["arranged"][section]["rows"]]
+
+    def test_gap_after_populated_chunk(self):
+        r = run("1girl, long hair, blue eyes", arrangement=self.arr())
+        self.assertEqual(r.text, "1girl,\nlong hair,\n\nblue eyes")
+        self.assertEqual(self.row_ids(r), [["count"], ["hair"], [], ["eyes"]])
+
+    def test_empty_chunk_keeps_gap_between_output(self):
+        for rows in ([["count"], ["hair"], ["eyes"]], [["count", "hair", "eyes"]]):
+            with self.subTest(rows=rows):
+                r = run("1girl, blue eyes", arrangement=self.arr(rows))
+                self.assertEqual(r.text, "1girl,\n\nblue eyes")
+                self.assertEqual(self.row_ids(r), [["count"], [], ["eyes"]])
+
+    def test_hidden_and_removed_chunks_keep_gap(self):
+        for hidden in (False, True):
+            arr = self.arr()
+            arr["chunks"]["hair"]["hidden"] = hidden
+            opts = {} if hidden else {"exclude": "body/hair"}
+            with self.subTest(hidden=hidden):
+                r = run("1girl, long hair, blue eyes", arrangement=arr, **opts)
+                self.assertEqual(r.text, "1girl,\n\nblue eyes")
+                self.assertEqual(self.row_ids(r), [["count"], ["hair"], [], ["eyes"]])
+                self.assertTrue(r.report["tokens"][1]["removed"])
+                arr["chunks"]["count"]["gap_after"] = True
+                r = run("1girl, long hair, blue eyes", arrangement=arr, **opts)
+                self.assertEqual(r.text, "1girl,\n\nblue eyes")
+                self.assertEqual(self.row_ids(r), [["count"], [], ["hair"], [], ["eyes"]])
+
+    def test_no_leading_or_trailing_gap(self):
+        arr = self.arr(gaps=("count", "hair", "eyes"))
+        for text in ("", "1girl", "blue eyes", "long hair"):
+            with self.subTest(text=text):
+                r = run(text, arrangement=arr)
+                self.assertEqual(r.text, text)
+                self.assertNotIn([], self.row_ids(r))
+        arr["chunks"]["count"]["hidden"] = True
+        r = run("1girl, blue eyes", arrangement=arr)
+        self.assertEqual(r.text, "blue eyes")
+        self.assertEqual(self.row_ids(r), [["count"], [], ["eyes"]])
+        arr["chunks"]["count"]["hidden"] = False
+        arr["chunks"]["eyes"]["hidden"] = True
+        self.assertEqual(run("1girl, blue eyes", arrangement=arr).text, "1girl")
+
+    def test_overlapping_gaps_collapse(self):
+        r = run("1girl, blue eyes", arrangement=self.arr(gaps=("count", "hair")))
+        self.assertEqual(r.text, "1girl,\n\nblue eyes")
+        self.assertEqual(self.row_ids(r), [["count"], [], ["eyes"]])
+
+    def test_gap_splits_middle_of_row(self):
+        r = run("1girl, long hair, blue eyes", arrangement=self.arr([["count", "hair", "eyes"]]))
+        self.assertEqual(r.text, "1girl, long hair,\n\nblue eyes")
+        self.assertEqual(self.row_ids(r), [["count", "hair"], [], ["eyes"]])
+
+    def test_single_line_ignores_gap(self):
+        arr = self.arr([["count", "hair", "eyes"]])
+        plain = json.loads(json.dumps(arr))
+        for spec in plain["chunks"].values():
+            spec.pop("gap_after", None)
+        self.assertEqual(run("1girl, long hair, blue eyes, smile", arrangement=arr, line_per_section=False).report["arranged"],
+                         run("1girl, long hair, blue eyes, smile", arrangement=plain, line_per_section=False).report["arranged"])
+        r = run("1girl, long hair, blue eyes, smile", arrangement=arr, line_per_section=False)
+        self.assertEqual(r.text, "1girl, long hair, blue eyes, smile")
+
+    def test_gap_without_trailing_comma(self):
+        r = run("1girl, long hair, blue eyes", arrangement=self.arr(), trailing_comma=False)
+        self.assertEqual(r.text, "1girl\nlong hair\n\nblue eyes")
+
+    def test_sentence_before_gap_has_no_comma(self):
+        arr = arrangement([["sentence", "count"]], {
+            "sentence": {"members": ["natural"], "gap_after": True},
+            "count": {"members": ["subject/count"]}})
+        for comma in (False, True):
+            with self.subTest(comma=comma):
+                r = run("She holds an umbrella. 1girl", arrangement=arr, trailing_comma=comma)
+                self.assertEqual(r.text, "She holds an umbrella.\n\n1girl")
+        self.assertEqual(run("She holds an umbrella. 1girl", arrangement=arr, line_per_section=False).text,
+                         "She holds an umbrella. 1girl")
+
+    def test_break_sections_do_not_share_gap(self):
+        r = run("1girl BREAK blue eyes BREAK 1boy, blue eyes", arrangement=self.arr(gaps=("count", "hair")))
+        self.assertEqual(r.text, "1girl\nBREAK\nblue eyes\nBREAK\n1boy,\n\nblue eyes")
+        self.assertEqual(self.row_ids(r, 0), [["count"]])
+        self.assertEqual(self.row_ids(r, 1), [["eyes"]])
+        self.assertEqual(self.row_ids(r, 2), [["count"], [], ["eyes"]])
+
+    def test_gap_before_rest(self):
+        r = run("blue eyes, smile", arrangement=self.arr(gaps=("eyes",)))
+        self.assertEqual(r.text, "blue eyes,\n\nsmile")
+        self.assertEqual(self.row_ids(r), [["eyes"], [], ["rest"]])
+
+    def test_old_arrangement_without_gap_is_unchanged(self):
+        arr = self.arr([["count", "hair"], ["eyes"]], gaps=())
+        r = run("1girl, long hair, blue eyes", arrangement=arr)
+        self.assertEqual(r.text, "1girl, long hair,\nblue eyes")
+        self.assertEqual(self.row_ids(r), [["count", "hair"], ["eyes"]])
+        arr["chunks"]["hair"]["gap_after"] = False
+        self.assertEqual(run("1girl, long hair, blue eyes", arrangement=arr).text, r.text)
+
+
 class OverrideTests(unittest.TestCase):
     def test_framing_override_replaces_and_hides(self):
         r = run("1girl, full body, shoes, smile", framing="upper body")

@@ -46,7 +46,8 @@ arrangement_from_layout(). 결과의 report["arranged"] 는 줄 → 청크 → �
         칩 토글(gaze_toggle), palette 의 gaze_conflicts. 팩 스키마는 그대로 — 옛 팩에는 시선 퀵 목록과 blocks 가
         없어 덮어쓰기만 동작한다.
 - v1.7: 시점 덮어쓰기도 여러 태그(view), 칩 토글(view_toggle), palette 의 view_conflicts·view_lift, report 의
-        view_lifted. 부위 어휘에 front_hips·back_hips. 팩 스키마는 그대로 — 옛 팩에서는 이전과 같이 동작한다.
+        view_lifted. 부위 어휘에 front_hips·back_hips·back_legs, 규칙 게이트의 unless_any, 배열 청크의 gap_after(빈 줄).
+        팩 스키마는 그대로 — 옛 팩에서는 이전과 같이 동작한다.
 """
 
 from __future__ import annotations
@@ -1402,6 +1403,7 @@ class Chunk:
     patterns: List[Any] = field(default_factory=list)        # 커스텀: 와일드카드·정규식
     hidden: bool = False                                     # 이 청크의 태그를 뺀다(hidden:<id>)
     excepts: List[Selector] = field(default_factory=list)    # 레이아웃 섹션의 except
+    gap_after: bool = False                                  # 뒤 묶음 앞에 빈 줄
 
 
 @dataclass
@@ -1562,7 +1564,7 @@ def _load_chunk(cid: str, spec: Any, pack: TagPack, errors: List[str]) -> Chunk:
         errors.append(f"{where} color 는 #rrggbb 여야 합니다: {color}")
     label = str(spec.get("label", "") or "") or _default_label(members, pack.taxonomy) or cid
     return Chunk(cid, label, color or _default_color(members, pack.taxonomy), members, tags, patterns,
-                 bool(spec.get("hidden")))
+                 bool(spec.get("hidden")), gap_after=bool(spec.get("gap_after")))
 
 
 def _layout_plan(pack: TagPack, name: str) -> Plan:
@@ -1650,7 +1652,7 @@ def _join(parts: Sequence[Tuple[str, bool]], sep: str, after_sentence: str = " "
 def _render(tokens: List[Token], plan: Plan, opts: Options, out_dialect: str
             ) -> Tuple[List[Tuple[str, bool]], List[List[Dict[str, Any]]]]:
     """((출력 줄, 문장으로 끝나는지), 줄 → 청크 구조). 줄 안의 청크는 ', ' 로 잇고(문장 뒤는 빈칸) 빈 청크·빈 줄은
-    건너뛴다. 구조에는 뺀 토큰도 넣는다."""
+    건너뛴다. 구조에는 뺀 토큰도 넣는다. 빈 줄 표시는 다음 내용이 있을 때만 넣는다."""
     by_slot: Dict[int, List[Token]] = {}
     for t in tokens:
         by_slot.setdefault(t.slot, []).append(t)
@@ -1662,24 +1664,40 @@ def _render(tokens: List[Token], plan: Plan, opts: Options, out_dialect: str
     rows.append([(-1, plan.rest)])
     lines: List[Tuple[str, bool]] = []
     arranged: List[List[Dict[str, Any]]] = []
+    parts: List[Tuple[str, bool]] = []
+    chunks: List[Dict[str, Any]] = []
+    text_gap = structure_gap = False
+
+    def flush() -> None:
+        nonlocal text_gap, structure_gap
+        if parts:
+            if text_gap and lines:
+                lines.append(("", True))   # 빈 줄 뒤에는 쉼표 없이 줄바꿈만 잇는다
+            lines.append((_join(parts, ", "), parts[-1][1]))
+            parts.clear()
+            text_gap = False
+        if chunks:
+            if structure_gap and arranged:
+                arranged.append([])
+            arranged.append(list(chunks))
+            chunks.clear()
+            structure_gap = False
+
     for row in rows:
-        parts: List[Tuple[str, bool]] = []
-        chunks: List[Dict[str, Any]] = []
         for slot, c in row:
             items = by_slot.get(slot)
-            if not items:
-                continue
-            items = _sorted_chunk(items, plan, opts)
-            kept = [t for t in items if not t.removed]
-            if kept:
-                text = _join([(_format_token(t, opts, out_dialect), t.kind == "natural") for t in kept], ", ")
-                parts.append((text, kept[-1].kind == "natural"))
-            chunks.append({"id": c.id, "label": c.label, "color": c.color, "hidden": c.hidden,
-                           "custom": bool(c.tags or c.patterns), "tokens": [t.index for t in items]})
-        if parts:
-            lines.append((_join(parts, ", "), parts[-1][1]))
-        if chunks:
-            arranged.append(chunks)
+            if items:
+                items = _sorted_chunk(items, plan, opts)
+                kept = [t for t in items if not t.removed]
+                if kept:
+                    text = _join([(_format_token(t, opts, out_dialect), t.kind == "natural") for t in kept], ", ")
+                    parts.append((text, kept[-1].kind == "natural"))
+                chunks.append({"id": c.id, "label": c.label, "color": c.color, "hidden": c.hidden,
+                               "custom": bool(c.tags or c.patterns), "tokens": [t.index for t in items]})
+            if c.gap_after and opts.line_per_section:
+                flush()
+                text_gap = structure_gap = True
+        flush()
     return lines, arranged
 
 

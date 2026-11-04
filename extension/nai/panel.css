@@ -89,6 +89,7 @@ main { flex: 1; min-height: 0; padding: 8px 10px; overflow: auto; }
 #edit_toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 
 .line { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 5px; }
+.line:empty { min-height: 1em; }
 
 .token {
   padding: 0 6px;

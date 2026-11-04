@@ -259,9 +259,32 @@ export class Model {
     return true;
   }
 
+  toggleGapAfter(cid) {
+    const spec = this.chunks.get(cid);
+    if (spec.gap_after) delete spec.gap_after;
+    else {
+      spec.gap_after = true;
+      this.breakAfter(cid);
+    }
+    return true;
+  }
+
+  toggleGapBefore(cid) {
+    const flat = this.flat();
+    const i = flat.indexOf(cid);
+    return i > 0 ? this.toggleGapAfter(flat[i - 1]) : false;
+  }
+
+  hasGapBefore(cid) {
+    const flat = this.flat();
+    const i = flat.indexOf(cid);
+    return i > 0 && Boolean(this.chunks.get(flat[i - 1]).gap_after);
+  }
+
   joinPrevious(cid) {
     const [r] = this.where(cid);
     if (r === 0) return false;
+    delete this.chunks.get(this.rows[r - 1].at(-1)).gap_after;
     this.rows[r - 1].push(...this.rows.splice(r, 1)[0]);
     return true;
   }

@@ -79,6 +79,13 @@ test("입력창이 읽은 글과 결과가 줄바꿈 표기만 다르면 같다"
   assert.equal(sameLines("b, a", "a, b"), false);
 });
 
+test("입력창의 빈 문단은 결과의 빈 줄과 같고, 빈 줄이 다르면 다른 글이다", () => {
+  assert.equal(sameLines("a,\n\n\n\n\nb", "a,\n\nb"), true);
+  assert.equal(sameLines("a,\n\n\n\n\n\n\n\nb", "a,\n\n\nb"), true);
+  assert.equal(sameLines("a,\n\nb", "a,\n\nb"), false);
+  assert.equal(sameLines("a,\n\n\n\n\nb", "a,\nb"), false);
+});
+
 test("알림 글에 뺀 태그를 적는다", () => {
   const done = { kept: 3, removed: ["a", "b", "c", "d", "e", "f", "g"], unknown: ["x"], warnings: 1 };
   assert.equal(summary(done), "3개 정렬 · 7개 뺌(a, b, c, d, e, f 외 1개) · DB에 없음 1개 · 문법 경고 1개");

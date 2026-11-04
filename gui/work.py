@@ -175,7 +175,11 @@ def rich_html(report, show_removed: bool = True) -> str:
     for si, seg in enumerate(report.get("arranged", ())):
         if si:
             lines.append(f"<span style='color:{t['muted']}'>BREAK</span>")
+        gap = drawn = False
         for row in seg["rows"]:
+            if not row:                                  # 빈 줄 자리: 앞뒤에 그릴 줄이 있을 때만
+                gap = True
+                continue
             parts = []
             for chunk in row:
                 shown = [i for i in chunk["tokens"] if show_removed or not rows[i].get("removed")]
@@ -190,7 +194,10 @@ def rich_html(report, show_removed: bool = True) -> str:
                     bg = _blend(chunk.get("color") or t["muted"], t["surface"], alpha)
                     parts.append(f"<span style='background-color:{bg}'>&nbsp;{joined}&nbsp;</span>")
             if parts:
+                if gap and drawn:
+                    lines.append("")
                 lines.append(" ".join(parts))
+                gap, drawn = False, True
     return "<div style='line-height:165%'>" + "<br>".join(lines) + "</div>"
 
 

@@ -489,6 +489,19 @@ class WorkWindowTests(unittest.TestCase):
         page.run()
         self.assertNotIn("문법 자동", page.status.text())
 
+    def test_rich_html_gap_follows_shown_rows(self):
+        from fixtures import core, pack
+        from gui.work import rich_html
+        arr = {"rows": [["who"], ["hair"], ["eyes"]],
+               "chunks": {"who": {"members": ["subject/count"], "gap_after": True},
+                          "hair": {"members": ["body/hair"], "gap_after": True, "hidden": True},
+                          "eyes": {"members": ["body/eyes"]}}}
+        report = core.organize("1girl, long hair, blue eyes", pack(), {"arrangement": arr}).report
+        shown, hidden = rich_html(report, True), rich_html(report, False)
+        self.assertEqual(shown.count("<br><br>"), 2)
+        self.assertEqual(hidden.count("<br><br>"), 1)                          # 감춘 줄의 앞뒤 빈 줄이 겹치지 않는다
+        self.assertNotIn("<br><br><br>", hidden)
+
     def test_stats(self):
         page = self.win.stats_page
         page.refresh(force=True)

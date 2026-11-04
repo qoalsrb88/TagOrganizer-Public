@@ -21,6 +21,37 @@ def sample() -> Model:
 
 
 class ModelTests(unittest.TestCase):
+    def test_gap_toggle_split_join_and_round_trip(self):
+        m = sample()
+        m.join_previous("character")
+        self.assertFalse(m.toggle_gap_before("count"))
+        self.assertFalse(m.has_gap_before("count"))
+        self.assertTrue(m.toggle_gap_before("character"))
+        self.assertEqual(m.rows[:2], [["count"], ["character"]])
+        self.assertTrue(m.has_gap_before("character"))
+        self.assertEqual(Model(m.to_json()).to_json(), m.to_json())
+        self.assertTrue(m.toggle_gap_after("count"))
+        self.assertNotIn("gap_after", m.chunks["count"])
+        self.assertEqual(m.rows[:2], [["count"], ["character"]])
+        m.toggle_gap_after("count")
+        self.assertTrue(m.join_previous("character"))
+        self.assertNotIn("gap_after", m.chunks["count"])
+        self.assertEqual(m.rows[0], ["count", "character"])
+
+    def test_gap_moves_with_chunk_and_disappears_when_deleted(self):
+        m = sample()
+        m.toggle_gap_after("count")
+        m.move_chunk("style", 0, 1)
+        self.assertTrue(m.has_gap_before("style"))
+        self.assertFalse(m.has_gap_before("character"))
+        m.merge_into("count", "style")
+        self.assertFalse(m.has_gap_before("character"))
+        cid = m.add_custom("빈 묶음")
+        m.toggle_gap_after(cid)
+        self.assertTrue(m.chunks[cid]["gap_after"])
+        m.delete_chunk(cid)
+        self.assertNotIn(cid, m.chunks)
+
     def test_rows_move_break_join(self):
         m = sample()
         first = [r[0] for r in m.rows[:4]]
@@ -178,7 +209,7 @@ class ModelTests(unittest.TestCase):
 
 try:
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtCore import QPoint, QPointF, Qt
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication, QDialog, QInputDialog, QMessageBox
     HAVE_QT = True
@@ -215,6 +246,55 @@ class CanvasTests(unittest.TestCase):
     def center(self, cid, mi=-1):
         box = next(b for b in self.canvas._boxes if b.cid == cid and b.mi == mi)
         return box.rect.center().toPoint()
+
+    def context_menu(self, pos, choose=None):
+        actions = {a.text(): a for a in self.canvas._context_menu(QPointF(pos)).actions()}
+        if choose:
+            self.assertIn(choose, actions)
+            actions[choose].trigger()
+        return list(actions)
+
+    def test_gap_chunk_menus_and_before_first_chunk(self):
+        labels = self.context_menu(self.center("count"), "아래에 빈 줄 넣기")
+        self.assertNotIn("위에 빈 줄 넣기", labels)
+        self.assertIn("아래 빈 줄 빼기", self.context_menu(self.center("count")))
+        self.assertIn(0, self.canvas._gap_bands)
+        self.context_menu(self.center("character"), "위 빈 줄 빼기")
+        self.assertEqual(self.canvas._gap_bands, {})
+        self.context_menu(self.center("character"), "위에 빈 줄 넣기")
+        self.assertTrue(self.model.has_gap_before("character"))
+        self.assertEqual(len(self.changes), 3)
+
+    def test_gap_row_menu_band_and_drop_target(self):
+        y = self.center("count").y()
+        old_top = self.canvas._bands[1][0]
+        self.context_menu(QPoint(4, y), "이 줄 아래에 빈 줄 넣기")
+        band = self.canvas._gap_bands[0]
+        self.assertGreater(self.canvas._bands[1][0], old_top)
+        self.assertLessEqual(band.bottom(), self.canvas._bands[0][1])
+        for by in (band.top(), band.center().y(), band.bottom()):
+            self.assertEqual(self.canvas._row_target(QPointF(100, by)), ("row", 0, 1))
+        self.assertEqual(self.canvas._row_target(QPointF(self.center("character")))[:2], ("row", 1))
+        self.assertEqual(self.canvas._row_target(QPointF(100, self.canvas._bands[1][0] - 3)), ("newrow", 1))
+        self.assertIn("이 줄 아래에 빈 줄 빼기", self.context_menu(QPoint(650, y)))
+        self.context_menu(band.center().toPoint(), "빈 줄 빼기")
+        self.assertEqual(self.canvas._bands[1][0], old_top)
+        self.assertEqual(self.canvas._gap_bands, {})
+
+    def test_drag_onto_gap_keeps_same_row_and_marks_middle_chunk(self):
+        self.context_menu(self.center("count"), "아래에 빈 줄 넣기")
+        band = self.canvas._gap_bands[0]
+        self.drag(self.center("style"), band.center().toPoint())
+        self.assertEqual(self.model.rows[0], ["count", "style"])
+        self.assertTrue(self.canvas._chip_label("count").endswith("↵"))
+        self.assertFalse(self.canvas.chunk_label("count").endswith("↵"))       # 메뉴에 쓰는 이름에는 없다
+        self.assertNotIn(0, self.canvas._gap_bands)
+        self.canvas.resize(260, 400)
+        self.canvas.refresh()
+        self.context_menu(self.center("style"), "아래에 빈 줄 넣기")
+        band = self.canvas._gap_bands[0]
+        self.assertGreater(band.top(), max(b.rect.bottom() for b in self.canvas._boxes if b.row == 0))
+        self.assertEqual(self.canvas._row_target(band.center()), ("row", 0, 2))
 
     def test_keyboard_edits(self):
         self.canvas.setFocus()
