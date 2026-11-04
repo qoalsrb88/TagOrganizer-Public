@@ -5,6 +5,8 @@
 //   머리글을 못 찾으면 화면 구석에 띄운다(NovelAI 화면이 바뀌어도 쓸 수 있게). 오른쪽 클릭 메뉴는 따로 남는다.
 // - 보이는 입력창만 다룬다. 모바일 배치의 복제본(크기 0)과 탭 배치의 숨은 탭(visibility)은 포커스를 받지 못한다.
 // - 글 읽기·넣기는 page/field.js 가 하고, 정렬은 서비스 워커(버튼)나 패널 iframe(미리보기)이 한다.
+// - 패널을 왼쪽 칸 옆에 붙이면 그림 칸에 왼쪽 여백만 준다. 패널은 NovelAI 의 React 트리 밖에 있으므로, 화면 구조가 바뀌어
+//   칸을 못 찾아도 떠 있는 창으로 돌아갈 뿐 망가지지 않는다.
 (() => {
   if (globalThis.__tagorgNai) return;
   globalThis.__tagorgNai = true;
@@ -14,6 +16,11 @@
   const MENU_ID = "tagorg-nai-menu";
   const PANEL_ID = "tagorg-nai-panel";
   const PANEL_KEY = "nai_panel";
+  const DOCK_KEY = "nai_panel_dock";
+  const DOCK_WIDTH = 440;
+  const DOCK_MIN = 360;
+  const DOCK_FOLDED = 96;
+  const STAGE_MIN = 320;       // 붙였을 때 그림 칸에 남길 폭. 이만큼 남지 않으면 떠 있는 창으로 돌아간다
   const PORT_NAME = "nai-panel";
   const IMAGE_PATH = "/image";
   const COMPACT_BELOW = 460;   // 머리글이 이보다 좁으면 글자를 빼서 탭이 다음 줄로 밀리지 않게 한다
@@ -58,6 +65,12 @@
     iframe { flex: 1; width: 100%; min-height: 0; border: 0; background: #101124; }
     .grip { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize; touch-action: none; background: linear-gradient(135deg, transparent 50%, #5a5c80 50%); border-bottom-right-radius: 8px; }
     :host(.collapsed) iframe, :host(.collapsed) .grip { display: none; }
+    button[hidden] { display: none; }
+    :host(.docked) .box { border-width: 0 1px 0 0; border-radius: 0; box-shadow: none; }
+    :host(.docked) .title { cursor: default; }
+    :host(.docked) .grip { top: 0; bottom: 0; width: 6px; height: auto; cursor: ew-resize; background: transparent; border-radius: 0; }
+    :host(.docked) .grip:hover { background: #5a5c80; }
+    :host(.docked.collapsed) .title span, :host(.docked.collapsed) .dock { display: none; }
   `;
 
   const sheet = (css) => {
@@ -324,6 +337,13 @@
   let panelPort = null;
   let panelRect = null;
   let rectBeforeEdit = null;     // 배열 편집으로 늘리기 전 크기. 손으로 바꾸면 그 크기를 그대로 쓴다
+  let dock = { on: false, width: DOCK_WIDTH };
+  let pushed = null;             // 왼쪽 여백을 준 그림 칸
+  let watchedSide = null;
+  const sideSize = new ResizeObserver(() => {
+    const panel = document.getElementById(PANEL_ID);
+    if (panel) placePanel(panel);
+  });
 
   // 배열 편집을 켜면 늘리고, 끄면 돌려놓는다(저장하지 않는다).
   function fitPanel(editing) {
@@ -354,7 +374,66 @@
       top: Math.max(PANEL_MARGIN, Math.min(rect.top, innerHeight - height - PANEL_MARGIN)) };
   }
 
+  // 왼쪽 칸과 그림 칸. 그림 칸은 왼쪽 칸과 같은 줄에 놓인 자식까지 올라가 찾는다(여백을 줄 곳).
+  function dockTarget() {
+    const side = [...document.querySelectorAll(".image-gen-panel-sidebar")].find(shown);
+    let results = [...document.querySelectorAll(".image-gen-results-stage")].find(shown);
+    if (!side || !results) return null;
+    while (results.parentElement && !results.parentElement.contains(side)) results = results.parentElement;
+    return results.parentElement && !results.contains(side) ? { side, results } : null;
+  }
+
+  function dockRect(wanted = dock.on) {
+    if (!wanted) return null;
+    const target = dockTarget();
+    if (!target) return null;
+    const room = target.results.getBoundingClientRect().width + (parseFloat(target.results.style.marginLeft) || 0);
+    const width = Math.min(Math.max(dock.width, DOCK_MIN), room - STAGE_MIN);
+    if (width < DOCK_MIN) return null;
+    const side = target.side.getBoundingClientRect();
+    return { ...target, left: side.right, top: side.top, height: side.height, width };
+  }
+
+  function pushResults(results, width) {
+    let changed = false;
+    if (pushed && pushed !== results) {
+      pushed.style.marginLeft = "";
+      changed = true;
+    }
+    pushed = width ? results : null;
+    const value = width ? `${width}px` : "";
+    if (results && results.style.marginLeft !== value) {
+      results.style.marginLeft = value;
+      changed = true;
+    }
+    if (changed) dispatchEvent(new Event("resize"));     // NovelAI 가 그림 크기를 새 폭으로 다시 재게 한다
+  }
+
+  function watchSide(side) {
+    if (side === watchedSide) return;
+    sideSize.disconnect();
+    watchedSide = side;
+    if (side) sideSize.observe(side);
+  }
+
   function placePanel(host) {
+    const collapsed = host.classList.contains("collapsed");
+    const docked = dockRect();
+    host.classList.toggle("docked", Boolean(docked));
+    const button = host.shadowRoot.querySelector(".dock");
+    button.textContent = docked ? "띄우기" : "붙이기";
+    button.title = docked ? "떠 있는 창으로 돌아갑니다" : "왼쪽 칸 옆에 붙여 그림을 가리지 않게 합니다";
+    button.hidden = !docked && !dockRect(true);
+    watchSide(docked?.side ?? null);
+    if (docked) {
+      host.style.left = `${docked.left}px`;
+      host.style.top = `${docked.top}px`;
+      host.style.width = `${collapsed ? DOCK_FOLDED : docked.width}px`;
+      host.style.height = collapsed ? `${TITLE_HEIGHT + 2}px` : `${docked.height}px`;
+      pushResults(docked.results, collapsed ? 0 : docked.width);
+      return;
+    }
+    pushResults(null, 0);
     const rect = clampRect(panelRect);
     host.style.left = `${rect.left}px`;
     host.style.top = `${rect.top}px`;
@@ -365,17 +444,23 @@
   // 끌기: iframe 이 포인터를 가로채지 않게 끄는 동안만 막는다.
   function dragWith(handle, frame, onMove) {
     handle.addEventListener("pointerdown", (start) => {
-      if (start.target.closest?.("button")) return;
+      const host = handle.getRootNode().host;
+      if (start.target.closest?.("button") || (handle.classList.contains("title") && host.classList.contains("docked"))) return;
       start.preventDefault();
       handle.setPointerCapture(start.pointerId);
       frame.style.pointerEvents = "none";
-      const from = { ...panelRect };
+      const from = { ...panelRect, docked: host.getBoundingClientRect().width };
       const move = (event) => onMove(from, event.clientX - start.clientX, event.clientY - start.clientY);
       const up = () => {
         handle.removeEventListener("pointermove", move);
         handle.removeEventListener("pointerup", up);
         handle.removeEventListener("pointercancel", up);
         frame.style.pointerEvents = "";
+        if (host.classList.contains("docked")) {
+          dock = { ...dock, width: Math.round(host.getBoundingClientRect().width) };
+          if (alive()) chrome.storage.local.set({ [DOCK_KEY]: dock });
+          return;
+        }
         panelRect = clampRect(panelRect);
         rectBeforeEdit = null;
         if (alive()) chrome.storage.local.set({ [PANEL_KEY]: panelRect });
@@ -394,22 +479,33 @@
     const existing = document.getElementById(PANEL_ID);
     if (existing) {
       existing.classList.remove("collapsed");
+      existing.shadowRoot.querySelector(".fold").textContent = "접기";
       placePanel(existing);
       return;
     }
-    panelRect = (await chrome.storage.local.get(PANEL_KEY))[PANEL_KEY] || defaultPanelRect();
+    const saved = await chrome.storage.local.get([PANEL_KEY, DOCK_KEY]);
+    panelRect = saved[PANEL_KEY] || defaultPanelRect();
+    dock = { on: false, width: DOCK_WIDTH, ...saved[DOCK_KEY] };
     rectBeforeEdit = null;
     if (document.getElementById(PANEL_ID)) return;
     const host = make("div", { id: PANEL_ID });
     const root = host.attachShadow({ mode: "open" });
     root.adoptedStyleSheets = [sheet(PANEL_CSS)];
+    const dockButton = make("button", { className: "dock", type: "button", textContent: "붙이기" });
     const fold = make("button", { className: "fold", type: "button", textContent: "접기" });
     const close = make("button", { className: "close", type: "button", textContent: "닫기" });
-    const title = make("div", { className: "title" }, make("span", { textContent: "TagOrganize" }), fold, close);
+    const title = make("div", { className: "title" }, make("span", { textContent: "TagOrganize" }), dockButton, fold, close);
     const frame = make("iframe", { title: "TagOrganize 미리보기", src: chrome.runtime.getURL("nai/panel.html") });
     frame.allow = "clipboard-write";
     const grip = make("div", { className: "grip" });
     root.append(make("div", { className: "box" }, title, frame, grip));
+    dockButton.addEventListener("click", () => {
+      dock = { ...dock, on: !host.classList.contains("docked") };
+      host.classList.remove("collapsed");
+      fold.textContent = "접기";
+      placePanel(host);
+      if (alive()) chrome.storage.local.set({ [DOCK_KEY]: dock });
+    });
     fold.addEventListener("click", () => {
       fold.textContent = host.classList.toggle("collapsed") ? "펼치기" : "접기";
       placePanel(host);
@@ -420,7 +516,8 @@
       placePanel(host);
     });
     dragWith(grip, frame, (from, dx, dy) => {
-      panelRect = { ...from, width: from.width + dx, height: from.height + dy };
+      if (host.classList.contains("docked")) dock = { ...dock, width: from.docked + dx };
+      else panelRect = { ...from, width: from.width + dx, height: from.height + dy };
       placePanel(host);
     });
     placePanel(host);
@@ -429,6 +526,8 @@
 
   function closePanel() {
     document.getElementById(PANEL_ID)?.remove();
+    pushResults(null, 0);
+    watchSide(null);
   }
 
   addEventListener("resize", () => {
@@ -546,6 +645,8 @@
       if (!onImagePage) closePanel();
       const list = onImagePage ? boxes() : [];
       mount(list);
+      const panel = document.getElementById(PANEL_ID);
+      if (panel && dock.on) placePanel(panel);    // NovelAI 가 칸을 다시 만들면 여백도 다시 준다
       if (panelPort) {
         watchTexts(list);
         pushBoxes(list);
