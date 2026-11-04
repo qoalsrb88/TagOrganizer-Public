@@ -75,13 +75,12 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .chips button { padding: 0 8px; border-radius: 10px; font-size: 12px; }
 .chips.multi button[aria-pressed="true"]:not(:first-child)::before { content: "✓ "; }
 
-#master { padding: 6px 10px; border-bottom: 1px solid var(--line); min-height: 0; max-height: 36%; overflow: auto; flex: 0 0 auto; }
-#master[hidden], #master_body[hidden], #master_import[hidden], #master_warning[hidden] { display: none; }
-.master-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
-#master_import { font-size: 12px; }
-#master_text { display: block; width: 100%; height: 64px; min-height: 48px; max-height: min(160px, 24vh); margin-top: 6px; padding: 6px 8px; resize: vertical; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--field); color: var(--fg); font: 12px/1.5 Consolas, monospace; }
+#master[hidden], #master_body[hidden], #master_warning[hidden], #show_master[hidden], #show_text[hidden], #generate[hidden] { display: none; }
+#master_body { display: flex; flex-direction: column; gap: 6px; height: 100%; }
+#master_import { flex: 0 0 auto; align-self: flex-start; font-size: 12px; }
+#master_text { flex: 1 1 auto; display: block; width: 100%; min-height: 64px; padding: 6px 8px; resize: none; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--field); color: var(--fg); font: 12px/1.5 Consolas, monospace; }
 #master_text:focus-visible, #master_on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-#master_warning { margin-top: 4px; color: var(--warn); font-size: 12px; overflow-wrap: anywhere; }
+#master_warning { padding: 4px 10px; color: var(--warn); font-size: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 
 #state { padding: 4px 10px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 #state.warn { color: var(--warn); }
@@ -139,5 +138,6 @@ footer {
   border-top: 1px solid var(--line);
 }
 
+footer button { flex: 0 0 auto; white-space: nowrap; }
 #notice { flex: 1; min-width: 0; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 #notice.warn { color: var(--warn); }

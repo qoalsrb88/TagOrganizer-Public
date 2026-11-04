@@ -487,6 +487,7 @@ try {
   const masterText = () => inFrame(frame, "document.getElementById('master_text').value");
   const viewChip = (tag) => `[...document.querySelectorAll('#view button')].find((b) => b.textContent === ${JSON.stringify(tag)})`;
   const writeMaster = async (text) => {
+    await clickInFrame(frame, "document.getElementById('show_master')");
     await clickInFrame(frame, "document.getElementById('master_text')");
     await key("a", "KeyA", 65, { modifiers: 2, command: "selectAll" });
     if (text) await send("Input.insertText", { text }, page);
@@ -501,9 +502,14 @@ try {
   };
   await type(0, masterPrompt);
   frame = await openEditor();
-  check("원본을 켜기 전에는 토글만 보임", await inFrame(frame, "!document.getElementById('master').hidden && document.getElementById('master_body').hidden && document.getElementById('master_import').hidden"));
+  check("원본을 켜기 전에는 토글만 보임", await inFrame(frame, "!document.getElementById('master').hidden && document.getElementById('master_body').hidden && document.getElementById('show_master').hidden"));
   await clickInFrame(frame, "document.getElementById('master_on')");
   check("처음 켜면 입력창으로 원본을 채움", (await masterText()) === masterPrompt);
+  check("켜면 원본 탭이 생기고 칸은 탭 안에 있음", await inFrame(frame, "!document.getElementById('show_master').hidden && document.getElementById('master_body').hidden && !document.getElementById('chips').hidden"));
+  await clickInFrame(frame, "document.getElementById('show_master')");
+  check("원본 탭은 미리보기 자리를 쓰고 가져오기가 보임", await inFrame(frame, "!document.getElementById('master_body').hidden && document.getElementById('chips').hidden && !document.getElementById('master_import').hidden && document.getElementById('master_text').getBoundingClientRect().height > 100"));
+  await screenshot("nai_master_tab.png");
+  await clickInFrame(frame, "document.getElementById('show_chips')");
   await clickInFrame(frame, viewChip("straight-on"));
   preview = await applyMaster();
   check("원본 적용: 결과에서만 시선이 빠짐", !preview.includes("looking back") && (await masterText()) === masterPrompt, preview);
@@ -524,6 +530,8 @@ try {
   await type(0, "1girl, red hair");
   await waitFor(() => inFrame(frame, "!document.getElementById('master_warning').hidden"), "직접 수정 경고");
   check("직접 수정은 경고하되 적용을 막지 않음", await inFrame(frame, "!document.getElementById('apply').disabled") && (await previewText(frame)) === masterOutput);
+  await clickInFrame(frame, "document.getElementById('show_master')");
+  check("직접 수정 경고는 원본 탭에서도 보임", await inFrame(frame, "!document.getElementById('master_warning').hidden"));
   await clickInFrame(frame, "document.getElementById('master_import')");
   check("가져오기 첫 클릭은 원본을 지킴", (await masterText()) === masterPrompt && (await inFrame(frame, "document.getElementById('notice').textContent")).includes("한 번 더"));
   await type(0, "1girl, green hair");
@@ -532,6 +540,7 @@ try {
   await clickInFrame(frame, "document.getElementById('master_import')");
   check("가져오기 두 번째 클릭으로 원본 교체", (await masterText()) === "1girl, green hair" && (await previewText(frame)).includes("green hair"));
   check("가져온 뒤에는 경고 없음", await inFrame(frame, "document.getElementById('master_warning').hidden"));
+  await clickInFrame(frame, "document.getElementById('show_chips')");
   // 다른 탭의 패널이 저장한 입력창은 이 패널의 저장이 덮지 않는다
   await evaluate(sw, "chrome.storage.local.get('nai_masters').then((x) => chrome.storage.local.set({ nai_masters: { ...x.nai_masters, 'base-prompt': { on: true, group: 'prompt', text: 'other tab', lastApplied: '' } } }))");
   await sleep(150);
@@ -547,8 +556,11 @@ try {
   const editedMaster = `${masterPrompt}, pink hair`;
   await writeMaster(editedMaster);
   await waitFor(async () => (await stored("nai_masters"))?.prompt?.text === editedMaster, "원본 입력 저장");
+  check("배열 편집 중에도 원본 탭으로 고칠 수 있음", await inFrame(frame, "document.getElementById('editor').hidden && !document.getElementById('preview').hidden && !document.getElementById('master_body').hidden && document.getElementById('show_text').hidden") && (await boxText(0)).trim() === "1girl, green hair");
+  await clickInFrame(frame, "document.getElementById('show_chips')");
+  check("배열 탭으로 돌아오면 청크 화면", await inFrame(frame, "!document.getElementById('editor').hidden && document.getElementById('preview').hidden && document.getElementById('show_chips').textContent === '배열'"));
   await waitFor(() => inFrame(frame, "[...document.querySelectorAll('.bmk-to-tok')].some((t) => t.textContent === 'pink hair')"), "원본으로 배열 미리보기");
-  check("배열 편집 중에도 원본을 고칠 수 있음", await inFrame(frame, "document.getElementById('views').hidden && document.getElementById('preview').hidden && !document.getElementById('master_body').hidden") && (await boxText(0)).trim() === "1girl, green hair");
+  await clickInFrame(frame, "document.getElementById('show_master')");
   const masterRect = await panelBox();
   const masterGrip = await ev(`(() => { const r = ${PANEL}.querySelector('.grip').getBoundingClientRect(); return [r.x + 7, r.y + 7]; })()`);
   await drag(masterGrip, [masterGrip[0] + 420 - masterRect.width, masterGrip[1]]);
@@ -557,6 +569,7 @@ try {
   check("빈 원본은 입력창으로 대체하지 않고 안내", await inFrame(frame, "document.getElementById('apply').disabled && !document.getElementById('state').hidden && document.getElementById('state').textContent.includes('원본 프롬프트가 비어')"));
   await writeMaster(editedMaster);
   await clickInFrame(frame, "document.getElementById('master_on')");
+  check("끄면 원본 탭이 사라지고 청크 화면으로", await inFrame(frame, "document.getElementById('show_master').hidden && document.getElementById('views').hidden && !document.getElementById('editor').hidden"));
   check("끄면 입력창을 쓰고 원본은 남김", (await previewText(frame)).includes("green hair") && (await masterText()) === editedMaster);
   await clickInFrame(frame, "document.getElementById('master_on')");
   check("다시 켜면 보관한 원본을 씀", (await masterText()) === editedMaster && (await previewText(frame)).includes("pink hair"));
@@ -568,6 +581,83 @@ try {
   check("꺼진 원본은 보관하고 칩은 잊음", (await masterText()) === editedMaster && await inFrame(frame, `!document.getElementById('master_on').checked && ${viewChip("자동")}.getAttribute('aria-pressed') === 'true'`));
   await closePanel();
   await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");
+
+  // 적용 후 생성: NovelAI 의 Generate 를 한 번 누른다. 시험에서는 눌림만 세고 NovelAI 로 넘기지 않는다(생성 요청 없음)
+  await ev(`document.addEventListener('click', (e) => {
+    if (!e.target.closest?.('.image-gen-generate-button')) return;
+    window.__tagorgGenerate = (window.__tagorgGenerate || 0) + 1;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }, true)`);
+  const genPressed = async () => (await ev("window.__tagorgGenerate")) || 0;
+  const NAI_GENERATE = "[...document.querySelectorAll('.image-gen-generate-button')].find((b) => b.getBoundingClientRect().width > 0)";
+  const genButton = "document.getElementById('generate')";
+  const generateText = () => inFrame(frame, `${genButton}.textContent`);
+  const genNotice = () => inFrame(frame, "document.getElementById('notice').textContent");
+  await type(0, WORD_PROMPT);
+  frame = await openEditor();
+  const genPlanned = await previewText(frame);
+  check("적용할 것이 있으면 비용과 함께 적용 후 생성", /^적용 후 생성 · \d+$/.test(await generateText()), await generateText());
+  await screenshot("nai_generate.png");
+  await clickInFrame(frame, genButton);
+  await waitFor(async () => (await genPressed()) === 1, "Generate 눌림");
+  check("입력창에 결과를 넣고 Generate 를 한 번 누름", squeeze(await boxText(0)) === squeeze(genPlanned) && (await genPressed()) === 1, { box: await boxText(0), genPlanned });
+  check("누른 뒤에는 잠김", await inFrame(frame, `${genButton}.disabled`) && (await generateText()) === "생성 중…", await generateText());
+  await clickInFrame(frame, genButton);
+  await sleep(100);
+  check("잠긴 동안 다시 눌러도 그대로", (await genPressed()) === 1, await genPressed());
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "잠금 풀림", 4000);
+  check("넣을 것이 없으면 생성", /^생성 · \d+$/.test(await generateText()), await generateText());
+  await clickInFrame(frame, genButton);
+  await waitFor(async () => (await genPressed()) === 2, "두 번째 Generate 눌림");
+  check("이미 넣었으면 글을 건드리지 않고 누름", squeeze(await boxText(0)) === squeeze(genPlanned) && (await genNotice()).includes("생성을 눌렀습니다"), await genNotice());
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "잠금 풀림", 4000);
+  await ev(`${NAI_GENERATE}.disabled = true`);
+  await waitFor(() => inFrame(frame, `${genButton}.disabled`), "NovelAI 버튼을 따라 꺼짐", 3000);
+  check("NovelAI 버튼이 꺼지면 함께 꺼짐", await inFrame(frame, `${genButton}.disabled`));
+  await ev("[...document.querySelectorAll('.image-gen-generate-button')].forEach((b) => { b.disabled = false; })");
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "NovelAI 버튼을 따라 켜짐", 3000);
+  await ev(`(() => { const b = ${NAI_GENERATE}; b.dataset.tagorgGenerate = '1'; b.classList.remove('image-gen-generate-button'); })()`);
+  await waitFor(() => inFrame(frame, `${genButton}.hidden`), "NovelAI 버튼을 못 찾으면 숨김", 3000);
+  check("NovelAI 버튼을 못 찾으면 숨기고 적용이 주 버튼", await inFrame(frame, `${genButton}.hidden && document.getElementById('apply').classList.contains('primary')`));
+  await ev("document.querySelector('[data-tagorg-generate]').classList.add('image-gen-generate-button')");
+  await waitFor(() => inFrame(frame, `!${genButton}.hidden`), "NovelAI 버튼을 다시 찾음", 3000);
+  await undo();
+  // 원본: 직접 고친 입력창은 생성하지 않고, 원본을 켠 다른 입력창도 함께 넣는다
+  await clickInFrame(frame, "document.getElementById('master_on')");
+  await clickInFrame(frame, viewChip("straight-on"));
+  const genMasterPlanned = await previewText(frame);
+  let genCount = await genPressed();
+  await clickInFrame(frame, genButton);
+  await waitFor(async () => (await genPressed()) === genCount + 1, "원본 결과로 Generate 눌림");
+  check("원본 결과를 넣고 누름", squeeze(await boxText(0)) === squeeze(genMasterPlanned));
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "잠금 풀림", 4000);
+  await type(0, "1girl, red hair");
+  await waitFor(() => inFrame(frame, "!document.getElementById('master_warning').hidden"), "직접 수정 경고");
+  genCount = await genPressed();
+  await clickInFrame(frame, genButton);
+  await sleep(200);
+  check("직접 고친 입력창은 생성하지 않고 알림", (await genPressed()) === genCount && (await genNotice()).includes("직접 고쳤습니다") && (await boxText(0)).trim() === "1girl, red hair", await genNotice());
+  await type(0, "");
+  await type(1, "lowres, upper body, masterpiece");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로", 3000);
+  check("UC 를 고른 채로도 원본이 켜진 입력창을 함께 넣을 계획", /^적용 후 생성/.test(await generateText()), await generateText());
+  await clickInFrame(frame, genButton);
+  await waitFor(async () => (await genPressed()) === genCount + 1, "UC 에서 Generate 눌림");
+  check("원본이 켜진 입력창도 함께 넣고 대상은 그대로", squeeze(await boxText(0)) === squeeze(genMasterPlanned) && await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), await boxText(0));
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "잠금 풀림", 4000);
+  await type(0, "");
+  await clickInFrame(frame, "document.querySelector('#boxes button:nth-child(2)')");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로 돌아옴", 3000);
+  genCount = await genPressed();
+  await clickInFrame(frame, genButton);
+  await waitFor(async () => (await genPressed()) === genCount + 1, "UC 를 그대로 두고 Generate 눌림");
+  await sleep(200);
+  check("다른 입력창만 넣어도 대상은 그대로", squeeze(await boxText(0)) === squeeze(genMasterPlanned) && await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), await boxText(0));
+  await type(1, "");
+  await closePanel();
+  await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");
+  await type(0, WORD_PROMPT);
 
   // 시점 칩: 여러 개를 고르고, 부딪치면 꺼지고, multiple views 를 켜면 함께 고른다
   await type(0, "1girl, ass, groin, navel");

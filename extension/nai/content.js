@@ -443,6 +443,38 @@
   let watched = [];
   const textWatcher = new MutationObserver(() => schedule());
 
+  // NovelAI 의 Generate 버튼. 비용은 글자만 바뀌므로 화면 전체를 보는 감시로는 알 수 없어 따로 본다.
+  const generateButton = () => [...document.querySelectorAll(".image-gen-generate-button")].find(shown) || null;
+  const generateReady = (button) => !button.disabled && button.getAttribute("aria-disabled") !== "true";
+  let watchedGenerate = null;
+  const generateWatcher = new MutationObserver(() => schedule());
+
+  function watchGenerate(button) {
+    if (button === watchedGenerate) return;
+    watchedGenerate = button;
+    generateWatcher.disconnect();
+    if (button) {
+      generateWatcher.observe(button, { characterData: true, childList: true, subtree: true, attributes: true,
+        attributeFilter: ["disabled", "aria-disabled"] });
+    }
+  }
+
+  function generateState(button) {
+    if (!button) return null;
+    const label = button.textContent.trim();
+    return { ready: generateReady(button), label, cost: /(\d[\d,]*)\s*Anlas/i.exec(label)?.[1] || "" };
+  }
+
+  // 누르는 쪽의 안전장치는 패널에 있다. 여기서는 그 사이 NovelAI 버튼이 바뀌지 않았는지만 다시 본다.
+  function clickGenerate() {
+    const button = generateButton();
+    if (!button) return { ok: false, reason: "NovelAI 의 생성 버튼을 찾지 못했습니다" };
+    if (!generateReady(button)) return { ok: false, reason: "NovelAI 가 지금은 생성할 수 없는 상태입니다" };
+    const { label } = generateState(button);
+    button.click();
+    return { ok: true, label };
+  }
+
   function watchTexts(list) {
     if (list.length === watched.length && list.every((box, i) => box.el === watched[i])) return;
     watched = list.map((box) => box.el);
@@ -452,7 +484,9 @@
 
   function pushBoxes(list) {
     if (!panelPort) return;
-    const payload = JSON.stringify({ type: "boxes", active: targetBox(list)?.id || null,
+    const button = generateButton();
+    watchGenerate(button);
+    const payload = JSON.stringify({ type: "boxes", active: targetBox(list)?.id || null, generate: generateState(button),
       boxes: list.map(({ id, kind, label, el }) => ({ id, kind, label, text: el.innerText })) });
     if (payload === lastPushed) return;
     lastPushed = payload;
@@ -478,6 +512,8 @@
       field.selectAll();
       const result = await field.apply(message.expected, message.text);
       port.postMessage({ type: "applied", ...result });
+    } else if (message.type === "generate") {
+      port.postMessage({ type: "generated", ...clickGenerate() });
     }
   }
 
@@ -491,6 +527,7 @@
       panelPort = null;
       watched = [];
       textWatcher.disconnect();
+      watchGenerate(null);
       if (!alive()) closePanel();
     });
     schedule();

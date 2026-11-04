@@ -21,6 +21,9 @@ const PORT_NAME = "nai-panel";
 const DIALECT_NAMES = { nai: "NAI", comfyui: "ComfyUI", anima: "Anima" };
 const OVERRIDES = ["framing"];
 const APPLIED = "적용했습니다. 되돌리기는 입력창에서 Ctrl+Z 입니다.";
+const GENERATE_SETTLE_MS = 300;       // 넣은 글을 NovelAI 가 자기 상태에 반영할 시간
+const GENERATE_LOCK_MIN_MS = 1500;    // 누른 뒤 NovelAI 버튼이 바뀌기를 기다리는 최소 시간(연타로 두 번 생성되지 않게)
+const GENERATE_LOCK_MAX_MS = 60000;   // NovelAI 버튼이 돌아오지 않아도 이만큼 지나면 다시 누를 수 있다
 const FALLBACK_COLOR = "#7a7c99";
 
 const $ = (id) => document.getElementById(id);
@@ -41,6 +44,11 @@ let mastersDirty = false;
 let dirtyMasters = new Set();   // 저장할 입력창 id. 아직 저장하지 않은 글은 다른 탭의 변경이 와도 지킨다
 let confirmedImport = null;
 let pendingApply = null;        // 응답이 올 때까지 대상과 결과를 보관한다
+let view = "chips";             // 보이는 탭: chips·text·master. 배열 편집 중에는 청크 화면이 chips·text 자리에 든다
+let naiGenerate = null;         // NovelAI 의 Generate 버튼 {ready, label, cost}. 못 찾으면 null
+let generateRun = false;        // 적용부터 누르기까지 진행 중
+let pendingGenerate = null;
+let generateLock = null;        // 누른 뒤 NovelAI 버튼이 돌아올 때까지 {at, label}
 
 // 배열 편집: 편집 중인 배열은 입력창 묶음과 상관없이 하나다. 입력창을 옮겨 다니며 같은 배열로 미리 보고 적용한다.
 let editor = null;
@@ -93,7 +101,7 @@ function renderMaster(box, output = "") {
   const master = masterFor(box);
   $("master").hidden = !box || boxGroup(box.kind) === "uc";
   $("master_on").checked = Boolean(master?.on);
-  $("master_body").hidden = $("master_import").hidden = !master?.on;
+  renderTabs(box);
   const text = master?.text ?? "";
   // 값을 그대로 두면 입력 중 커서와 선택이 유지된다.
   if ($("master_text").value !== text) $("master_text").value = text;
@@ -101,6 +109,24 @@ function renderMaster(box, output = "") {
   if (confirmedImport && (confirmedImport.id !== box?.id || confirmedImport.text !== box.text || confirmedImport.previous !== text)) {
     confirmedImport = null;
   }
+}
+
+function renderTabs(box) {
+  const hasMaster = Boolean(masterFor(box)?.on);
+  if (view === "master" && !hasMaster) view = "chips";
+  const showEditor = editing && view !== "master";
+  $("editor").hidden = !showEditor;
+  $("preview").hidden = showEditor;
+  $("views").hidden = editing && !hasMaster;
+  $("show_chips").textContent = editing ? "배열" : "색 미리보기";
+  $("show_text").hidden = editing;
+  $("show_master").hidden = !hasMaster;
+  $("show_chips").setAttribute("aria-pressed", String(showEditor || view === "chips"));
+  $("show_text").setAttribute("aria-pressed", String(!editing && view === "text"));
+  $("show_master").setAttribute("aria-pressed", String(view === "master"));
+  $("chips").hidden = view !== "chips";
+  $("text").hidden = view !== "text";
+  $("master_body").hidden = view !== "master";
 }
 
 function importMaster() {
@@ -258,6 +284,7 @@ function clearResult(message, warn = false) {
   $("apply").textContent = "적용";
   $("copy").disabled = true;
   setState(message, warn);
+  renderGenerate();
 }
 
 const activeBox = () => boxes.find((b) => b.id === activeId);
@@ -269,7 +296,7 @@ function currentOptions(box) {
   if (editing && draft) {
     return draft.arr ? optionsFor(merged, JSON.parse(draft.arr), null, HOSTNAME) : optionsFor(merged, null, draft.layout, HOSTNAME);
   }
-  const preset = presets[$("preset").selectedIndex] || presets[0];
+  const preset = presetOf(effective.preset) || presets[0];
   return optionsFor(merged, preset.arrangement, preset.layout, HOSTNAME);
 }
 
@@ -315,9 +342,106 @@ function render() {
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));
   $("copy").disabled = !sorted.text;
-  $("apply").disabled = Boolean(pendingApply) || unchanged || !sorted.text.trim();
+  $("apply").disabled = Boolean(pendingApply) || generateRun || unchanged || !sorted.text.trim();
   $("apply").textContent = unchanged ? "정렬됨" : "적용";
+  renderGenerate();
   if (!sorted.text.trim()) setNotice(`모두 빠집니다 (${sorted.report.counts.removed}개). 적용할 수 없습니다.`, true);
+}
+
+// ─── 적용 후 생성 ────────────────────────────────────────────────
+
+// 입력창에 넣을 글: 원본을 켠 다른 보이는 입력창과 지금 입력창. 지금 입력창을 마지막에 넣어 대상이 그대로 남게 한다.
+function generatePlan() {
+  const plan = [];
+  for (const box of boxes) {
+    const master = masterFor(box);
+    if (box.id === result.box.id || !master?.on || !master.text?.trim()) continue;
+    const { text } = organize(inputText(box), pack, currentOptions(box));
+    if (text.trim() && !sameLines(box.text, text)) plan.push({ box, output: text, drift: masterDrift(box.text, master, text) });
+  }
+  if (!result.unchanged) {
+    plan.push({ box: result.box, output: result.output, drift: masterDrift(result.box.text, masterFor(result.box), result.output) });
+  }
+  return plan;
+}
+
+function generateLocked() {
+  if (!generateLock) return false;
+  const age = performance.now() - generateLock.at;
+  const back = naiGenerate?.ready && naiGenerate.label === generateLock.label;
+  if (age < GENERATE_LOCK_MAX_MS && (age < GENERATE_LOCK_MIN_MS || !back)) return true;
+  generateLock = null;
+  return false;
+}
+
+function renderGenerate() {
+  const button = $("generate");
+  button.hidden = !naiGenerate;
+  $("apply").classList.toggle("primary", !naiGenerate);
+  if (!naiGenerate) return;
+  const busy = generateRun || generateLocked();
+  let plan = null;
+  if (result?.output.trim() && !busy) {
+    try {
+      plan = generatePlan();
+    } catch (e) {
+      console.warn("[TagOrganize] 생성 계획을 만들지 못했습니다:", e);
+    }
+  }
+  const label = busy ? "생성 중…" : plan?.length ? "적용 후 생성" : "생성";
+  button.textContent = naiGenerate.cost && !busy ? `${label} · ${naiGenerate.cost}` : label;
+  button.title = `${plan?.length ? "입력창에 결과를 넣고 " : ""}NovelAI 의 Generate 를 한 번 누릅니다${naiGenerate.cost ? ` (${naiGenerate.cost} Anlas)` : ""}`;
+  button.disabled = busy || Boolean(pendingApply) || !naiGenerate.ready || !plan;
+}
+
+const postApply = (box, output) => new Promise((resolve) => {
+  pendingApply = { id: box.id, output, resolve };
+  port.postMessage({ type: "apply", id: box.id, expected: box.text, text: output });
+});
+
+const postGenerate = () => new Promise((resolve) => {
+  pendingGenerate = resolve;
+  port.postMessage({ type: "generate" });
+});
+
+async function applyAndGenerate() {
+  if (!result?.output.trim() || !naiGenerate?.ready || pendingApply || generateRun || generateLocked()) return;
+  let plan;
+  try {
+    plan = generatePlan();
+  } catch (e) {
+    setNotice(e.message, true);
+    return;
+  }
+  const drifted = plan.find((item) => item.drift);
+  if (drifted) {
+    setNotice(`${drifted.box.label} 입력창을 직접 고쳤습니다. 그 입력창을 고른 뒤 원본으로 가져오거나 적용하고 나서 생성하세요.`, true);
+    return;
+  }
+  const target = activeId;
+  generateRun = true;
+  render();
+  try {
+    for (const { box, output } of plan) {
+      const applied = await postApply(box, output);
+      if (!applied.ok) {
+        setNotice(applied.reason, true);
+        return;
+      }
+    }
+    if (plan.at(-1) && plan.at(-1).box.id !== target) port.postMessage({ type: "select", id: target });   // 넣은 입력창으로 대상이 옮겨 갔다
+    if (plan.length) await new Promise((resolve) => setTimeout(resolve, GENERATE_SETTLE_MS));
+    const clicked = await postGenerate();
+    if (clicked.ok) {
+      generateLock = { at: performance.now(), label: clicked.label };
+      setTimeout(render, GENERATE_LOCK_MIN_MS + 50);
+      setTimeout(render, GENERATE_LOCK_MAX_MS + 50);
+      setNotice(plan.length ? "입력창에 넣고 생성을 눌렀습니다." : "생성을 눌렀습니다.");
+    } else setNotice(clicked.reason, true);
+  } finally {
+    generateRun = false;
+    render();
+  }
 }
 
 function fillPresets() {
@@ -333,11 +457,11 @@ function changeBoxSetting(patch) {
   render();
 }
 
-function showView(chips) {
-  $("chips").hidden = !chips;
-  $("text").hidden = chips;
-  $("show_chips").setAttribute("aria-pressed", String(chips));
-  $("show_text").setAttribute("aria-pressed", String(!chips));
+function showView(name) {
+  view = name;
+  renderTabs(activeBox());
+  if (editing && name !== "master") editor.refresh();
+  if (name === "master") $("master_text").focus();
 }
 
 // ─── 배열 편집 ───────────────────────────────────────────────────
@@ -547,10 +671,9 @@ async function setEditing(on) {
     if (!draftDirty()) openDraft(boxSettings(settings, stored, activeBox()?.kind).preset);
     const { [SPLIT_KEY]: split } = await chrome.storage.local.get(SPLIT_KEY);
     ensureEditor(split);
+    if (view === "master") view = "chips";
   }
-  $("editor").hidden = !on;
-  $("views").hidden = on;
-  $("preview").hidden = on;
+  renderTabs(activeBox());
   port.postMessage({ type: "fit", editing: on });
   if (on) editor.refresh();
   updateEditButtons();
@@ -564,19 +687,22 @@ port.onMessage.addListener((message) => {
   if (message.type === "boxes") {
     boxes = message.boxes;
     activeId = message.active;
+    naiGenerate = message.generate ?? null;
     render();
   } else if (message.type === "applied") {
-    if (message.ok) {
-      // 원본을 켜지 않은 입력창의 글은 저장하지 않는다
-      if (pendingApply && masters[pendingApply.id]?.on) {
-        const { id, output } = pendingApply;
-        masters[id] = { ...masters[id], lastApplied: output };
-        storeMasters(id);
-      }
-      setNotice(APPLIED);
-    } else setNotice(message.reason, true);
+    const done = pendingApply;
+    // 원본을 켜지 않은 입력창의 글은 저장하지 않는다
+    if (message.ok && done && masters[done.id]?.on) {
+      masters[done.id] = { ...masters[done.id], lastApplied: done.output };
+      storeMasters(done.id);
+    }
     pendingApply = null;
+    done?.resolve(message);
     render();
+  } else if (message.type === "generated") {
+    const done = pendingGenerate;
+    pendingGenerate = null;
+    done?.(message);
   }
 });
 
@@ -596,7 +722,9 @@ $("master_on").addEventListener("change", () => {
   masters[box.id] = { ...master, on, group: boxGroup(box.kind), text: on && !master.text.trim() ? box.text : master.text };
   confirmedImport = null;
   storeMasters(box.id);
+  if (on && !masters[box.id].text.trim()) view = "master";     // 붙여 넣을 자리를 바로 보여 준다
   render();
+  if (view === "master") $("master_text").focus();
 });
 $("master_text").addEventListener("input", () => {
   const box = activeBox();
@@ -613,14 +741,17 @@ addEventListener("pagehide", flushMasters);
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) flushMasters();
 });
-$("show_chips").addEventListener("click", () => showView(true));
-$("show_text").addEventListener("click", () => showView(false));
-$("apply").addEventListener("click", () => {
-  if (!result || result.unchanged || !result.output.trim() || pendingApply) return;
-  pendingApply = { id: result.box.id, kind: result.box.kind, output: result.output };
+$("show_chips").addEventListener("click", () => showView("chips"));
+$("show_text").addEventListener("click", () => showView("text"));
+$("show_master").addEventListener("click", () => showView("master"));
+$("apply").addEventListener("click", async () => {
+  if (!result || result.unchanged || !result.output.trim() || pendingApply || generateRun) return;
   $("apply").disabled = true;
-  port.postMessage({ type: "apply", id: result.box.id, expected: result.box.text, text: result.output });
+  const applied = await postApply(result.box, result.output);
+  if (applied.ok) setNotice(APPLIED);
+  else setNotice(applied.reason, true);
 });
+$("generate").addEventListener("click", applyAndGenerate);
 $("copy").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText($("text").value);
