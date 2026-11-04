@@ -253,7 +253,7 @@ def build_pack(
     extra_dbs, site_keys = _merge_layers(extra, site, rows, aliases, overlay, kaomoji, errors, warnings)
 
     rules = config["rules"]
-    for group in ("framing", "view"):
+    for group in ("framing", "view", "gaze"):
         cfg = rules.get(group) or {}
         for gate in cfg.get("gates", ()):
             for reg in gate.get("hide", ()):
@@ -261,6 +261,7 @@ def build_pack(
                     errors.append(f"rules.{group} hide 에 없는 부위입니다: {reg}")
             _check_rule_tags(f"rules.{group}", gate.get("tags", ()), rows, aliases, warnings)
             _check_rule_tags(f"rules.{group}.reveal", (gate.get("reveal") or {}).keys(), rows, aliases, warnings)
+            _check_rule_tags(f"rules.{group}.keep", gate.get("keep", ()), rows, aliases, warnings)
         for block in cfg.get("blocks", ()):
             _check_rule_tags(f"rules.{group}.blocks", list(block.get("tags", ())) + list(block.get("block", ())),
                              rows, aliases, warnings)

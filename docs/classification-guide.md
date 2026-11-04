@@ -98,6 +98,8 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 
 참고: from behind는 front_torso·front_hips·face·eyes를, 정면 쪽 시점(straight-on, front view, three quarter view)은 back·back_hips·back_legs를 가린다. from side는 아무것도 가리지 않는다. 그래서 날개·꼬리처럼 등에 붙어도 정면에서 보이는 것에는 back을 붙이지 않는다. 고개를 돌려 얼굴이 보이는 시선 태그(looking 계열, facing viewer·back·to the side·up)가 있으면 face·eyes는 보인다. 따라서 표정 태그는 from behind 단일 샷에서 시선 태그가 없거나 facing away일 때 빠진다.
 
+facing 시선(facing viewer 등)은 eyes를 가립니다. 눈이 보이지 않아도 성립하는 태그(closed eyes, no eyes 등)는 남기고, looking 태그가 함께 있으면 가리지 않습니다.
+
 ## 4. identity (캐릭터 고유 외형)
 
 "다른 캐릭터로 바꿔 그리면 바뀌어야 하는 외형"이면 1.

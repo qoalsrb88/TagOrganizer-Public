@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "태그 이름은 정규화한 형태(소문자, 밑줄 대신 공백)로 적는다. 별칭이 아니라 대표 이름을 쓴다. 부위 기반 규칙(gates)은 태그의 regions가 전부 가려질 때만 그 태그를 뺀다. 부위는 크롭이 가르는 높이와 시점이 가르는 앞뒤를 함께 나타낸다: 몸통 앞 front_torso·뒤 back, 골반 앞 front_hips·뒤 back_hips·양쪽 hips, 다리 뒤 back_legs. unless_any 의 태그가 있으면 그 게이트를 쓰지 않는다: from behind 와 함께 쓴 straight-on 은 정확히 뒤에서 본 그림이다. blocks 는 그 크롭·시점과 함께 그릴 수 없는 태그를 빼고 시선 칩에서도 숨긴다(1인 그림만, 기준 태그가 여럿이면 모두가 막는 것만).",
+  "note": "태그 이름은 정규화한 형태(소문자, 밑줄 대신 공백)로 적는다. 별칭이 아니라 대표 이름을 쓴다. 부위 기반 규칙(gates)은 태그의 regions가 전부 가려질 때만 그 태그를 뺀다. 부위는 크롭이 가르는 높이와 시점이 가르는 앞뒤를 함께 나타낸다: 몸통 앞 front_torso·뒤 back, 골반 앞 front_hips·뒤 back_hips·양쪽 hips, 다리 뒤 back_legs. unless_any 의 태그가 있으면 그 게이트를 쓰지 않는다: from behind 와 함께 쓴 straight-on 은 정확히 뒤에서 본 그림이다. blocks 는 그 크롭·시점과 함께 그릴 수 없는 태그를 빼고 시선 칩에서도 숨긴다(1인 그림만, 기준 태그가 여럿이면 모두가 막는 것만). keep 의 태그는 그 게이트가 부위를 가려도 남기고, unless_prefix 로 시작하는 태그가 있으면 unless_any 처럼 게이트를 쓰지 않는다.",
   "regions": ["head", "face", "eyes", "front_torso", "back", "arms", "hands", "hips", "front_hips", "back_hips", "thighs", "lower_legs", "back_legs", "feet"],
   "quick": {
     "note": "배열 세팅의 크롭/시점/시선 퀵 덮어쓰기(organize 의 framing·view·gaze)에 보여 줄 태그. 덮어쓰면 프롬프트의 같은 서브 카테고리(composition/framing·composition/angle·action/gaze) 태그를 모두 고른 태그로 바꾼다. 시선은 여러 개를 고를 수 있고, gaze_conflicts(양방향)의 태그는 켜는 순간 서로 꺼진다. looking 은 눈이 보일 때, facing 은 눈을 감거나 가렸을 때의 짝이다. 시점도 여러 개를 고를 수 있고, view_conflicts(양방향)의 태그는 켜는 순간 서로 꺼진다. view_lift 태그를 켜면 부딪치는 시점도 함께 고를 수 있다.",
@@ -61,6 +61,19 @@
       {"tags": ["from behind", "rear view"], "block": []}
     ],
     "exempt": ["multiple views", "reference sheet", "split screen", "comic", "4koma", "reference inset", "collage", "mirror", "reflection"],
+    "multi_subject_exempt": true
+  },
+  "gaze": {
+    "label": "시선 규칙",
+    "note": "facing 은 눈을 감거나 가렸을 때의 태그라, 눈이 떠 있어야 성립하는 태그(색·눈매·눈동자·속눈썹)가 있으면 그림에서 눈이 뜨인다. 그 태그들을 뺀다. keep 은 눈이 보이지 않아도 성립하는 태그다. 위키의 facing viewer 에는 다른 곳을 보는 경우도 있어서(looking in another direction) looking 계열이 함께 있으면 쓰지 않는다.",
+    "gates": [
+      {"tags": ["facing viewer", "facing away", "facing back", "facing to the side", "facing ahead", "facing down", "facing up"],
+       "hide": ["eyes"],
+       "keep": ["closed eyes", "eyes closed", "eyes mostly closed", "closing eyes", "blinking", "no eyes", "eyes in shadow", "=_=", "u_u", "3_3", "t_t", "x_x", "x eyes"],
+       "unless_prefix": ["looking "],
+       "unless_any": ["sideways glance", "eye contact", "staring", "stare", "peeking", "peeping", "averting eyes"]}
+    ],
+    "exempt": ["multiple views", "reference sheet", "split screen", "comic", "4koma", "reference inset", "collage"],
     "multi_subject_exempt": true
   },
   "multi_subject": {

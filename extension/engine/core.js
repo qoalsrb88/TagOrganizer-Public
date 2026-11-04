@@ -19,7 +19,7 @@ const AUTO_DIALECT = "auto";
 const INPUT_DIALECTS = [AUTO_DIALECT, ...DIALECTS];
 const DIALECT_PRIORITY = ["nai", "comfyui", "anima"];
 const COMMENT_MODES = ["remove", "keep"];
-const RULE_GROUPS = ["framing", "view", "explicit"];
+const RULE_GROUPS = ["framing", "view", "gaze", "explicit"];
 const RULE_MODES = ["off", "report", "remove"];
 const ORDERS = ["input", "popular", "alpha"];
 const SYSTEM_CATEGORIES = ["etc", "unknown", "special", "natural"];
@@ -1095,14 +1095,19 @@ function ruleGroups(present, pack, opts) {
   const modes = ruleModes(opts);
   const multi = isMultiSubject(present, pack.rules);
   const out = [];
-  for (const group of ["framing", "view"]) {
+  for (const group of ["framing", "view", "gaze"]) {
     const mode = modes[group];
     const cfg = pack.rules[group] || {};
     if (mode === "off" || anyIn(cfg.exempt, present)) continue;
-    if (group === "view" && multi && (cfg.multi_subject_exempt ?? true)) continue;
+    if (multi && (cfg.multi_subject_exempt ?? group === "view")) continue;
     out.push([group, mode, cfg]);
   }
   return out;
+}
+
+function gateActive(gate, present) {
+  if (!anyIn(gate.tags, present) || anyIn(gate.unless_any, present)) return false;
+  return !(gate.unless_prefix || []).some((prefix) => [...present].some((key) => key.startsWith(prefix)));
 }
 
 // 크롭·시점이 막는 태그 → [그룹, 모드, 기준 태그]. 한 그룹의 기준 태그가 여럿이면 모두가 막는 것만 막고, 여러 명이면 쓰지 않는다.
@@ -1127,9 +1132,11 @@ function applyRules(tokens, pack, opts) {
   const multi = isMultiSubject(present, rules);
 
   const hidden = new Map();
+  const spared = new Map();   // 그룹 → 그 그룹이 가려도 남기는 태그
   for (const [group, mode, cfg] of ruleGroups(present, pack, opts)) {
-    const active = (cfg.gates || []).filter((g) => anyIn(g.tags, present) && !anyIn(g.unless_any, present));
+    const active = (cfg.gates || []).filter((g) => gateActive(g, present));
     if (!active.length) continue;
+    spared.set(group, new Set(active.flatMap((g) => g.keep || [])));
     let regions = new Set(active[0].hide || []);
     for (const g of active.slice(1)) {
       const next = new Set(g.hide || []);
@@ -1149,7 +1156,7 @@ function applyRules(tokens, pack, opts) {
     for (const t of alive) {
       if (t.info === null || !t.info.regions.length) continue;
       const regs = [...new Set(t.info.regions)];
-      if (!regs.every((r) => hidden.has(r))) continue;
+      if (!regs.every((r) => hidden.has(r) && !spared.get(hidden.get(r)[0]).has(t.key))) continue;
       const unique = new Map(regs.map((r) => [JSON.stringify(hidden.get(r)), hidden.get(r)]));
       const entries = [...unique.values()].sort((a, b) =>
         compareCp(a[0], b[0]) || compareCp(a[1], b[1]) || compareCp(a[2], b[2]));

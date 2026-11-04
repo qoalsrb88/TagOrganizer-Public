@@ -478,6 +478,37 @@ class GazeTests(unittest.TestCase):
         injected = [(row["text"], row["injected"]) for row in r.report["tokens"] if row.get("injected")]
         self.assertEqual(injected, [("looking back", "gaze"), ("looking at viewer", "gaze")])
 
+    def test_facing_hides_tags_that_need_open_eyes(self):
+        reason = "rule:gaze(facing viewer)"
+        r = run("1girl, looking at viewer, blue eyes, closed eyes, one eye closed, smile", gaze="facing viewer")
+        self.assertEqual(reasons(r), {"looking at viewer": "override:gaze", "blue eyes": reason, "one eye closed": reason})
+        self.assertNotIn("blue eyes", r.text)
+        self.assertIn("closed eyes", r.text)
+        self.assertIn("smile", r.text)
+
+    def test_facing_typed_in_prompt_counts_too(self):
+        r = run("1girl, facing viewer, blue eyes")
+        self.assertEqual(reasons(r), {"blue eyes": "rule:gaze(facing viewer)"})
+
+    def test_facing_with_looking_keeps_eyes(self):
+        for prompt, gaze in (("1girl, blue eyes", "facing to the side, looking up"), ("1girl, facing viewer, looking up, blue eyes", ""),
+                             ("1girl, facing viewer, sideways glance, blue eyes", "")):
+            with self.subTest(prompt=prompt, gaze=gaze):
+                self.assertEqual(reasons(run(prompt, gaze=gaze)), {})
+
+    def test_facing_rule_follows_modes_and_exemptions(self):
+        self.assertEqual(reasons(run("1girl, facing viewer, blue eyes", rules="off")), {})
+        reported = run("1girl, facing viewer, blue eyes", rules="report")
+        self.assertEqual(reasons(reported), {})
+        self.assertIn("blue eyes", reported.text)
+        self.assertEqual(reasons(run("1girl, facing viewer, blue eyes", rules={"gaze": "off"})), {})
+        self.assertEqual(reasons(run("2girls, facing viewer, blue eyes")), {})         # 다른 사람의 눈일 수 있다
+        self.assertEqual(reasons(run("1girl, multiple views, facing viewer, blue eyes")), {})
+
+    def test_keep_only_spares_tags_from_its_own_group(self):
+        r = run("1girl, closed eyes, facing viewer, head out of frame")
+        self.assertEqual(reasons(r), {"closed eyes": "rule:framing(head out of frame)"})
+
     def test_must_be_gaze_tag(self):
         with self.assertRaises(ValueError) as cm:
             run("1girl", gaze="smile")

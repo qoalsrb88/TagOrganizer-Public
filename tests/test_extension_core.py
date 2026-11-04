@@ -34,6 +34,11 @@ REAL_PACK = ROOT / "build" / "tagpack.json.gz"
 LITERAL_SOURCES = ("test_core.py", "test_syntax.py", "test_arrangement.py", "test_extra.py", "test_e621.py")
 
 HANDWRITTEN = [
+    "1girl, facing viewer, blue eyes, closed eyes, one eye closed, smile",
+    "1girl, facing to the side, looking up, blue eyes",
+    "1girl, facing viewer, sideways glance, aqua eyes",
+    "2girls, facing away, blue eyes",
+    "1girl, facing back, closed eyes, head out of frame",
     "",
     " , ,\n",
     "smile, 1girl, shoes, upper body, hatsune miku, blue hair, 1.2::long hair ::, outdoors, {{sky}}, from side",

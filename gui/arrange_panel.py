@@ -461,7 +461,7 @@ class ArrangementPanel(QWidget):
             for tag in self.palette["quick"].get("view") or ()})
         self._build_multi(layout, "gaze", "시선", {
             tag: "프롬프트의 시선 태그를 고른 태그들로 바꿉니다("
-            + ("눈을 감거나 가렸을 때" if tag.startswith("facing") else "눈이 보일 때") + ") — 여러 개 고를 수 있음"
+            + ("눈을 감거나 가렸을 때, 눈 색·눈매 태그를 뺌" if tag.startswith("facing") else "눈이 보일 때") + ") — 여러 개 고를 수 있음"
             for tag in self.palette["quick"].get("gaze") or ()})
 
         # 청크 화면은 따로(self.board): 미리보기 탭이 색 미리보기 옆에 놓는다
