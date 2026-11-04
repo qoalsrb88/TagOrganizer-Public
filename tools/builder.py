@@ -297,13 +297,18 @@ def build_pack(
     quick = rules.get("quick") or {}
     for group, target in core.OVERRIDE_TARGETS.items():
         _check_rule_tags(f"rules.quick.{group}", quick.get(group, ()), rows, aliases, warnings)
+        lifts = set(quick.get(f"{group}_lift", ()))
         for tag in quick.get(group, ()):
-            if tag in rows and rows[tag][3] != target:
+            if tag in rows and rows[tag][3] != target and tag not in lifts:
                 warnings.append(f"rules.quick.{group} '{tag}' 는 {target} 가 아닙니다({rows[tag][3]}) — 덮어쓸 수 없음")
     for tag, others in (quick.get("gaze_conflicts") or {}).items():
         for name in (tag, *others):
             if name not in quick.get("gaze", ()):
                 warnings.append(f"rules.quick.gaze_conflicts '{name}' 는 시선 퀵 목록에 없습니다")
+    for tag, others in (quick.get("view_conflicts") or {}).items():
+        for name in (tag, *others):
+            if name not in quick.get("view", ()):
+                warnings.append(f"rules.quick.view_conflicts '{name}' 는 시점 퀵 목록에 없습니다")
     guess = dict(config.get("guess") or {})
     try:
         core.compile_guess_rules(guess.get("patterns", ()), SimpleNamespace(rules=rules, categories=cats), "guess")

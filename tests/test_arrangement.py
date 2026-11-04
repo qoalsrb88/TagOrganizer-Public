@@ -233,6 +233,135 @@ class OverrideTests(unittest.TestCase):
             self.assertIn(part, str(cm.exception))
 
 
+class ViewRegionTests(unittest.TestCase):
+    """시점에 따라 몸의 앞면·뒷면에만 있는 태그가 빠진다."""
+
+    REAR = {"median furrow", "dimples of venus", "ass", "butt crack", "underbutt"}
+    FRONT = {"mons pubis", "groin", "pubic tattoo", "navel"}
+    PROMPT = "1girl, median furrow, dimples of venus, ass, butt crack, underbutt, mons pubis, groin, pubic tattoo, navel"
+
+    def removed_by(self, **opts):
+        return set(reasons(run(self.PROMPT, **opts)))
+
+    def test_front_views_hide_rear_only(self):
+        for view in ("straight-on", "front view", "three quarter view"):
+            with self.subTest(view=view):
+                self.assertEqual(self.removed_by(view=view), self.REAR)
+
+    def test_from_behind_hides_front_only(self):
+        self.assertEqual(self.removed_by(view="from behind"), self.FRONT)
+
+    def test_side_and_elevation_hide_nothing(self):
+        for view in ("from side", "from above", "from below", "dutch angle", "pov"):
+            with self.subTest(view=view):
+                self.assertEqual(self.removed_by(view=view), set())
+
+    def test_both_sides_stay_in_every_view(self):
+        for view in ("straight-on", "front view", "three quarter view", "from behind", "from side"):
+            with self.subTest(view=view):
+                self.assertEqual(reasons(run("1girl, wide hips, skirt, shirt", view=view)), {})
+
+    def test_combined_views_keep_the_directional_rule(self):
+        self.assertEqual(self.removed_by(view="from behind, from side"), self.FRONT)
+        self.assertEqual(self.removed_by(view="from behind, from below"), self.FRONT)
+        self.assertEqual(self.removed_by(view="three quarter view, dutch angle"), self.REAR)
+        self.assertEqual(self.removed_by(view="front view, from side"), self.REAR)
+
+    def test_rear_side_view_shows_face(self):
+        for view in ("from behind, from side", "from behind, profile"):
+            with self.subTest(view=view):
+                self.assertEqual(reasons(run("1girl, smile, navel", view=view)), {"navel": "rule:view(from behind)"})
+
+    def test_straight_on_with_from_behind_is_a_rear_view(self):
+        r = run(self.PROMPT + ", from behind, straight-on")
+        self.assertEqual(set(reasons(r)), self.FRONT)
+
+    def test_opposite_views_cancel_without_multiple_views(self):
+        self.assertEqual(self.removed_by(view="front view, from behind"), set())
+
+    def test_multiple_views_turns_view_rules_off(self):
+        self.assertEqual(self.removed_by(view="front view, from behind, multiple views"), set())
+        self.assertEqual(self.removed_by(view="from above, from below, multiple views"), set())
+
+    def test_crop_hides_both_sides_of_the_hips(self):
+        r = run("1girl, upper body, ass, groin, wide hips, navel")
+        self.assertEqual(set(reasons(r)), {"ass", "groin", "wide hips"})
+        r = run("1girl, portrait, ass, groin, wide hips")
+        self.assertEqual(set(reasons(r)), {"ass", "groin", "wide hips"})
+
+    def test_lower_body_hides_the_torso(self):
+        r = run("1girl, lower body, navel, median furrow, smile, detached sleeves, ass, groin, thighs")
+        self.assertEqual(set(reasons(r)), {"navel", "median furrow", "smile", "detached sleeves"})
+
+    def test_back_of_the_legs(self):
+        self.assertEqual(reasons(run("1girl, kneepits", view="front view")), {"kneepits": "rule:view(front view)"})
+        self.assertEqual(reasons(run("1girl, kneepits", view="from behind")), {})
+        self.assertEqual(reasons(run("1girl, kneepits", framing="cowboy shot")), {"kneepits": "rule:framing(cowboy shot)"})
+        self.assertEqual(reasons(run("1girl, kneepits", framing="full body")), {})
+
+    def test_several_subjects_turn_view_rules_off(self):
+        self.assertEqual(reasons(run("2girls, ass, groin", view="front view")), {})
+
+
+class ViewChipTests(unittest.TestCase):
+    def test_override_takes_several_views(self):
+        r = run("1girl, from side, black hair", view="from behind, from below")
+        self.assertEqual(reasons(r), {"from side": "override:view"})
+        injected = [row["text"] for row in r.report["tokens"] if row.get("injected")]
+        self.assertEqual(injected, ["from behind", "from below"])
+
+    def test_multiple_views_alone_keeps_prompt_views(self):
+        r = run("1girl, from side, from behind", view="multiple views")
+        self.assertEqual(reasons(r), {})
+        self.assertIn("multiple views", r.text)
+        self.assertFalse(r.report["view_lifted"])                              # 칩을 끄면 다시 막아야 한다
+
+    def test_multiple_views_with_a_view_replaces_prompt_views(self):
+        r = run("1girl, from side", view="from behind, multiple views")
+        self.assertEqual(reasons(r), {"from side": "override:view"})
+        self.assertIn("multiple views", r.text)
+
+    def test_only_listed_lift_tags_pass_the_category_check(self):
+        with self.assertRaises(ValueError):
+            run("1girl", view="reference sheet")
+
+    def test_view_lifted_follows_the_prompt(self):
+        self.assertFalse(run("1girl, from side").report["view_lifted"])
+        self.assertTrue(run("1girl, mirror, from side").report["view_lifted"])
+        self.assertTrue(run("1girl, multiple views", view="multiple views").report["view_lifted"])
+
+    def toggle(self, selected, tag, lifted=False):
+        return core.view_toggle(core.palette(pack()), selected, tag, lifted)
+
+    def test_toggle_combines_compatible_views(self):
+        self.assertEqual(self.toggle(["from behind"], "from side"), ["from side", "from behind"])
+        self.assertEqual(self.toggle(["from behind"], "from below"), ["from behind", "from below"])
+        self.assertEqual(self.toggle(["three quarter view"], "dutch angle"), ["three quarter view", "dutch angle"])
+        self.assertEqual(self.toggle(["front view", "from side", "pov"], "dutch angle"),
+                         ["front view", "from side", "pov", "dutch angle"])
+
+    def test_toggle_turns_conflicts_off(self):
+        self.assertEqual(self.toggle(["front view"], "from behind"), ["from behind"])
+        self.assertEqual(self.toggle(["from behind", "from side"], "straight-on"), ["straight-on", "from side"])
+        self.assertEqual(self.toggle(["from above"], "from below"), ["from below"])
+        self.assertEqual(self.toggle(["from behind"], "three quarter view"), ["three quarter view"])
+
+    def test_toggle_off_removes(self):
+        self.assertEqual(self.toggle(["front view", "from side"], "from side"), ["front view"])
+
+    def test_multiple_views_lifts_conflicts(self):
+        self.assertEqual(self.toggle(["front view", "multiple views"], "from behind"),
+                         ["front view", "from behind", "multiple views"])
+        self.assertEqual(self.toggle(["from above", "from below"], "multiple views"),
+                         ["from above", "from below", "multiple views"])
+        self.assertEqual(self.toggle(["front view"], "from behind", lifted=True), ["front view", "from behind"])
+
+    def test_turning_multiple_views_off_keeps_the_first_of_a_conflict(self):
+        self.assertEqual(self.toggle(["front view", "from behind", "multiple views"], "multiple views"), ["front view"])
+        self.assertEqual(self.toggle(["front view", "from behind", "multiple views"], "multiple views", lifted=True),
+                         ["front view", "from behind"])
+
+
 class GazeTests(unittest.TestCase):
     def test_replaces_gaze_tags_with_several_chosen(self):
         r = run("1girl, looking down, smile", gaze="looking back, looking at viewer")

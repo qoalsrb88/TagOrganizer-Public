@@ -1,11 +1,18 @@
 {
   "version": 1,
-  "note": "태그 이름은 정규화한 형태(소문자, 밑줄 대신 공백)로 적는다. 별칭이 아니라 대표 이름을 쓴다. 부위 기반 규칙(gates)은 태그의 regions가 전부 가려질 때만 그 태그를 뺀다. blocks 는 그 크롭·시점과 함께 그릴 수 없는 태그를 빼고 시선 칩에서도 숨긴다(1인 그림만, 기준 태그가 여럿이면 모두가 막는 것만).",
-  "regions": ["head", "face", "eyes", "front_torso", "back", "arms", "hands", "hips", "thighs", "lower_legs", "feet"],
+  "note": "태그 이름은 정규화한 형태(소문자, 밑줄 대신 공백)로 적는다. 별칭이 아니라 대표 이름을 쓴다. 부위 기반 규칙(gates)은 태그의 regions가 전부 가려질 때만 그 태그를 뺀다. 부위는 크롭이 가르는 높이와 시점이 가르는 앞뒤를 함께 나타낸다: 몸통 앞 front_torso·뒤 back, 골반 앞 front_hips·뒤 back_hips·양쪽 hips, 다리 뒤 back_legs. unless_any 의 태그가 있으면 그 게이트를 쓰지 않는다: from behind 와 함께 쓴 straight-on 은 정확히 뒤에서 본 그림이다. blocks 는 그 크롭·시점과 함께 그릴 수 없는 태그를 빼고 시선 칩에서도 숨긴다(1인 그림만, 기준 태그가 여럿이면 모두가 막는 것만).",
+  "regions": ["head", "face", "eyes", "front_torso", "back", "arms", "hands", "hips", "front_hips", "back_hips", "thighs", "lower_legs", "back_legs", "feet"],
   "quick": {
-    "note": "배열 세팅의 크롭/시점/시선 퀵 덮어쓰기(organize 의 framing·view·gaze)에 보여 줄 태그. 덮어쓰면 프롬프트의 같은 서브 카테고리(composition/framing·composition/angle·action/gaze) 태그를 모두 고른 태그로 바꾼다. 시선은 여러 개를 고를 수 있고, gaze_conflicts(양방향)의 태그는 켜는 순간 서로 꺼진다. looking 은 눈이 보일 때, facing 은 눈을 감거나 가렸을 때의 짝이다.",
+    "note": "배열 세팅의 크롭/시점/시선 퀵 덮어쓰기(organize 의 framing·view·gaze)에 보여 줄 태그. 덮어쓰면 프롬프트의 같은 서브 카테고리(composition/framing·composition/angle·action/gaze) 태그를 모두 고른 태그로 바꾼다. 시선은 여러 개를 고를 수 있고, gaze_conflicts(양방향)의 태그는 켜는 순간 서로 꺼진다. looking 은 눈이 보일 때, facing 은 눈을 감거나 가렸을 때의 짝이다. 시점도 여러 개를 고를 수 있고, view_conflicts(양방향)의 태그는 켜는 순간 서로 꺼진다. view_lift 태그를 켜면 부딪치는 시점도 함께 고를 수 있다.",
     "framing": ["portrait", "close-up", "upper body", "cowboy shot", "full body", "lower body", "feet out of frame", "head out of frame"],
-    "view": ["from behind", "from side", "from above", "from below", "straight-on", "profile", "pov", "dutch angle"],
+    "view": ["front view", "straight-on", "three quarter view", "from side", "from behind", "from above", "from below", "profile", "pov", "dutch angle", "multiple views"],
+    "view_conflicts": {
+      "front view": ["from behind"],
+      "straight-on": ["from behind"],
+      "three quarter view": ["from behind"],
+      "from above": ["from below"]
+    },
+    "view_lift": ["multiple views"],
     "gaze": ["looking at viewer", "looking back", "looking to the side", "sideways glance", "looking ahead", "looking down", "looking up", "looking afar",
              "facing viewer", "facing away", "facing back", "facing to the side", "facing ahead", "facing down", "facing up"],
     "gaze_conflicts": {
@@ -22,12 +29,12 @@
   "framing": {
     "label": "크롭 규칙",
     "gates": [
-      {"tags": ["portrait", "close-up", "headshot portrait", "bust portrait"], "hide": ["hands", "hips", "thighs", "lower_legs", "feet"]},
-      {"tags": ["upper body", "half-length portrait"], "hide": ["hips", "thighs", "lower_legs", "feet"]},
-      {"tags": ["cowboy shot", "three-quarter portrait"], "hide": ["lower_legs", "feet"]},
+      {"tags": ["portrait", "close-up", "headshot portrait", "bust portrait"], "hide": ["hands", "hips", "front_hips", "back_hips", "thighs", "lower_legs", "back_legs", "feet"]},
+      {"tags": ["upper body", "half-length portrait"], "hide": ["hips", "front_hips", "back_hips", "thighs", "lower_legs", "back_legs", "feet"]},
+      {"tags": ["cowboy shot", "three-quarter portrait"], "hide": ["lower_legs", "back_legs", "feet"]},
       {"tags": ["feet out of frame"], "hide": ["feet"]},
       {"tags": ["head out of frame"], "hide": ["head", "face", "eyes"]},
-      {"tags": ["lower body"], "hide": ["head", "face", "eyes"]},
+      {"tags": ["lower body"], "hide": ["head", "face", "eyes", "front_torso", "back", "arms"]},
       {"tags": ["full body", "full-length portrait"], "hide": []}
     ],
     "blocks": [
@@ -38,13 +45,18 @@
   "view": {
     "label": "시점 규칙",
     "gates": [
-      {"tags": ["from behind", "rear view"], "hide": ["front_torso", "face", "eyes"], "reveal": {
+      {"tags": ["from behind", "rear view"], "hide": ["front_torso", "front_hips", "face", "eyes"], "reveal": {
+        "from side": ["face", "eyes"], "side view": ["face", "eyes"], "profile": ["face", "eyes"],
         "looking back": ["face", "eyes"], "looking at viewer": ["face", "eyes"], "looking to the side": ["face", "eyes"], "sideways glance": ["face", "eyes"],
         "looking ahead": ["face", "eyes"], "looking down": ["face", "eyes"], "looking up": ["face", "eyes"], "looking afar": ["face", "eyes"],
-        "facing viewer": ["face", "eyes"], "facing back": ["face", "eyes"], "facing to the side": ["face", "eyes"], "facing up": ["face", "eyes"]}}
+        "facing viewer": ["face", "eyes"], "facing back": ["face", "eyes"], "facing to the side": ["face", "eyes"], "facing up": ["face", "eyes"]}},
+      {"tags": ["straight-on"], "hide": ["back", "back_hips", "back_legs"], "unless_any": ["from behind", "rear view"]},
+      {"tags": ["front view"], "hide": ["back", "back_hips", "back_legs"]},
+      {"tags": ["three quarter view", "three-quarter view"], "hide": ["back", "back_hips", "back_legs"]}
     ],
     "blocks": [
       {"tags": ["straight-on", "front view"], "block": ["looking back", "facing back", "facing away", "facing to the side"]},
+      {"tags": ["three quarter view", "three-quarter view"], "block": ["looking back", "facing back", "facing away"]},
       {"tags": ["profile"], "block": ["facing viewer", "facing away"]},
       {"tags": ["from behind", "rear view"], "block": []}
     ],

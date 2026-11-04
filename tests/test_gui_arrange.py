@@ -413,6 +413,35 @@ class PreviewArrangeTests(unittest.TestCase):
         self.page.run()
         self.assertTrue(chips["looking back"].isHidden())
 
+    def test_view_chips_combine_and_conflict(self):
+        chips = {b.property("tag"): b for b in self.panel._chips["view"].buttons()}
+        self.run_page("1girl, ass, groin")
+        chips["from behind"].click()
+        chips["from side"].click()
+        self.assertEqual(self.panel.view, "from side, from behind")
+        self.assertFalse(chips[""].isChecked())
+        self.page.run()
+        self.assertNotIn("groin", self.page.output.toPlainText())
+        self.assertIn("ass", self.page.output.toPlainText())
+        chips["front view"].click()                                            # from behind 와 부딪친다
+        self.assertEqual(self.panel.view, "front view, from side")
+        self.assertFalse(chips["from behind"].isChecked())
+        self.page.run()
+        self.assertNotIn("ass", self.page.output.toPlainText())
+        chips["multiple views"].click()
+        self.page.run()
+        chips["from behind"].click()
+        self.assertEqual(self.panel.view, "front view, from side, from behind, multiple views")
+        self.page.run()
+        self.assertIn("ass", self.page.output.toPlainText())
+        self.assertIn("groin", self.page.output.toPlainText())
+        chips["multiple views"].click()                                        # 끄면 부딪치는 것 중 앞쪽만 남는다
+        self.assertEqual(self.panel.view, "front view, from side")
+        chips[""].click()
+        self.assertEqual(self.panel.view, "")
+        self.assertTrue(chips[""].isChecked())
+        self.assertFalse(chips["front view"].isChecked())
+
     def test_filter_and_custom_chunk_from_tokens(self):
         self.page.preset.setCurrentIndex(self.page.preset.findData("sort_only"))
         self.run_page("smile, my odd phrase, holding chainsword, 1girl")

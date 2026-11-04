@@ -64,7 +64,7 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 
 ## 3. regions (구도 규칙용 신체 부위)
 
-부위 어휘: `head, face, eyes, front_torso, back, arms, hands, hips, thighs, lower_legs, feet`
+부위 어휘: `head, face, eyes, front_torso, back, arms, hands, hips, front_hips, back_hips, thighs, lower_legs, back_legs, feet`
 
 **태그의 내용이 그 부위가 화면에 없으면 그려질 수 없을 때만** 붙인다. 붙인 부위가 **전부** 가려질 때만 태그가 빠진다. 확신이 없으면 비운다. 잘못 지우는 것이 놓치는 것보다 나쁘다.
 
@@ -79,11 +79,14 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 | 등(back) | back |
 | 소매·팔 노출·겨드랑이·팔꿈치 장갑 | arms (장갑은 arms\|hands) |
 | 장갑·손톱·반지·손 제스처(v, hand up) | hands |
-| 엉덩이·사타구니·벨트·속옷 하의 | hips |
+| 골반 앞면에만 있는 것: 사타구니·치골·음모·버클 | front_hips |
+| 골반 뒷면에만 있는 것: 엉덩이·엉덩이 골·항문 | back_hips |
+| 앞뒤에서 모두 보이는 것: 골반 폭·벨트·속옷 하의·성기·삽입과 체위 | hips |
 | 치마·반바지 | hips\|thighs |
 | 바지 | hips\|thighs\|lower_legs |
 | 허벅지·절대영역·허벅지 끈 | thighs |
 | 다리 전체·니삭스(thighhighs) | thighs\|lower_legs |
+| 다리 뒷면에만 있는 것: 무릎 뒤 | back_legs |
 | 팬티스타킹 | hips\|thighs\|lower_legs\|feet |
 | 양말·무릎 양말 | lower_legs\|feet |
 | 부츠 | lower_legs\|feet |
@@ -91,7 +94,9 @@ general 태그 하나에 아래 7개 값을 정한다. 이 문서는 LLM 배치 
 
 비우는 것: 꼬리·날개(정면·측면에서도 보임), 자세·활동·시선, holding X, 목에 거는 것(choker, collar, scarf), 몸 전체에 걸친 상태(wet, sweat, shiny skin), 배경·이펙트·메타.
 
-참고: 시점 규칙(from behind)은 front_torso·face·eyes를 가린다. 고개를 돌려 얼굴이 보이는 시선 태그(looking 계열, facing viewer·back·to the side·up)가 있으면 face·eyes는 보인다. 따라서 표정 태그는 from behind 단일 샷에서 시선 태그가 없거나 facing away일 때 빠진다.
+앞뒤는 서 있는 자세에서 반대쪽으로 보이지 않을 때만 나눈다. 확신이 없으면 hips로 둔다.
+
+참고: from behind는 front_torso·front_hips·face·eyes를, 정면 쪽 시점(straight-on, front view, three quarter view)은 back·back_hips·back_legs를 가린다. from side는 아무것도 가리지 않는다. 그래서 날개·꼬리처럼 등에 붙어도 정면에서 보이는 것에는 back을 붙이지 않는다. 고개를 돌려 얼굴이 보이는 시선 태그(looking 계열, facing viewer·back·to the side·up)가 있으면 face·eyes는 보인다. 따라서 표정 태그는 from behind 단일 샷에서 시선 태그가 없거나 facing away일 때 빠진다.
 
 ## 4. identity (캐릭터 고유 외형)
 

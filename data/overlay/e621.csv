@@ -189,7 +189,7 @@ advertisement,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.75,e621 위키: �
 aerial_(disambiguation),e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 동음이의 안내 태그(위키 없음),,
 aerial_view,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 높은 곳에서 내려다봄,,from_above
 aesop's_fables,e621,series,,,,,accepted,claude:2026-10-29,0.85,이솝 우화(하위 우화 태그가 함의) — 작품,,
-after_anal_penetration,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,위키 없음 · 항문 삽입 직후(함의 after_anal) · 선례 after_anal,,
+after_anal_penetration,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,위키 없음 · 항문 삽입 직후(함의 after_anal) · 선례 after_anal,,
 after_bath,e621,,,,,,accepted,claude:2026-10-29,0.9,목욕 뒤,,after_bathing
 after_oral,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 구강 성행위 직후 장면 · 선례 after_fellatio,,
 after_orgasm,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,"e621 위키: 절정 직후 장면(성별 무관) — after_ejaculation 보다 넓음, 선례 after_sex",,
@@ -268,13 +268,13 @@ amp,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음 �
 amputation,e621,meta/genre,,q,,,accepted,claude:2026-10-29,0.7,e621 위키: 사고·수술로 팔다리를 잘라냄 · severed_limb 선례(잔혹 묘사 q),,
 amusement_ride,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 놀이기구(관람차·롤러코스터 등) · 선례 ferris_wheel,,
 anal_bead_pull,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 애널비즈를 항문에서 당겨 뺌, 함의 anal_beads",,
-anal_beads_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 항문에 넣은 애널 비즈 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+anal_beads_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,"e621 위키: 항문에 넣은 애널 비즈 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 anal_canal,e621,body/lower,,e,,0,accepted,claude:2026-10-29,0.8,위키 없음 · 항문 안쪽 관(단면·투시) · 선례 cervix,,
 anal_fluids,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 항문에서 나온 점액 — anal_fluid 와 같은 뜻,,anal_fluid
 anal_head_gulp,e621,meta/genre,,e,,,accepted,claude:2026-10-29,0.7,위키 없음 · 항문으로 머리를 삼킴 · anal_vore 선례(e),,
-anal_juice_drip,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 흘러내리는 항문 분비액 — 선례 anal_fluid,,
+anal_juice_drip,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,위키 없음 · 흘러내리는 항문 분비액 — 선례 anal_fluid,,
 anal_juice_on_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 음경에 묻은 장액 · 선례 pussy_juice_on_penis,,
-anal_juice_string,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 실처럼 늘어진 항문 분비액 · 선례 pussy_juice_trail,,
+anal_juice_string,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 실처럼 늘어진 항문 분비액 · 선례 pussy_juice_trail,,
 anal_knotting,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.95,e621 위키: 항문에 혹을 넣음 · 함의 knotting·anal_penetration — 선례 knotting,,
 anal_masturbation,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 자기 항문 자극 — masturbation·anal_fingering 선례,,
 anal_orgasm,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,"e621 위키: 항문 자극으로 절정(함의 orgasm) · 선례 orgasm, e621 vaginal_orgasm",,
@@ -287,7 +287,7 @@ anal_storage,e621,meta/genre,,q,,,accepted,claude:2026-10-29,0.65,e621 위키: �
 anal_threading,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 항문으로 들어가 몸을 관통 · 함의 all_the_way_through,,
 anal_tugging,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 anal_grip,,anal_grip
 anatomically_correct,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 종에 맞는 동물 성기·항문 · 선례 e621 animal_genitalia,,
-anatomically_correct_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 종에 맞게 그린 항문 · horse_anus 선례,,
+anatomically_correct_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 종에 맞게 그린 항문 · horse_anus 선례,,
 anatomically_correct_genitalia,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 종에 맞는 동물 성기 · animal_genitalia 선례,,
 anatomically_correct_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 종에 맞는 사실적 음경 · 선례 penis 형태 계열(animal_penis 등),,
 anatomically_correct_vulva,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,종에 맞는 해부학적 음부 형태(e621 성기 형태) · dog_pussy·e621 humanoid_vulva 선례,,
@@ -363,8 +363,8 @@ anthro_to_feral,e621,action/activity,meta/genre,g,,,accepted,claude:2026-10-29,0
 anthrofied,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 동물형 캐릭터를 의인화(수인화)해 그림 · furrification·animalization 선례,,
 anti_material_rifle,e621,,,,,,accepted,claude:2026-10-29,0.95,표기만 다름,,anti-materiel_rifle
 anticipation,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.8,e621 위키: 다가올 일을 기다리는 감정 · expectant 선례,,
-anus_focus,e621,composition/focus,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 항문을 화면 중심에 · penis_focus 선례(e),,
-anus_only,e621,clothes/state,,e,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 항문만 드러남(구멍 뚫린 옷 등) — 항문이라 e,,
+anus_focus,e621,composition/focus,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 항문을 화면 중심에 · penis_focus 선례(e),,
+anus_only,e621,clothes/state,,e,back_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 항문만 드러남(구멍 뚫린 옷 등) — 항문이라 e,,
 anus_outline,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 옷 위로 항문 위치가 드러남 — covered_anus 와 같은 뜻,,covered_anus
 aphrodisiac_gas,e621,effect/atmosphere,,s,,,accepted,claude:2026-10-29,0.7,위키 없음 · 최음 가스 · gas·aphrodisiac(s) 선례,,
 apocalyptic,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 종말 분위기 — apocalypse 와 같은 뜻,,apocalypse
@@ -503,7 +503,7 @@ autograph,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 팬
 autotitfuck,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 autopaizuri — 같은 뜻,,autopaizuri
 average_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 보통 크기 음경 · 선례 penis 형태 계열(animal_penis 등),,
 avian_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 새 발 같은 비늘·발톱 팔 · feathered_arms·scutes 선례,,
-avian_butt,e621,body/lower,body/features,g,hips,1,accepted,claude:2026-10-29,0.8,e621 위키: 볼기 없이 꼬리깃으로 이어지는 새형 엉덩이,,
+avian_butt,e621,body/lower,body/features,g,back_hips,1,accepted,claude:2026-11-04,0.8,e621 위키: 볼기 없이 꼬리깃으로 이어지는 새형 엉덩이,,
 avian_caruncle,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,e621 위키: 새의 볏·육수·코 늘어짐 · 선례 comb_(chicken),,
 avian_feet,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.9,e621 위키: 새 발(비늘·갈고리 발톱) — 선례 talons,,
 avoiding_eye_contact,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 시선을 피함 — averting_eyes 와 같은 뜻,,averting_eyes
@@ -527,7 +527,7 @@ back_wings,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 
 background_music,e621,meta/technical,,,,,accepted,claude:2026-10-29,0.9,영상·소리 형식(animated 는 Danbooru meta),,
 background_text,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.7,위키 없음 · 배경 속 글자 — e621 text_background(글자로 된 배경)와 따로 있음 · 지침 §1 그림 속 글자,,
 backless_clothing,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 등이 드러나는 상의,,backless_outfit
-backsack,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.9,e621 위키: 뒤에서 보이는 고환(balls 함의) · testicles 선례,,
+backsack,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.9,e621 위키: 뒤에서 보이는 고환(balls 함의) · testicles 선례,,
 backward_arm_support,e621,action/gesture,,g,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 몸 뒤쪽에 짚은 팔로 체중을 받침 · 함의 arm_support,,
 backwards_baseball_cap,e621,clothes/headwear,,g,head,,accepted,claude:2026-10-29,0.9,e621 위키: 챙을 뒤로 쓴 야구모자(함의 baseball_cap·backwards_hat),,
 backwards_cap,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 모자를 거꾸로 씀,,backwards_hat
@@ -536,7 +536,7 @@ bad_parenting,e621,etc,,,,,accepted,claude:2026-10-29,,"미성년 성적 함의 
 bad_trigger_discipline,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 쏘지 않을 때 방아쇠에 손가락을 댐,,finger_on_trigger
 baking_tray,e621,,,,,,accepted,claude:2026-10-29,0.9,베이킹 팬,,baking_sheet
 balance,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음 · 균형 잡기(balancing)인지 저울인지 모름(e621 에 balancing 따로 있음),,
-bald_crotch,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.75,e621 위키: 털·깃털 몸인데 사타구니만 맨살 · 선례 e621 featureless_crotch(q),,
+bald_crotch,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.75,e621 위키: 털·깃털 몸인데 사타구니만 맨살 · 선례 e621 featureless_crotch(q),,
 ball_and_chain,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 죄수를 묶는 쇠공과 사슬(무기 아님) — Danbooru 별칭 대상(무기)이 아닌 구속구 태그,,ball_and_chain_restraint
 ball_bite,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 고환을 깨묾,,biting_testicles
 ball_bulge,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 안에 든 것 때문에 불룩한 고환(cock vore 등) · 선례 stomach_bulge,,
@@ -606,7 +606,7 @@ barefoot_sandals,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 발 장�
 barely_contained,e621,clothes/state,,s,,,accepted,claude:2026-10-29,0.8,e621 위키: 너무 큰 부위를 옷이 겨우 담음 · 선례 bursting_breasts·tight_clothes,,
 barely_contained_breasts,e621,body/torso,,s,front_torso,0,accepted,claude:2026-10-29,0.8,위키 없음 · 옷에 겨우 담긴 가슴 · 선례 bursting_breasts,,
 barely_contained_penis,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 옷이 겨우 음경을 가둠(아직 드러나지 않음) · 선례 bulge·e621 penis_outline(q),,
-barely_visible_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 작거나 가려 겨우 보이는 항문(e 태그) · anus 선례,,
+barely_visible_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 작거나 가려 겨우 보이는 항문(e 태그) · anus 선례,,
 barely_visible_balls,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.75,e621 위키: 작거나 가려져 잘 안 보이는 고환,,
 barely_visible_breasts,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.65,e621 위키: 작거나 가려져 잘 안 보이는 가슴,,
 barely_visible_genitalia,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 작거나 가려져 잘 안 보이는 성기(Explicit) · genitals 선례,,
@@ -693,7 +693,7 @@ belly_markings,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.
 belly_mouth,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 stomach_mouth,,stomach_mouth
 belly_nipples,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.8,e621 위키: 배에 난 젖꼭지 — extra_nipples 선례,,
 belly_on_ground,e621,action/posture,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · 배를 바닥에 댐 · on_stomach 선례,,
-belly_overhang,e621,body/torso,,g,front_torso|hips,,accepted,claude:2026-10-29,0.8,e621 위키: 허리선 위로 처진 배 · 선례 muffin_top,,
+belly_overhang,e621,body/torso,,g,front_torso|front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 허리선 위로 처진 배 · 선례 muffin_top,,
 belly_peek,e621,,,,,,accepted,claude:2026-10-29,0.9,배가 살짝 보임,,midriff_peek
 belly_piercing,e621,clothes/accessory,,g,front_torso,,accepted,claude:2026-10-29,0.85,e621 위키: 배 표면 피어싱(배꼽 아님) · 선례 navel_piercing(§6 피어싱),,
 belly_poke,e621,,,,,,accepted,claude:2026-10-29,0.9,배를 찌름,,poking_belly
@@ -725,7 +725,7 @@ beverage,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 음료,,drink
 beverage_bottle,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.9,위키 없음 · 음료병 — §6 용기는 prop,,
 beverage_can,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 음료 캔 일반 — soda·beer can 의 상위인 drink_can 과 같은 뜻,,drink_can
 bfg,e621,object/weapon,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 둠·퀘이크의 거대 총 · huge_weapon 선례,,
-big_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 사실적 범위의 큰 항문 · huge_penis 선례(성기 크기 id 0),,
+big_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 사실적 범위의 큰 항문 · huge_penis 선례(성기 크기 id 0),,
 big_areola,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 평균보다 큰 유륜,,large_areolae
 big_arms,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: thick_arms 참고 — 같은 뜻,,thick_arms
 big_balls,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 large_testicles — 같은 뜻,,large_testicles
@@ -734,7 +734,7 @@ big_ben,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 빅벤(엘리자�
 big_bow,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 큰 리본,,large_bow
 big_breasts,e621,,,,,,accepted,claude:2026-10-29,1.0,지침 §9 예시,,large_breasts
 big_bulge,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 large_bulge — 같은 뜻,,large_bulge
-big_butt,e621,body/lower,,g,hips,1,accepted,claude:2026-10-29,0.8,e621 위키: 사실적인 범위의 큰 엉덩이(huge_butt 아래 단계) — huge_ass 보다 작음 · 선례 wide_hips·large_breasts(g),,
+big_butt,e621,body/lower,,g,back_hips,1,accepted,claude:2026-11-04,0.8,e621 위키: 사실적인 범위의 큰 엉덩이(huge_butt 아래 단계) — huge_ass 보다 작음 · 선례 wide_hips·large_breasts(g),,
 big_cheeks,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 머리의 큰 부분을 차지하는 살찐 볼(체형) · 선례 plump,,
 big_chest,e621,body/torso,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 허리보다 넓고 큰 상체(가슴·흉근 크기 아님) · 선례 broad_shoulders,,
 big_claws,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.9,e621 위키: 보통보다 큰 발톱(함의 claws) · 선례 claws,,
@@ -766,7 +766,7 @@ big_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,위키 없�
 big_power_bottom,e621,action/sexual,subject,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 더 큰 쪽이 주도하며 삽입당함 · 선례 size_difference,,
 big_pubes,e621,,,,,,accepted,claude:2026-10-29,0.85,같은 뜻 — e621 별칭 excessive_pubic_hair,,excessive_pubic_hair
 big_pupils,e621,body/eyes,,g,eyes,,accepted,claude:2026-10-29,0.8,별칭 large_pupils · 큰 동공(dilated_pupils 가 함의) · 선례 e621 big_eyes(그림체 성향),,
-big_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"e621 위키: 큰 칼집(음경), 함의 sheath — §9 크기 계열 · 선례 e621 fully_sheathed",,
+big_sheath,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,"e621 위키: 큰 칼집(음경), 함의 sheath — 크기 계열 · 선례 e621 fully_sheathed",,
 big_tail,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 큰 꼬리,,large_tail
 big_teats,e621,body/features,,s,,1,accepted,claude:2026-10-29,0.8,e621 위키: 큰 사타구니 젖(teats) · 선례 udder,,
 big_teeth,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.8,위키 없음 · 큰 이빨 · 선례 teeth·fang,,
@@ -779,7 +779,7 @@ bikini_aside,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 비키니 �
 bikini_bottom,e621,clothes/bottom,,s,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 상의 없이 입거나 하의만 보이는 비키니 하의 · e621 함의 bikini · bikini_bottom_only 선례,,
 bikini_bottom_removed,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 벗은 비키니 하의,,unworn_bikini_bottom
 bikini_bralette,e621,clothes/top,,s,front_torso,,accepted,claude:2026-10-29,0.75,위키 없음 · 브라렛 모양 비키니 상의 · 선례 bikini_top_only,,
-bikini_bulge,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.8,위키 없음 · 비키니 위로 드러난 사타구니 불룩함 · 선례 panty_bulge,,
+bikini_bulge,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.8,위키 없음 · 비키니 위로 드러난 사타구니 불룩함 · 선례 panty_bulge,,
 bikini_lift,e621,,,,,,accepted,claude:2026-10-29,0.85,비키니 들추기,,bikini_top_lift
 bikini_pull,e621,clothes/state,,s,,,accepted,claude:2026-10-29,0.8,"e621 위키: 입은 비키니를 당겨 젖힘 — *_pull 은 s, bikini_bottom_pull 선례",,
 bikini_removed,e621,,,,,,accepted,claude:2026-10-29,0.85,벗은 비키니,,unworn_bikini
@@ -819,7 +819,7 @@ black_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,"e621 위키
 black_and_white_and_red,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 검정·하양·빨강만,,
 black_and_yellow,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 검정·노랑 팔레트,,
 black_antennae,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,위키 없음 · 검은 더듬이(antennae 함의) · antennae·black_horns 선례,,
-black_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 검은 항문 · 선례 e621 pink_anus,,
+black_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 검은 항문 · 선례 e621 pink_anus,,
 black_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 검은 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 black_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 검은 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 black_armwear,e621,clothes/handwear,,g,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 검은 팔 착용물(armwear 함의) · 선례 e621 armwear·<색>_handwear,,
@@ -842,7 +842,7 @@ black_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별�
 black_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 black_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 검은 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
 black_briefs,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.9,함의 briefs · 검은 브리프 · 선례 briefs,,
-black_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 검은 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+black_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 검은 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 black_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 black_coded,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.7,e621 위키: 사람이 아닌 캐릭터를 흑인 문화로 그림(머리·옷·말투) — 설정·성격,,
 black_countershading,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,색 수식어 + countershading(함의 black_body) · 선례 e621 countershading,,
@@ -894,8 +894,8 @@ black_pepper,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭
 black_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 black_pillow,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.95,함의 pillow(색 수식) · 선례 pillow,,
 black_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,"e621 위키: 검은 음모, 함의 pubes",,black_pubic_hair
-black_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 검은 털·비늘의 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
-black_sheath_slit,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.7,위키 없음 · 검은 칼집 입구 · 선례 sheath_slit·색 수식어,,
+black_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 검은 털·비늘의 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+black_sheath_slit,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.7,위키 없음 · 검은 칼집 입구 · 선례 sheath_slit·색 수식어,,
 black_skinsuit,e621,clothes/onepiece,,g,front_torso|back|hips|thighs|lower_legs,,accepted,claude:2026-10-29,0.85,"e621 위키: 검은 전신 밀착복, 함의 skinsuit · 선례 bodysuit",,
 black_speech_bubble,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 검은 말풍선 · 선례 colored_speech_bubble,,
 black_spikes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.7,위키 없음 · 색 수식어 + 신체 가시 · 선례 spines·back_spikes,,
@@ -927,7 +927,7 @@ black_vulva,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,색 수식
 black_whiskers,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.9,색 수식어 + whiskers · whiskers 선례,,
 black_wristband,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,검은 손목밴드 · wristband 선례,,
 blacklight,e621,,,,,,accepted,claude:2026-10-29,0.95,자외선 조명,,ultraviolet_light
-bladder_bulge,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.7,위키 없음 · 꽉 찬 방광으로 아랫배가 불룩 · 선례 bladder,,
+bladder_bulge,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.7,위키 없음 · 꽉 찬 방광으로 아랫배가 불룩 · 선례 bladder,,
 blade,e621,object/weapon,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 무기·도구의 날,,
 blaze_(marking),e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.9,e621 위키: 이마~코의 세로 줄무늬(facial_markings 함의) · 선례 e621 facial_markings,,
 bleached_hair,e621,body/hair,,g,head,1,accepted,claude:2026-10-29,0.75,e621 위키 없음 — 탈색 머리(머리색),,
@@ -995,8 +995,8 @@ blue_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭
 blue_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 blue_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 파란 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
 blue_briefs,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.9,함의 briefs · 파란 브리프 · 선례 briefs,,
-blue_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 파란 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
-blue_clitoris,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,색 수식어 + clitoris · 선례 blue_anus,,
+blue_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 파란 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+blue_clitoris,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,색 수식어 + clitoris · 선례 blue_anus,,
 blue_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 blue_clouds,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,파란 구름 — 색 수식어(colorful_clouds 보다 좁음) · 선례 colorful_clouds,,
 blue_condom,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.9,색 수식어 + condom 선례(colored_condom),,
@@ -1050,7 +1050,7 @@ blue_paws,e621,body/features,,g,hands|feet,1,accepted,claude:2026-10-29,0.85,색
 blue_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 blue_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,함의 pubes · 파란 음모,,blue_pubic_hair
 blue_seam_underwear,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.85,함의 colored_seam_underwear — 솔기가 파란 남성 속옷 · male_underwear 선례,,
-blue_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 파란 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+blue_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 파란 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 blue_skinsuit,e621,clothes/onepiece,,g,front_torso|back|hips|thighs|lower_legs,,accepted,claude:2026-10-29,0.85,"e621 위키: 파란 전신 밀착복, 함의 skinsuit · 선례 bodysuit",,
 blue_smoke,e621,effect/atmosphere,,,,,accepted,claude:2026-10-29,0.95,함의 smoke(색 수식) · 선례 colored_smoke,,
 blue_speedo,e621,clothes/bottom,,g,hips,,accepted,claude:2026-10-29,0.9,위키 없음 · 함의 speedo(=swim_briefs)·blue_swimwear · 선례 blue_male_swimwear,,
@@ -1089,13 +1089,13 @@ blushing_profusely,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.
 bodily,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음(bodily_fluids 등의 조각 추정),,
 bodily_fluids,e621,object/fluid,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 체액 상위(땀·눈물·침·피·성기 체액) — 낮은 쪽 g,,
 bodily_fluids_drip,e621,object/fluid,,g,,,accepted,claude:2026-10-29,0.7,"위키 없음 · 체액(땀·침·정액 등 상위)이 떨어짐 — 범위가 넓어 낮은 등급, 선례 dripping",,
-bodily_fluids_in_ass,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 항문 안의 체액(피·정액·소변) · cum_in_ass 선례,,
+bodily_fluids_in_ass,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 항문 안의 체액(피·정액·소변) · cum_in_ass 선례,,
 bodily_fluids_in_mouth,e621,object/fluid,,g,face,,accepted,claude:2026-10-29,0.7,"e621 위키: 입 안의 체액(피·정액·소변) — 상위 태그라 낮은 쪽 g, blood_in_mouth 선례",,
 bodily_fluids_in_pussy,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 질 속 체액(정액·피·소변) · 선례 cum_in_pussy,,
 bodily_fluids_on_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 음경에 묻은 체액 · 선례 cum_on_penis,,
 bodily_noises,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.75,e621 위키: 몸에서 나는 소리(효과음) 상위 태그 — sound_effects 선례,,
 body_grab,e621,action/interaction,action/gesture,g,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 몸통을 움켜쥠, torso_grab 선례 · §8 X_grab 통일",,
-body_in_anus,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 몸을 남의 항문에 넣음 · large_insertion 선례,,
+body_in_anus,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 몸을 남의 항문에 넣음 · large_insertion 선례,,
 body_in_mouth,e621,action/interaction,,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 몸 일부가 남의 입 안(삼킴 아님) — head_in_mouth 선례,,
 body_inflation,e621,body/skin,,s,,,accepted,claude:2026-10-29,0.8,e621 위키: 온몸을 부풀려 못 움직임 · 함의 inflation — 선례 inflation(s),,
 body_odor,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.75,위키 없음 · 몸 냄새(냄새 선) · 선례 smell,,
@@ -1245,7 +1245,7 @@ brother_penetrating_brother,e621,action/sexual,subject,e,,,accepted,claude:2026-
 brother_penetrating_sister,e621,action/sexual,subject,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 형제가 자매에게 삽입(나이 무관) · 선례 brother_and_sister,,
 brown_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,함의: monochrome — 두 색만,,
 brown_antlers,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,위키 없음 · 갈색 사슴뿔(antlers 함의) · brown_horns 선례,,
-brown_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 갈색 항문 · 선례 e621 pink_anus,,
+brown_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 갈색 항문 · 선례 e621 pink_anus,,
 brown_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 갈색 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 brown_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 갈색 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 brown_backpack,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.9,e621 함의 backpack · 갈색 배낭 · backpack 선례(bag 보다 좁음),,
@@ -1257,7 +1257,7 @@ brown_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 
 brown_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,e621 위키: 갈색 하의 · 선례 black_skirt·black_shorts,,
 brown_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 brown_bowtie,,brown_bowtie
 brown_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 갈색 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-brown_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 갈색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+brown_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 갈색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 brown_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 brown_countershading,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,색 수식어 + countershading · 선례 e621 countershading,,
 brown_ear_tips,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,e621 위키: brown 귀 끝 · 함의 dipstick_ears,,
@@ -1291,7 +1291,7 @@ brown_paws,e621,body/features,,g,hands|feet,1,accepted,claude:2026-10-29,0.85,�
 brown_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,색 수식어 + penis · 선례 dark_penis 계열(black_penis 등),,
 brown_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 brown_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,함의 pubes · 갈색 음모,,brown_pubic_hair
-brown_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 갈색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+brown_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 갈색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 brown_skin,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.9,"e621 위키: 갈색 피부, 함의 brown_body(지침 §9 <색>_skin) · 선례 dark_skin",,
 brown_spots,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 털·피부의 brown 반점 — 몸 무늬(e621 관례) · 선례 e621 facial_markings,,
 brown_stripes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 캐릭터 몸의 brown 줄무늬 · 함의 stripes — 몸 무늬(e621 관례),,
@@ -1305,7 +1305,7 @@ brown_vulva,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,색 수식
 brown_wristband,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,갈색 손목밴드 · wristband 선례,,
 bruised,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 몸에 멍,,bruise
 brush,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 붓·빗·칫솔 등 솔 — 소품,,
-bubble_butt,e621,body/lower,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 둥글고 탱탱한 엉덩이 · 선례 e621 big_butt,,
+bubble_butt,e621,body/lower,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 둥글고 탱탱한 엉덩이 · 선례 e621 big_butt,,
 bubble_gum,e621,object/food,,g,,,accepted,claude:2026-10-29,0.9,e621 위키: 풍선을 부는 껌 · chewing_gum 선례,,
 buccinator,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.75,e621 위키: 입을 벌리면 보이는 볼 근육막(주로 파충류형),,
 buckled_boots,e621,,,,,,accepted,claude:2026-10-29,0.9,버클 달린 부츠,,belt_boots
@@ -1320,7 +1320,7 @@ bulge_grab,e621,action/interaction,action/sexual,q,,,accepted,claude:2026-10-29,
 bulge_in_face,e621,action/interaction,body/lower,q,,,accepted,claude:2026-10-29,0.75,e621 위키: 사타구니 불룩함이 남의 얼굴 가까이 — 선례 bulge(q),,
 bulge_lick,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 licking_bulge — 같은 뜻,,licking_bulge
 bulge_on_ass,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 엉덩이에 닿은 사타구니 불룩함,,bulge_to_ass
-bulge_rubbing,e621,action/sexual,,q,hips,,accepted,claude:2026-10-29,0.75,위키 없음 · 옷 위로 불룩한 곳을 문지름 · 선례 crotch_rub,,
+bulge_rubbing,e621,action/sexual,,q,front_hips,,accepted,claude:2026-11-04,0.75,위키 없음 · 옷 위로 불룩한 곳을 문지름 · 선례 crotch_rub,,
 bulging_breasts,e621,body/torso,,s,front_torso,0,accepted,claude:2026-10-29,0.8,e621 위키: 꽉 끼는 옷을 밀어내는 가슴 · 선례 bursting_breasts,,
 bull_horn,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,함의: bovine_horn — 황소 뿔(Danbooru 별칭 megaphone 과 다름) · 선례 cow_horns,,
 bullet_casing,e621,,,,,,accepted,claude:2026-10-29,0.9,탄피 — Danbooru shell_casing 과 같은 뜻,,shell_casing
@@ -1344,7 +1344,7 @@ businessman,e621,clothes,,g,,,accepted,claude:2026-10-29,0.85,위키 없음 · �
 businesswear,e621,clothes,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 정장·블라우스·펜슬 스커트 등 업무용 옷 · 선례 office_lady·business_suit,,
 bust_portrait,e621,composition/framing,,g,,,accepted,claude:2026-10-29,0.9,e621 위키: 어깨·윗가슴 위 — portrait 선례,,
 busty_feral,e621,body/torso,,g,front_torso,1,accepted,claude:2026-10-29,0.8,e621 위키: 앞가슴에 사람식 가슴이 있는 feral — 선례 breasts,,
-butt,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 엉덩이,,ass
+butt,e621,body,,s,back_hips,,reviewed,user:2026-11-04,,,,
 butt_bite,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 biting_ass — 같은 뜻,,biting_ass
 butt_blush,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 ass_blush — 같은 뜻,,ass_blush
 butt_cleavage,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 옷 위로 엉덩이 골 윗부분이 드러남(별칭 ass_crack),,butt_crack
@@ -1353,23 +1353,23 @@ butt_focus,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 ass_focus — �
 butt_from_the_front,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 ass_visible_through_thighs — 같은 뜻,,ass_visible_through_thighs
 butt_grab,e621,action/interaction,action/sexual,s,,,accepted,claude:2026-10-29,0.8,"e621 위키: 자기·남의 엉덩이를 움켜쥠 · §8 X_grab 통일, 낮은 쪽 grabbing_own_ass(s) · breast_grab 선례",,
 butt_hair,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 ass_hair — 같은 뜻,,ass_hair
-butt_heart,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이가 하트 모양으로 보이는 카운터셰이딩 · countershading 선례,,
+butt_heart,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이가 하트 모양으로 보이는 카운터셰이딩 · countershading 선례,,
 butt_in_face,e621,action/interaction,,s,,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이가 남의 얼굴 가까이(닿지 않아도) — 선례 face_in_ass,,
-butt_jiggle,e621,body/lower,effect/motion,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이가 출렁임(움직임 선) · 선례 bouncing_ass,,
+butt_jiggle,e621,body/lower,effect/motion,s,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이가 출렁임(움직임 선) · 선례 bouncing_ass,,
 butt_lick,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이 볼기 핥기(rimming 과 다름),,licking_ass
-butt_markings,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 엉덩이의 무늬 — §9 markings,,
-butt_pose,e621,action/posture,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 뒤돌아 엉덩이를 보이며 상체를 틀어 봄(boobs-and-butt pose) · 선례 posing,,
+butt_markings,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 엉덩이의 무늬 — markings,,
+butt_pose,e621,action/posture,,g,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 뒤돌아 엉덩이를 보이며 상체를 틀어 봄(boobs-and-butt pose) · 선례 posing,,
 butt_ripples,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 엉덩이 출렁임 물결,,ass_ripple
-butt_shot,e621,composition/focus,composition/framing,s,,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이를 가까이 잘라 담음 · 선례 ass_focus(s)·e621 mouth_shot,,
+butt_shot,e621,composition/focus,composition/framing,s,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이를 가까이 잘라 담음 · 선례 ass_focus(s)·e621 mouth_shot,,
 butt_size_difference,e621,subject,body/lower,,,,accepted,claude:2026-10-29,0.8,e621 위키: 인물들 사이 엉덩이 크기 차 · 선례 size_difference,,
 butt_slam,e621,action/interaction,,g,,,accepted,claude:2026-10-29,0.65,e621 위키: 엉덩이로 세게 부딪침(공격·삽입 등 여러 뜻) — 수위는 낮은 쪽,,
-butt_slap,e621,action/sexual,action/interaction,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이를 때림(하위 spanking) · 선례 spanking,,
-butt_smother,e621,action/interaction,,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이로 얼굴을 덮어 짓누름(거친 facesitting) · 함의 smothering·butt · 선례 face_in_ass·breast_smother,,
+butt_slap,e621,action/sexual,action/interaction,s,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이를 때림(하위 spanking) · 선례 spanking,,
+butt_smother,e621,action/interaction,,s,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이로 얼굴을 덮어 짓누름(거친 facesitting) · 함의 smothering·butt · 선례 face_in_ass·breast_smother,,
 butt_sniffing,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 엉덩이·항문 냄새 맡기 — smelling_ass 와 같은 뜻,,smelling_ass
 butt_squish,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 엉덩이가 눌려 찌그러짐 — ass_press 와 같은 뜻(breast_squish→breast_press 선례),,ass_press
 butt_stack,e621,action/posture,action/interaction,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 여럿이 포개 누워 엉덩이를 내밂 · 선례 human_stacking·presenting,,
 butt_tattoo,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 ass_tattoo,,ass_tattoo
-butt_tuft,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 엉덩이의 털·깃털 뭉치 · chest_tuft 선례(§9 tuft),,
+butt_tuft,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 엉덩이의 털·깃털 뭉치 · chest_tuft 선례(tuft),,
 butt_wings,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.85,e621 위키: 엉덩이 쪽에서 난 날개 · wings 선례,,
 butt_worship,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 남의 엉덩이를 숭배하듯 만지고 핥음,,ass_worship
 butterfly_knife,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 접이식 나비칼 = balisong,,balisong
@@ -1377,7 +1377,7 @@ butterfly_on_finger,e621,object/animal,,g,hands,,accepted,claude:2026-10-29,0.85
 button_(fastener),e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 옷 단추 — 같은 뜻,,buttons
 button_pop,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 단추가 튀어 나감,,popped_button
 buttplug,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 애널 플러그,,butt_plug
-buttplug_in_ass,e621,action/sexual,object/prop,e,hips,,accepted,claude:2026-10-29,0.85,"e621 위키: 항문에 꽂은 버트플러그 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion) · butt_plug",,
+buttplug_in_ass,e621,action/sexual,object/prop,e,back_hips,,accepted,claude:2026-11-04,0.85,"e621 위키: 항문에 꽂은 버트플러그 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion) · butt_plug",,
 buttplug_in_mouth,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 butt_plug_in_mouth,,butt_plug_in_mouth
 buttplug_insertion,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 버트플러그가 몸(항문·질) 안에 · 선례 anal_object_insertion·butt_plug,,
 buttplug_tail,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 anal_tail,,anal_tail
@@ -1500,7 +1500,7 @@ character_cipher,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.85,e621 위
 character_collage,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 여러 캐릭터를 모아 그린 콜라주 — collage 선례,,
 character_prepared_as_food,e621,meta/genre,,s,,,accepted,claude:2026-10-29,0.7,위키 없음 · 별칭 cooking_vore — 캐릭터를 요리함 · vore 선례(s),,
 charcoal_(artwork),e621,style/medium,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 목탄 그림,,
-chastity_bulge,e621,clothes/accessory,,q,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 자물쇠 표시가 있는 정조대 겸 사타구니 덮개 · 선례 chastity_belt,,
+chastity_bulge,e621,clothes/accessory,,q,front_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 자물쇠 표시가 있는 정조대 겸 사타구니 덮개 · 선례 chastity_belt,,
 chastity_cage_only,e621,clothes/state,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 정조대 케이지만(함의 nude) — chastity_cage 선례 e,,
 chastity_device,e621,clothes/accessory,,q,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 성기 접근을 막는 잠금 장치 상위(케이지·벨트) · 선례 chastity_belt(q),,
 chastity_device_only,e621,clothes/state,,q,,,accepted,claude:2026-10-29,0.85,e621 위키: 정조 기구만(케이지·벨트) — 낮은 쪽 chastity_belt 선례 q,,
@@ -1622,13 +1622,13 @@ clip_studio_paint_(artwork),e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위�
 clit_clamp,e621,,,,,,accepted,claude:2026-10-29,0.9,위키 없음 · 줄임말,,clitoris_clamp
 clit_torture,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 클리토리스 고문,,clitoris_torture
 clitoral,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 clitoral_stimulation — 같은 뜻,,clitoral_stimulation
-clitoral_hood_piercing,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.9,위키 없음 · 음핵 포피 피어싱 · 선례 clitoral_piercing,,
-clitoral_masturbation,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 자기 음핵 자극 — clitoral_stimulation 선례,,
+clitoral_hood_piercing,e621,clothes/accessory,,e,front_hips,,accepted,claude:2026-11-04,0.9,위키 없음 · 음핵 포피 피어싱 · 선례 clitoral_piercing,,
+clitoral_masturbation,e621,action/sexual,,e,front_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 자기 음핵 자극 — clitoral_stimulation 선례,,
 clitoral_rubbing,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 클리토리스를 문질러 자극,,clitoral_stimulation
 clitoral_winking,e621,action/sexual,body/lower,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: (말 등) 음순을 젖혀 음핵을 드러냈다 덮음 · clitoris 선례,,
-clitoris_outline,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 천 위로 음핵 윤곽(함의 camel_toe) · 성기 윤곽 계열은 e621 penis_outline(q)에 맞춤,,
+clitoris_outline,e621,body/lower,,q,front_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 천 위로 음핵 윤곽(함의 camel_toe) · 성기 윤곽 계열은 e621 penis_outline(q)에 맞춤,,
 clitoris_piercing,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 클리토리스 피어싱,,clitoral_piercing
-cloaca_juice,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 총배설강에서 나온 체액 · 선례 pussy_juice,,
+cloaca_juice,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 총배설강에서 나온 체액 · 선례 pussy_juice,,
 cloacal,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 총배설강이 관련된 행위 상위(cloacal_penetration 등),,
 cloacal_penetration,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 총배설강 삽입(함의 cloacal) — 선례 e621 penetration,,
 cloacal_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 총배설강에서 나오는 음경 · 선례 penis 형태 계열(animal_penis 등),,
@@ -1797,8 +1797,8 @@ countershade_belly,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-2
 countershade_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 몸의 대비색 · 선례 countershading,,
 countershade_border,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음(대비색 경계 모양 추정),,
 countershade_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 가슴의 대비색 · 선례 countershading,,
-countershade_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 엉덩이의 대비색 · 선례 e621 red_butt·countershading,,
-countershade_crotch,e621,body/features,,s,hips,1,accepted,claude:2026-10-29,0.75,e621 위키: 사타구니 색이 몸 색과 다름 · 선례 e621 countershading·groin(s),,
+countershade_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 엉덩이의 대비색 · 선례 e621 red_butt·countershading,,
+countershade_crotch,e621,body/features,,s,front_hips,1,accepted,claude:2026-11-04,0.75,e621 위키: 사타구니 색이 몸 색과 다름 · 선례 e621 countershading·groin(s),,
 countershade_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,e621 위키: 몸과 다른 대비색 귀(함의 countershading) — 선례 e621 countershading,,
 countershade_face,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.9,e621 위키: 목·턱·입가의 대비색(함의 countershading) — 선례 e621 countershading,,
 countershade_feet,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.85,e621 위키: 발바닥이 다른 색(함의 countershading) — 선례 e621 countershading,,
@@ -1825,12 +1825,12 @@ covered_vulva,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 별칭 c
 covering,e621,action/gesture,clothes/state,g,hands,,accepted,claude:2026-10-29,0.75,e621 위키: 몸 어느 부분(입·눈·귀·가슴 등)이든 가림 — covering_privates 보다 넓음 · 선례 covering_face,,
 covering_chest,e621,clothes/state,,g,front_torso,,accepted,claude:2026-10-29,0.7,e621 위키: 가슴 없는 인물이 가슴을 가림(있으면 covering_breasts) — topless_male 선례로 g,,
 covering_ears,e621,action/gesture,action/interaction,g,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 귀를 가림 — 지침 §8 손 동작 규칙 · 선례 covering_own_ears,,
-covering_erection,e621,clothes/state,body/lower,q,hips,,accepted,claude:2026-10-29,0.7,"위키 없음 · 별칭 hiding_erection — 발기를 가림, 선례 covering_crotch·erection_under_clothes(q)",,
+covering_erection,e621,clothes/state,body/lower,q,front_hips,,accepted,claude:2026-11-04,0.7,"위키 없음 · 별칭 hiding_erection — 발기를 가림, 선례 covering_crotch·erection_under_clothes(q)",,
 covering_eyes,e621,action/gesture,action/interaction,g,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 눈을 가림 — 지침 §8 손 동작 규칙 · 선례 covering_own_eyes,,
 covering_mouth,e621,action/interaction,action/gesture,g,,,accepted,claude:2026-10-29,0.75,"e621 위키: 남의 입을 막음, 하위 covering_own_mouth — 자기·남 모두 · 선례 covering_another's_mouth",,
-covering_penis,e621,clothes/state,,s,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 음경을 가림(함의 covering_crotch) · 선례 covering_crotch,,
+covering_penis,e621,clothes/state,,s,front_hips,,accepted,claude:2026-11-04,0.8,위키 없음 · 음경을 가림(함의 covering_crotch) · 선례 covering_crotch,,
 covering_self,e621,action/gesture,clothes/state,g,hands,,accepted,claude:2026-10-29,0.8,"e621 위키: 자기 몸(얼굴·가슴·성기)을 가림, 함의 covering · 선례 e621 covering",,
-covering_vulva,e621,clothes/state,action/gesture,s,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 음부를 손 등으로 가림 — 선례 covering_crotch,,
+covering_vulva,e621,clothes/state,action/gesture,s,front_hips,,accepted,claude:2026-11-04,0.8,위키 없음 · 음부를 손 등으로 가림 — 선례 covering_crotch,,
 cow_horn,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 cow_horns — 같은 뜻,,cow_horns
 cow_print_armwear,e621,clothes/handwear,,g,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 젖소 무늬 팔 착용물 · cow_print_gloves 선례,,
 cow_print_thigh_highs,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 cow_print_thighhighs — 같은 뜻,,cow_print_thighhighs
@@ -1868,14 +1868,14 @@ crossgender,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 성별을 바
 crossover_cosplay,e621,clothes,meta/genre,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 다른 작품 캐릭터 의상을 입음(함의 crossover·cosplay) · 선례 X_(cosplay),,
 crossover_ship,e621,meta/genre,subject,,,,accepted,claude:2026-10-29,0.85,"e621 위키: 다른 작품 캐릭터끼리의 커플링, 함의 crossover · 선례 crossover·couple",,
 crossplay,e621,clothes,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · 다른 성별 캐릭터 코스프레 · crossdressing·cosplay 선례,,
-crotch_apron,e621,clothes/bottom,,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 사타구니 앞만 가리는 앞치마 천(로인클로스와 비슷) · loincloth 선례,,
+crotch_apron,e621,clothes/bottom,,s,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 사타구니 앞만 가리는 앞치마 천(로인클로스와 비슷) · loincloth 선례,,
 crotch_attack,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 groin_attack — 같은 뜻,,groin_attack
 crotch_breasts,e621,body/features,,q,hips,1,accepted,claude:2026-10-29,0.75,e621 위키: 사타구니에 달린 사람형 가슴(teat 계열) · 선례 extra_breasts,,
-crotch_lines,e621,body/lower,,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 골반과 허벅지가 만나는 사타구니 주름 — groin_tendon 선례,,
-crotch_shot,e621,composition/focus,composition/framing,s,,,accepted,claude:2026-10-29,0.8,e621 위키: 사타구니를 가까이 잘라 담음 · 선례 crotch_focus(s),,
+crotch_lines,e621,body/lower,,s,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 골반과 허벅지가 만나는 사타구니 주름 — groin_tendon 선례,,
+crotch_shot,e621,composition/focus,composition/framing,s,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 사타구니를 가까이 잘라 담음 · 선례 crotch_focus(s),,
 crotch_sniffing,e621,action/sexual,,s,face,,accepted,claude:2026-10-29,0.8,e621 위키: 사타구니 냄새 맡기(옷 위 포함) · 선례 smelling_ass(s)·smelling_pussy,,
 crotch_tentacles,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 성기 대신·함께 난 촉수 · 선례 animal_penis(§9 성기 형태),,
-crotch_tuft,e621,body/features,,s,hips,1,accepted,claude:2026-10-29,0.8,"e621 위키: 사타구니 둘레의 털 뭉치 · chest_tuft 선례, 사타구니 노출이라 s(groin 선례)",,
+crotch_tuft,e621,body/features,,s,front_hips,1,accepted,claude:2026-11-04,0.8,"e621 위키: 사타구니 둘레의 털 뭉치 · chest_tuft 선례, 사타구니 노출이라 s(groin 선례)",,
 crotchless_bottomwear,e621,clothes/bottom,,q,hips|thighs,,accepted,claude:2026-10-29,0.85,위키 없음 · 가랑이가 트인 하의 · 선례 crotchless_pants,,
 crotchless_clothing,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 가랑이가 트인 옷,,crotchless
 crotchless_swimwear,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 crotchless_swimsuit,,crotchless_swimsuit
@@ -1908,9 +1908,9 @@ cum_everywhere,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.9,e621 위키
 cum_exchange,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 요도로 상대 성기·고환에 사정,,
 cum_explosion,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 구멍에서 정액이 폭발하듯 터져 나옴 — 선례 excessive_cum,,
 cum_expulsion,e621,object/fluid,action/sexual,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 입 외의 구멍에서 정액을 밀어냄(함의 cum) — 선례 cum_in_ass,,
-cum_fart,e621,object/fluid,action/sexual,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 항문에서 정액을 방귀처럼 뿜음(함의 cum) — 선례 cum_in_ass,,
+cum_fart,e621,object/fluid,action/sexual,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 항문에서 정액을 방귀처럼 뿜음(함의 cum) — 선례 cum_in_ass,,
 cum_flooding,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 바닥을 덮을 만큼 넘치는 정액(함의 hyper_cum) · cum_pool 선례,,
-cum_from_ass,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 항문에서 흘러나오는 정액 · cum_in_ass 선례,,
+cum_from_ass,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 항문에서 흘러나오는 정액 · cum_in_ass 선례,,
 cum_from_mouth,e621,object/fluid,,e,face,,accepted,claude:2026-10-29,0.9,e621 위키: 입에서 흘러나오는 정액 — cum_in_mouth 선례,,
 cum_from_nose,e621,object/fluid,,e,face,,accepted,claude:2026-10-29,0.9,e621 위키: 코로 흘러나오는 정액 — cum_in_nose 선례,,
 cum_from_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.7,e621 위키: 위쪽의 정액이 아래쪽 음경으로 나옴 · 선례 cum_on_penis,,
@@ -1938,7 +1938,7 @@ cum_inside,e621,object/fluid,action/sexual,e,,,accepted,claude:2026-10-29,0.85,e
 cum_kiss,e621,action/sexual,object/fluid|action/interaction,e,face,,accepted,claude:2026-10-29,0.85,e621 위키: 입에 정액을 머금은 채 키스(옮기지 않아도 됨) · 선례 cum_swap,,
 cum_meter,e621,composition/format,,q,,,accepted,claude:2026-10-29,0.75,e621 위키: 사정까지 남은 정도를 보이는 게이지 — health_bar 선례 · 성적 함의라 q,,
 cum_on,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.7,"e621 위키 없음 — cum_on_* 상위, cum_on_body 선례",,
-cum_on_anus,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 항문에 묻은 정액(cum 함의) · cum_on_X 선례,,
+cum_on_anus,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 항문에 묻은 정액(cum 함의) · cum_on_X 선례,,
 cum_on_arm,e621,object/fluid,,e,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 팔에 묻은 정액 · cum_on_X 선례,,
 cum_on_armpit,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 겨드랑이에 묻은 정액 · 단수·복수 표기 차이,,cum_on_armpits
 cum_on_balls,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 고환에 묻은 정액,,cum_on_testicles
@@ -1974,7 +1974,7 @@ cum_on_own_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 
 cum_on_own_tongue,e621,object/fluid,,e,face,,accepted,claude:2026-10-29,0.9,e621 위키: 자기 정액이 자기 혀에 · 함의 cum_on_tongue · 선례 cum_on_tongue,,
 cum_on_panties,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 팬티 위 정액 — cum_on_clothes 보다 좁음 · 선례 cum_on_crotch,,
 cum_on_partner,e621,object/fluid,action/sexual,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 삽입당하며 상대에게 사정 · 선례 cum_on_body,,
-cum_on_partner's_butt,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 상대 엉덩이에 묻은 정액 · 선례 cum_on_ass,,
+cum_on_partner's_butt,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,위키 없음 · 상대 엉덩이에 묻은 정액 · 선례 cum_on_ass,,
 cum_on_perineum,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 회음부의 정액 · 선례 cum_on_body,,
 cum_on_shirt,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.9,위키 없음 · 셔츠에 묻은 정액 · 선례 cum_on_clothes,,
 cum_on_shoes,e621,,,,,,accepted,claude:2026-10-29,0.9,신발 위 정액 — Danbooru cum_on_shoe 가 같은 뜻(별칭 대상 cum_on_clothes 는 넓음),,cum_on_shoe
@@ -2131,9 +2131,9 @@ detached_hand,e621,body/features,,g,,0,accepted,claude:2026-10-29,0.7,e621 위�
 detached_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"e621 위키: 몸에서 떨어져 늘어진 칼집, 함의 sheath",,
 detailed,e621,meta/quality,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 털·비늘까지 세밀하게 그림 — 품질 찬사(§8 highly detailed),,
 detailed_ambient_creature,e621,object/animal,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 초점이 아닌 배경 생물(나비·새)을 자세히 그림 · 선례 animal,,
-detailed_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 세밀·사실적으로 그린 항문 · anus 선례,,
+detailed_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 세밀·사실적으로 그린 항문 · anus 선례,,
 detailed_background,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 장소가 드러나는 배경 — §8 배경을 풍부하게 하는 문구,,
-detailed_bulge,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 형태가 구분될 만큼 자세한 사타구니 불룩함 · 선례 bulge·e621 penis_outline,,
+detailed_bulge,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 형태가 구분될 만큼 자세한 사타구니 불룩함 · 선례 bulge·e621 penis_outline,,
 detailed_food,e621,object/food,meta/quality,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 세밀하게 그린 음식(함의 food·detailed),,
 detailed_fur,e621,body/features,meta/quality,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 세밀하고 사실적인 털 묘사(함의 detailed·fur),,
 detailed_genitals,e621,body/lower,meta/quality,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 몸보다 세밀하게 그린 성기(함의 genitals),,
@@ -2181,7 +2181,7 @@ digital_media_(artwork),e621,style/medium,,,,,accepted,claude:2026-10-29,0.95,e6
 digital_painting_(artwork),e621,style/medium,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 칠한 느낌의 디지털 그림,,
 digital_watercolor_(artwork),e621,style/medium,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 디지털 수채,,
 dildo_fellatio,e621,action/sexual,object/prop,q,face,,accepted,claude:2026-10-29,0.8,e621 위키: 딜도를 펠라하듯 빪 — 선례 dildo_in_mouth(q),,
-dildo_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 딜도로 항문 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+dildo_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,"e621 위키: 딜도로 항문 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 dildo_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 dildo_in_pussy — 질에 딜도 · vaginal_object_insertion 선례,,
 dildo_insertion,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 딜도를 구멍에 넣음(입 포함) · 선례 object_insertion,,
 dildo_lick,e621,,,,,,accepted,claude:2026-10-29,0.95,별칭 대상과 같은 뜻(표기 차이),,licking_dildo
@@ -2335,7 +2335,7 @@ eating_feces,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 coprophagia �
 eating_food,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 음식을 먹음(함의 eating),,eating
 edging,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 절정 직전까지 자극하고 멈춤(오르가즘 거부) — 선례 orgasm_denial,,
 egg_bulge,e621,body/torso,,q,front_torso,0,accepted,claude:2026-10-29,0.7,e621 위키: 알 여러 개로 울퉁불퉁 부푼 배 · 선례 stomach_bulge,,
-egg_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,"e621 위키: 알을 항문에 넣음 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+egg_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.85,"e621 위키: 알을 항문에 넣음 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 egg_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,별칭 egg_in_pussy — 질 속 알 · egg_implantation 선례,,
 egg_inflation,e621,body/torso,action/sexual,e,front_torso,,accepted,claude:2026-10-29,0.75,e621 위키: 몸에 낳아진 알로 부풂(산란 페티시) — 선례 egg_laying(e)·cum_inflation,,
 egg_insertion,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 egg_implantation — 같은 뜻,,egg_implantation
@@ -2406,9 +2406,9 @@ equine_vulva,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭
 erect_nipples,e621,body/torso,,q,front_torso,0,accepted,claude:2026-10-29,0.9,e621 위키: 뚜렷이 선 젖꼭지(함의 nipples) — covered_nipples 와 다름 · 선례 puffy_nipples,,
 erect_tail,e621,body/features,,g,,0,accepted,claude:2026-10-29,0.8,e621 위키: 뻣뻣이 곧추선 꼬리(놀람 등) · 선례 tail_raised,,
 erection_in_diaper,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 기저귀 속 발기(별칭 diaper_tent) · 선례 erection_under_clothes,,
-erection_under_bottomwear,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,위키 없음 · 하의 속 발기 · 선례 erection_under_clothes,,
+erection_under_bottomwear,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,위키 없음 · 하의 속 발기 · 선례 erection_under_clothes,,
 erection_under_clothing,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 erection_under_clothes — 같은 뜻,,erection_under_clothes
-erection_under_skirt,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 치마 아래 발기 · 선례 erection_under_clothes,,
+erection_under_skirt,e621,body/lower,,q,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 치마 아래 발기 · 선례 erection_under_clothes,,
 erection_while_penetrated,e621,action/sexual,body/lower,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 삽입당하며 발기 · 선례 masturbating_while_penetrated,,
 erotic_asphyxiation,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 질식으로 성적 흥분 — 같은 뜻,,breathplay
 error,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 그림의 실수 — artistic_error 와 같은 뜻,,artistic_error
@@ -2446,7 +2446,7 @@ explosives,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 폭발물,,exp
 exposed,e621,clothes/state,,e,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 성기가 드러남(내보이거나 쓰지는 않음),,
 exposed_belly,e621,clothes/state,,g,front_torso,,accepted,claude:2026-10-29,0.75,위키 없음 · 드러난 배 · 선례 midriff,,
 exposed_breasts,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 옷을 입은 채 가슴이 드러남(breasts_out 별칭) — Danbooru breasts_out 과 같은 뜻,,breasts_out
-exposed_butt,e621,clothes/state,,q,hips,,accepted,claude:2026-10-29,0.7,위키 없음 · 드러난 맨엉덩이 · 선례 bottomless,,
+exposed_butt,e621,clothes/state,,q,back_hips,,accepted,claude:2026-11-04,0.7,위키 없음 · 드러난 맨엉덩이 · 선례 bottomless,,
 exposed_chest,e621,clothes/state,,g,front_torso,,accepted,claude:2026-10-29,0.85,e621 위키: 옷을 입은 채 흉부가 드러남(가슴 있으면 exposed_breasts) · 선례 e621 bare_chest,,
 exposed_diaper,e621,clothes/state,,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 하의 틈·아래로 기저귀가 드러남 · 선례 diaper(s),,
 exposed_endoskeleton,e621,body/features,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 로봇 외피 사이로 내골격이 보임 — 선례 exposed_internal_machinery,,
@@ -2559,7 +2559,7 @@ fast_sex,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.8,위키 없음 ·
 fat_arms,e621,body/limbs,,g,arms,1,accepted,claude:2026-10-29,0.85,위키 없음 · 살찐 팔 · thick_arms 선례,,
 fat_folds,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 뱃살 접힘 — fat_rolls 와 같은 뜻,,fat_rolls
 fat_legs,e621,body/limbs,,g,thighs|lower_legs,1,accepted,claude:2026-10-29,0.7,위키 없음 · 살찐 다리 · 선례 thick_thighs,,
-fat_upper_pubic_area,e621,body/lower,,s,hips,1,accepted,claude:2026-10-29,0.7,위키 없음 · 별칭 fupa — 아랫배·치골 위 지방 · fat_mons(q)보다 넓어 s,,
+fat_upper_pubic_area,e621,body/lower,,s,front_hips,1,accepted,claude:2026-11-04,0.7,위키 없음 · 별칭 fupa — 아랫배·치골 위 지방 · fat_mons(q)보다 넓어 s,,
 fatal,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.7,e621 위키: 죽음에 이르게 될 일 — 선례 death·dying,,
 fatal_vore,e621,meta/genre,,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 먹이가 죽는 보어(암시 포함) · vore 선례,,
 fatal_wound,e621,body/skin,,q,,,accepted,claude:2026-10-29,0.75,"e621 위키: 죽음이 확실한 치명상 · injury 선례, 잔혹 묘사 q(§6)",,
@@ -2579,17 +2579,17 @@ feathering,e621,body/features,,g,lower_legs,1,accepted,claude:2026-10-29,0.85,e6
 featureless_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 손·발굽 없는 팔 · 선례 e621 handless,,
 featureless_breasts,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 별칭 no_nipples — 같은 뜻,,no_nipples
 featureless_chest,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.8,e621 위키: 젖꼭지·가슴이 없는 흉부 · 선례 no_nipples·e621 featureless_crotch,,
-featureless_crotch,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 드러난 사타구니에 성기가 없음(성별 무관) — no_pussy 보다 넓음,,
+featureless_crotch,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 드러난 사타구니에 성기가 없음(성별 무관) — no_pussy 보다 넓음,,
 featureless_face,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 눈·코·입이 없는 얼굴,,faceless
 featureless_feet,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 별칭 no_toes — 같은 뜻,,no_toes
 featureless_hands,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.85,e621 위키: 손가락 없는 손,,
 featureless_legs,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.7,e621 위키: 발·발굽 없이 끝나는 다리 · 선례 e621 featureless_feet,,
 featureless_limbs,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.8,e621 위키: 손발 끝에 손가락·발굽이 없는 팔다리 — featureless_arms·legs·hands 와 같게,,
 feces,e621,object/fluid,,q,,,accepted,claude:2026-10-29,0.7,e621 위키: 배설물 자체(scat 은 별칭) — 선례 pee(q)·scat(e) 중 낮은 쪽,,
-feces_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 항문 속 배설물(feces 함의) · pee_in_ass 선례,,
+feces_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 항문 속 배설물(feces 함의) · pee_in_ass 선례,,
 feces_in_mouth,e621,object/fluid,,q,face,,accepted,claude:2026-10-29,0.8,e621 위키: 입 안의 배설물 — 선례 e621 feces(q)·feces_on_face,,
 feces_on_body,e621,object/fluid,action/sexual,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 몸에 묻은 대변 · 선례 scat,,
-feces_on_butt,e621,object/fluid,action/sexual,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이에 묻은 대변 · 선례 scat,,
+feces_on_butt,e621,object/fluid,action/sexual,e,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이에 묻은 대변 · 선례 scat,,
 feces_on_face,e621,object/fluid,,q,face,,accepted,claude:2026-10-29,0.8,e621 위키: 얼굴에 묻은 배설물(함의 feces) — 선례 e621 feces(q),,
 feces_on_ground,e621,object/fluid,,q,,,accepted,claude:2026-10-29,0.8,e621 위키: 바닥의 배설물 · feces 선례(q),,
 feces_on_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 음경에 묻은 배설물 · 선례 scat,,
@@ -2838,7 +2838,7 @@ foot_on_penis,e621,action/sexual,action/gesture,e,feet,,accepted,claude:2026-10-
 foot_on_wall,e621,,,,,,accepted,claude:2026-10-29,0.9,벽에 발을 댐,,foot_against_wall
 foot_play,e621,action/sexual,,s,feet,,accepted,claude:2026-10-29,0.8,e621 위키: 발로 성적 자극·발 핥기(함의 foot_fetish) · 선례 e621 foot_fetish(s),,
 foot_rub,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 foot_massage,,foot_massage
-foot_shot,e621,composition/focus,composition/framing,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 발만 가까이 담음 · 선례 foot_focus,,
+foot_shot,e621,composition/focus,composition/framing,g,feet,,accepted,claude:2026-11-04,0.85,e621 위키: 발만 가까이 담음 · 선례 foot_focus,,
 foot_smother,e621,,,,,,accepted,claude:2026-10-29,0.85,발로 얼굴 누르기,,foot_on_another's_face
 foot_sniffing,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 smelling_feet,,smelling_feet
 foot_suck,e621,action/sexual,,s,feet,,accepted,claude:2026-10-29,0.8,"위키 없음 · 발 빨기, 함의 foot_in_mouth · 선례 toe_sucking(좁음)",,
@@ -2926,7 +2926,7 @@ from_front_position,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 
 front-tie_bikini,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 가슴 사이에서 묶는 비키니(상의 매듭),,front-tie_bikini_top
 front-tie_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · 앞으로 묶는 옷 · 선례 front-tie_top,,
 front_view,e621,composition/angle,,g,,,accepted,claude:2026-10-29,0.9,"e621 위키: 정면에서 본 그림 — §9 <x>_view, 선례 facing_viewer",,
-front_vulva,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.65,위키 없음 · 별칭 front_pussy — 몸 앞쪽의 음부로 봄 · pussy 선례,,
+front_vulva,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.65,위키 없음 · 별칭 front_pussy — 몸 앞쪽의 음부로 봄 · pussy 선례,,
 frontal_taur_genitals,e621,body/lower,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 타우르 앞(인간형) 몸의 성기(함의 taur),,
 frontier_brain,e621,series,,,,,accepted,claude:2026-10-29,0.85,포켓몬 배틀 프런티어 보스 묶음(pokemon 함의) — §6 그룹은 series,,
 frosting,e621,,,,,,accepted,claude:2026-10-29,0.9,위키 없음 · 케이크 크림 장식 — icing 과 같은 뜻,,icing
@@ -2961,7 +2961,7 @@ fully_clothed_humanoid,e621,clothes/state,,g,,,accepted,claude:2026-10-29,0.85,�
 fully_clothed_male,e621,clothes/state,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 상하의를 다 입은 남성 — e621 clothed_male 선례,,
 fully_inside,e621,meta/genre,,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 다른 인물 몸속에 완전히 들어감(보어) · 선례 vore(s),,
 fully_restrained,e621,action/posture,action/interaction,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 남·촉수에게 붙잡혀 거의 못 움직임 · 선례 e621 fully_bound·pinned,,
-fully_sheathed,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 음경이 생식기 칼집(sheath)에 완전히 숨음 — Danbooru sheathed(칼집에 든 칼)와 뜻 다름 · §9 sheath,,
+fully_sheathed,e621,body/lower,,e,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 음경이 생식기 칼집(sheath)에 완전히 숨음 — Danbooru sheathed(칼집에 든 칼)와 뜻 다름 · sheath,,
 fully_submerged,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 몸 전체가 액체에 잠김 — submerged(partially_submerged 와 구분)와 같은 뜻,,submerged
 fumes,e621,effect/atmosphere,,,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 김·연기, steam·smoke 선례",,
 fundoshi_only,e621,clothes/state,,s,,,accepted,claude:2026-10-29,0.85,e621 위키: 훈도시만 — underwear_only 선례,,
@@ -3002,7 +3002,7 @@ gaming,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 게임(비디오·
 gaming_while_penetrated,e621,action/sexual,action/activity,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 게임하며 삽입당함 · 선례 masturbating_while_penetrated,,
 gang_rape,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.95,"e621 위키: 여럿이 한 명을 강제로, 함의 rape·gangbang · 선례 gangbang",,
 ganguro_(fashion),e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 갸루 계열 태닝 패션 — 같은 뜻,,ganguro
-gaping_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.9,e621 위키: 벌어진 항문(gaping 함의) · gaping 선례(그보다 좁음),,
+gaping_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.9,e621 위키: 벌어진 항문(gaping 함의) · gaping 선례(그보다 좁음),,
 gaping_mouth,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 목젖이 보일 만큼 크게 벌린 입(함의 open_mouth) — open_mouth 선례,,
 gaping_urethra,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 벌어진 채인 요도 · urethra·gaping 선례,,
 gaping_vagina,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 gaping_pussy — 벌어진 질 · gaping 선례,,
@@ -3025,7 +3025,7 @@ genital_close-up,e621,composition/framing,composition/focus,e,,,accepted,claude:
 genital_danger_play,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.7,e621 위키: 생식기에 위협을 가함 · 선례 imminent_penis_severing,,
 genital_expansion,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 성기가 커짐 — 선례 penis_expansion,,
 genital_fluids,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.85,"e621 위키: 성기에서 나온 체액 상위(정액·애액·소변), Explicit 태그",,
-genital_focus,e621,composition/focus,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 성기를 크게 보이며 몸 대부분도 보임 · penis_focus 선례,,
+genital_focus,e621,composition/focus,,e,hips,,accepted,claude:2026-11-04,0.9,e621 위키: 성기를 크게 보이며 몸 대부분도 보임 · penis_focus 선례,,
 genital_growth,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 새 성기가 생김 · penis_expansion 선례,,
 genital_leash,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 성기(피어싱·정조대 등)에 건 목줄 · 선례 leash·penis_piercing,,
 genital_markings,e621,body/features,body/lower,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 성기의 무늬 — §9 markings · 성기라 e,,
@@ -3035,7 +3035,7 @@ genital_piercing,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.9,
 genital_raphe,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,함의 genitals — 성기의 봉선 · §9 성기 형태,,
 genital_rope,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 성기에 감은 밧줄(하위 ball_rope·penis_rope) · 선례 crotch_rope,,
 genital_scar,e621,body/skin,,e,hips,1,accepted,claude:2026-10-29,0.8,e621 위키: 성기의 흉터(포경·수술) — §6 피부 표식,,
-genital_shot,e621,composition/focus,composition/framing,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 성기를 가까이 잘라 담음 · 선례 penis_focus·pussy_focus,,
+genital_shot,e621,composition/focus,composition/framing,e,hips,,accepted,claude:2026-11-04,0.85,e621 위키: 성기를 가까이 잘라 담음 · 선례 penis_focus·pussy_focus,,
 genital_slit,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 음경이 들어가 있는 생식 틈 — §9 성기 형태,,
 genital_tattoo,e621,body/skin,,e,hips,1,accepted,claude:2026-10-29,0.85,위키 없음 · 성기 문신(하위 ball·penis·pussy_tattoo) · 선례 penis_tattoo,,
 genital_torture,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 성기에 가하는 고통 상위 태그 · cbt·e621 pussy_torture 선례,,
@@ -3078,7 +3078,7 @@ glasses_on_head,e621,clothes/accessory,,g,head,,accepted,claude:2026-10-29,0.95,
 glasses_only,e621,clothes/state,,q,,,accepted,claude:2026-10-29,0.85,e621 위키: 안경만 쓴 나체 — naked_jewelry 선례,,
 glistening,e621,body/skin,,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 몸(주로)·물체의 광택 상위 · glistening_skin=shiny_skin 선례,,
 glistening_abs,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.85,위키 없음 · 번들거리는 복근 · glistening 계열(shiny_skin) 상태 id 0,,
-glistening_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 함의 glistening·anus · 번들거리는 항문 · glistening 계열(shiny) 상태 id 0,,
+glistening_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 함의 glistening·anus · 번들거리는 항문 · glistening 계열(shiny) 상태 id 0,,
 glistening_areola,e621,body/torso,,q,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 번들거리는 유륜 · glistening 계열 상태 id 0,,
 glistening_arms,e621,body/limbs,,g,arms,0,accepted,claude:2026-10-29,0.85,e621 위키: 번들거리는 팔 · glistening 계열 상태 id 0,,
 glistening_balls,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 번들거리는 고환 · 선례 shiny_skin(상태 identity 0),,
@@ -3088,7 +3088,7 @@ glistening_body,e621,body/skin,,g,,0,accepted,claude:2026-10-29,0.85,e621 위키
 glistening_bodysuit,e621,clothes/onepiece,,g,front_torso|back|hips|thighs,,accepted,claude:2026-10-29,0.85,e621 위키: 번들거리는 바디슈트 · 선례 shiny_leotard·bodysuit,,
 glistening_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.85,e621 위키: 번들거리는 하의 · 선례 shiny_skirt,,
 glistening_breasts,e621,body/torso,,s,front_torso,0,accepted,claude:2026-10-29,0.8,e621 위키: 번들거리는 가슴 · 선례 sweaty_breasts·shiny_skin,,
-glistening_butt,e621,body/lower,,s,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 번들거리는 엉덩이 · 선례 sweaty_breasts·shiny_skin,,
+glistening_butt,e621,body/lower,,s,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 번들거리는 엉덩이 · 선례 sweaty_breasts·shiny_skin,,
 glistening_claws,e621,body/features,,g,hands,0,accepted,claude:2026-10-29,0.8,e621 위키: 반짝이는 발톱(함의 claws·glistening) — 광택은 상태라 identity 0 · 선례 claws,,
 glistening_clothing,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 shiny_clothes — 같은 뜻,,shiny_clothes
 glistening_cum,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.85,함의 cum·glistening_genital_fluids · 번들거리는 정액 · 선례 cum,,
@@ -3144,7 +3144,7 @@ glowing_horn,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 glowing_horns
 glowing_nose,e621,body/features,,g,face,,accepted,claude:2026-10-29,0.8,e621 위키: 빛나는 코 — glowing_mouth 선례(상태 0),,
 glowing_pawpads,e621,body/features,,g,hands|feet,,accepted,claude:2026-10-29,0.8,위키 없음 · 빛나는 육구(함의 glowing) · 선례 e621 glowing_feathers,,
 glowing_vulva,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 glowing_pussy,,glowing_pussy
-glowing_womb_tattoo,e621,body/skin,,s,hips,1,accepted,claude:2026-10-29,0.85,위키 없음 · 빛나는 음문(淫紋) · 선례 e621 womb_tattoo·glowing_tattoo,,
+glowing_womb_tattoo,e621,body/skin,,s,front_hips,1,accepted,claude:2026-11-04,0.85,위키 없음 · 빛나는 음문(淫紋) · 선례 e621 womb_tattoo·glowing_tattoo,,
 gluck,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 삼킴·캑캑 소리 의성어,,
 glurk,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 삼킴 소리 의성어,,
 gluteal_fold,e621,body/lower,,s,hips|thighs,0,accepted,claude:2026-10-29,0.75,e621 위키: 엉덩이와 다리 사이 주름 — ass_visible_through_thighs 와 다름 · 선례 underbutt,,
@@ -3215,7 +3215,7 @@ green_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,
 green_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 green_bowtie,,green_bowtie
 green_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 green_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 초록 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-green_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 초록 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+green_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 초록 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 green_claws,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.9,색 수식어 + claws · 선례 blue_claws,,
 green_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 green_condom,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.9,색 수식어 + condom 선례(colored_condom),,
@@ -3256,7 +3256,7 @@ green_nose,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.9,e621 위�
 green_pawpads,e621,body/features,,g,hands|feet,1,accepted,claude:2026-10-29,0.9,"색 수식어 + pawpads(함의 pawpads) · 선례 pawpads, e621 paws(hands|feet)",,
 green_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 green_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,함의 pubes · 초록 음모,,green_pubic_hair
-green_shell,e621,body/features,,g,back,1,accepted,claude:2026-10-29,0.7,"위키 없음 · 초록 등껍질(거북·쿠파), 함의 shell · 선례 turtle_shell",,
+green_shell,e621,body/features,,g,,1,accepted,claude:2026-11-04,0.7,"위키 없음 · 초록 등껍질(거북·쿠파), 함의 shell · 선례 turtle_shell",,
 green_smoke,e621,effect/atmosphere,,,,,accepted,claude:2026-10-29,0.95,함의 smoke(색 수식) · 선례 colored_smoke,,
 green_spots,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 털·피부의 green 반점 — 몸 무늬(e621 관례) · 선례 e621 facial_markings,,
 green_star,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.8,색 별 기호 — star_(symbol) 선례(e621 위키 없음),,
@@ -3275,7 +3275,7 @@ green_uniform,e621,clothes/onepiece,,g,front_torso|back,,accepted,claude:2026-10
 green_vulva,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 green_pussy,,green_pussy
 green_wristband,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,초록 손목밴드 · wristband 선례,,
 greeting,e621,action/gesture,text/in_image,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 인사(손짓·말·인사 문구) · waving 선례,,
-grey_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 회색 항문 · 선례 e621 pink_anus,,
+grey_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 회색 항문 · 선례 e621 pink_anus,,
 grey_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 회색 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 grey_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 회색 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 grey_balls,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 회색 고환(성기 몸 색) · 선례 e621 pink_anus·dark_anus,,
@@ -3287,7 +3287,7 @@ grey_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: �
 grey_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,e621 위키: 회색 하의 · 선례 black_skirt·black_shorts,,
 grey_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 grey_bowtie,,grey_bowtie
 grey_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 회색 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-grey_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 회색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+grey_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 회색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 grey_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 grey_countershading,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,색 수식어 + countershading · 선례 e621 countershading,,
 grey_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,e621 위키: 귀 색(안쪽 제외) — 선례 black_ears,,
@@ -3321,7 +3321,7 @@ grey_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,색 수식어
 grey_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 grey_pillow,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.95,함의 pillow(색 수식) · 선례 pillow,,
 grey_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,함의 pubes · 회색 음모,,grey_pubic_hair
-grey_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 회색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+grey_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 회색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 grey_spots,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 털·피부의 grey 반점 — 몸 무늬(e621 관례) · 선례 e621 facial_markings,,
 grey_stripes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 캐릭터 몸의 grey 줄무늬 · 함의 stripes — 몸 무늬(e621 관례),,
 grey_t-shirt,e621,clothes/top,,g,front_torso|back,,accepted,claude:2026-10-29,0.9,위키 없음 · 함의 t-shirt·grey_shirt · 선례 t-shirt,,
@@ -3475,12 +3475,12 @@ hand_on_back,e621,action/gesture,action/interaction,g,hands,,accepted,claude:202
 hand_on_balls,e621,action/gesture,action/sexual,e,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 고환에 손 — §8 hand_on_X(성적 부위) · 선례 e621 hand_on_penis,,
 hand_on_belly,e621,action/gesture,action/interaction,g,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 배에 손 — 지침 §8 손 동작 규칙 · 선례 hand_on_own_stomach,,
 hand_on_breast,e621,action/gesture,action/sexual,s,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 가슴에 손(중립 접촉) — §8 hand_on_X(성적 부위),,
-hand_on_bulge,e621,action/gesture,action/sexual,q,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 옷 위 사타구니 불룩함에 손 — §8 · 선례 bulge(q),,
-hand_on_butt,e621,action/gesture,action/sexual,s,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 엉덩이에 손(중립) — §8 · 선례 e621 holding_butt,,
+hand_on_bulge,e621,action/gesture,action/sexual,q,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 옷 위 사타구니 불룩함에 손 — 선례 bulge(q),,
+hand_on_butt,e621,action/gesture,action/sexual,s,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 자기·남의 엉덩이에 손(중립) — 선례 e621 holding_butt,,
 hand_on_cheek,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 뺨 모두 · hand_on_X 통일 규칙(§8),,
 hand_on_chest,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 가슴 모두 · hand_on_X 통일 규칙(§8),,
 hand_on_chin,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 턱 모두 · hand_on_X 통일 규칙(§8),,
-hand_on_crotch,e621,action/gesture,action/sexual,s,hands,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 사타구니에 손 — §8 손 동작(성적 부위) · 선례 hand_on_own_crotch(s),,
+hand_on_crotch,e621,action/gesture,action/sexual,s,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 자기·남의 사타구니에 손 — 손 동작(성적 부위) · 선례 hand_on_own_crotch(s),,
 hand_on_diaper,e621,action/gesture,action/interaction,s,hands,,accepted,claude:2026-10-29,0.8,함의 touching_diaper · 자기·남의 기저귀에 손 — §8 손 동작 · 선례 diaper(s),,
 hand_on_ear,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 귀 모두 · hand_on_X 통일 규칙(§8),,
 hand_on_face,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 얼굴 모두 · hand_on_X 통일 규칙(§8),,
@@ -3580,7 +3580,7 @@ hatching_(art),e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 촘촘한 �
 hawaiian_text,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 그림 속 이 문자·언어의 글 — english_text 선례,,
 hazard_suit,e621,,,,,,accepted,claude:2026-10-29,0.9,방호복,,hazmat_suit
 hazard_symbol,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.9,e621 위키: 위험 표지 · 선례 biohazard_symbol,,
-head_between_buttocks,e621,action/interaction,,s,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 엉덩이 사이에 머리 · 선례 face_in_ass·head_between_thighs,,
+head_between_buttocks,e621,action/interaction,,s,back_hips,,accepted,claude:2026-11-04,0.8,위키 없음 · 엉덩이 사이에 머리 · 선례 face_in_ass·head_between_thighs,,
 head_bite,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 머리를 묾 — biting_head 와 같은 뜻,,biting_head
 head_bow,e621,clothes/hair_acc,,g,head,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 머리에 단 리본, hair_bow 선례",,
 head_crest,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,e621 위키: 동물 머리 위의 볏·돌기 · 선례 comb_(chicken)·head_fins,,
@@ -3719,8 +3719,8 @@ holding_both_ears,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 별칭 holding_e
 holding_both_legs,e621,action/gesture,,g,hands,,accepted,claude:2026-10-29,0.8,e621 위키: 자기 두 다리를 잡음(남의 다리 아님) · 선례 holding_own_leg·e621 holding_leg,,
 holding_both_thighs,e621,action/gesture,action/interaction,g,hands,,accepted,claude:2026-10-29,0.85,위키 없음 · 두 허벅지를 잡음 — §8 holding_X 통일 · 선례 e621 holding_leg,,
 holding_breast,e621,action/gesture,action/sexual,s,front_torso,,accepted,claude:2026-10-29,0.8,e621 위키: 자기·남의 가슴을 받쳐 듦 — 지침 §8 손 동작 통일 · 선례 breast_lift,,
-holding_bulge,e621,action/gesture,action/sexual,q,hands,,accepted,claude:2026-10-29,0.8,e621 위키: 자기 불룩함에 손 · 선례 bulge(q),,
-holding_butt,e621,action/gesture,action/sexual,s,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 자기·남의 엉덩이를 받쳐 듦 — 지침 §8 손 동작 통일 · 선례 ass_lift,,
+holding_bulge,e621,action/gesture,action/sexual,q,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 자기 불룩함에 손 · 선례 bulge(q),,
+holding_butt,e621,action/gesture,action/sexual,s,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 자기·남의 엉덩이를 받쳐 듦 — 손 동작 통일 · 선례 ass_lift,,
 holding_cape,e621,action/holding,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · 망토를 쥠(입은 채일 수도) — 대상의 unworn 한정이 없음 · 선례 holding_unworn_cape,,
 holding_cards,e621,,,,,,accepted,claude:2026-10-29,0.9,위키 없음 · 복수형,,holding_card
 holding_carton,e621,action/holding,,g,,,accepted,claude:2026-10-29,0.85,holding_X 구조,,
@@ -3840,7 +3840,7 @@ hooved_fingers,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.85,e62
 hooved_plantigrade,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.85,e621 위키: 발굽 발가락이지만 발바닥으로 섬 · 선례 hooves,,
 hooved_toes,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.85,"위키 없음 · 발굽 달린 발가락, 함의 hooves · 선례 hooves",,
 horizontal_blockage,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 큰 칸 위·아래에 작은 칸이 나란한 칸 배치 · 선례 comic 형식,,
-horizontal_cloaca,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 몸과 수직으로 놓인 총배설강 · 선례 cloaca,,
+horizontal_cloaca,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 몸과 수직으로 놓인 총배설강 · 선례 cloaca,,
 horizontal_diphallism,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 나란히 놓인 음경 두 개(함의 diphallism),,
 horizontal_staggering,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 칸 경계가 어긋나게 맞물린 가로 칸 배치 · 선례 comic,,
 horizontal_stripes,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.7,위키 없음 · 가로 줄무늬(옷 무늬로 주로 씀) · striped_clothes 선례,,
@@ -3855,7 +3855,7 @@ horn_markings,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,위�
 hornet's_needle,e621,object/weapon,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · Hollow Knight 의 호넷이 쓰는 바늘 무기,,
 horror_(expression),e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 공포에 질린 표정 — horrified 와 같은 뜻,,horrified
 horse_armor,e621,,,,,,accepted,claude:2026-10-29,0.85,말 갑옷(마갑),,barding
-hose_in_butt,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 항문에 호스를 꽂음(주로 인플레이션) · 선례 object_insertion,,
+hose_in_butt,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 항문에 호스를 꽂음(주로 인플레이션) · 선례 object_insertion,,
 hose_in_mouth,e621,action/holding,object/prop,g,face,,accepted,claude:2026-10-29,0.75,위키 없음 · 입에 문 호스(함의 hose) — mouth_hold 선례,,
 hose_inflation,e621,body/skin,object/prop,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 호스(입·엉덩이)로 부풀림 · 함의 hose·inflation — 선례 inflation(s),,
 hot_dogging,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 buttjob — 같은 뜻,,buttjob
@@ -3865,11 +3865,11 @@ hourglass_figure,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키
 how-to,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 how_to — 같은 뜻,,how_to
 howl,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 howling — 같은 뜻,,howling
 hud,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 헤드업 디스플레이,,heads-up_display
-huge_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 비현실적으로 큰 항문(big_anus 함의) · huge_penis 선례,,
+huge_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 비현실적으로 큰 항문(big_anus 함의) · huge_penis 선례,,
 huge_areola,e621,body/torso,,q,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 가슴을 크게 덮는 유륜(big_areola 함의) · large_areolae 선례,,
 huge_balls,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 huge_testicles — 같은 뜻,,huge_testicles
 huge_belly,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 아주 큰 배 · 선례 big_belly,,
-huge_bulge,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 주먹~머리만 한 불룩함 · 선례 large_bulge,,
+huge_bulge,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 주먹~머리만 한 불룩함 · 선례 large_bulge,,
 huge_butt,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 huge_ass — 같은 뜻,,huge_ass
 huge_cheeks,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴만 한 볼(big_cheeks 위 단계),,
 huge_diaper,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.85,함의 big_diaper · 아주 큰 기저귀 · 선례 diaper,,
@@ -3884,7 +3884,7 @@ huge_moobs,e621,body/torso,,g,front_torso,1,accepted,claude:2026-10-29,0.85,위�
 huge_muscles,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 보디빌더 수준의 근육 — muscular 선례,,
 huge_pecs,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 아주 큰 가슴 근육 — 같은 뜻,,huge_pectorals
 huge_penetration,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 허벅지보다 굵은 비현실적 삽입(별칭 huge_insertion) · 선례 large_insertion,,
-huge_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"위키 없음 · 아주 큰 칼집, 함의 big_sheath — §9 크기 계열",,
+huge_sheath,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,"위키 없음 · 아주 큰 칼집, 함의 big_sheath — 크기 계열",,
 huge_sword,e621,object/weapon,,g,,,accepted,claude:2026-10-29,0.9,거대한 검(huge_weapon 의 좁은 뜻) · 선례 huge_weapon,,
 huge_tail,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 몸만 한 꼬리 · 함의 big_tail · 선례 large_tail,,
 huge_teats,e621,body/features,,s,,1,accepted,claude:2026-10-29,0.8,e621 위키: 아주 큰 사타구니 젖 · 함의 big_teats · 선례 udder,,
@@ -3967,13 +3967,13 @@ hybrid_genitalia,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 �
 hybrid_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 여러 종의 특징이 섞인 음경 · 선례 penis 형태 계열(animal_penis 등),,
 hyper,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.7,e621 위키: 신체·체액이 비현실적으로 큰 것의 상위 메타 태그(hyper_breasts 등) — 부위 미정이라 체형,,
 hyper_abdominal_bulge,e621,body/torso,,e,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 비현실적으로 큰 배 불룩함 · 선례 stomach_bulge,,
-hyper_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 극단적으로 큰 항문 · huge_penis 선례,,
+hyper_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 극단적으로 큰 항문 · huge_penis 선례,,
 hyper_areola,e621,body/torso,,q,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 극단적으로 큰 유륜 · large_areolae 선례,,
 hyper_balls,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 머리만 한~몸보다 큰 비현실적 고환(huge_balls 위 단계) · 선례 gigantic_testicles,,
 hyper_belly,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 몸에 비해 비현실적으로 큰 배 · 선례 big_belly,,
 hyper_breasts,e621,body/torso,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 몸통을 덮을 만큼 비현실적으로 큰 가슴(huge 위 단계) · 선례 gigantic_breasts,,
-hyper_bulge,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 비현실적으로 큰 사타구니 불룩함 · 선례 large_bulge,,
-hyper_butt,e621,body/lower,,s,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 몸에 비해 비현실적으로 큰 엉덩이(huge 위 단계) · 선례 gigantic_ass,,
+hyper_bulge,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 비현실적으로 큰 사타구니 불룩함 · 선례 large_bulge,,
+hyper_butt,e621,body/lower,,s,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 몸에 비해 비현실적으로 큰 엉덩이(huge 위 단계) · 선례 gigantic_ass,,
 hyper_cheeks,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 머리보다 몇 배 큰 볼(huge_cheeks 위 단계),,
 hyper_cum,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 비현실적으로 엄청난 양의 정액(함의 excessive_cum) · 선례 excessive_cum,,
 hyper_diaper,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.85,함의 huge_diaper · 비현실적으로 큰 기저귀 · 선례 diaper,,
@@ -3990,7 +3990,7 @@ hyper_nipples,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e6
 hyper_pecs,e621,body/torso,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 머리보다 큰 비현실적 가슴 근육 · 선례 huge_pectorals,,
 hyper_penis,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 몸에 비해 터무니없이 큰 음경(huge_penis 위 단계) — gigantic_penis,,gigantic_penis
 hyper_pregnancy,e621,body/torso,,g,front_torso,,accepted,claude:2026-10-29,0.85,"e621 위키: 비현실적으로 큰 임신 배, 함의 pregnant · 선례 pregnant",,
-hyper_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"e621 위키: 비현실적으로 큰 칼집, 함의 huge_sheath — §9 크기 계열",,
+hyper_sheath,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,"e621 위키: 비현실적으로 큰 칼집, 함의 huge_sheath — 크기 계열",,
 hyper_soiling,e621,object/fluid,,q,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 비현실적으로 많은 대변으로 옷을 더럽힘 · 함의 soiling · 선례 peeing_self(q),,
 hyper_tail,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 몸의 몇 배인 꼬리 · 함의 huge_tail · 선례 large_tail,,
 hyper_thighs,e621,body/lower,,g,thighs,1,accepted,claude:2026-10-29,0.9,e621 위키: 비현실적으로 거대한 허벅지 · 함의 huge_thighs,,
@@ -4079,7 +4079,7 @@ inner_ear_fluff,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 animal_ear_
 inner_labia,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 소음순(별칭 labia_minora·pussy_lips) · 선례 pussy·long_labia,,
 inner_monologue,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 속마음 글(생각 말풍선) — thought_bubble 선례,,
 inner_tube,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 튜브,,innertube
-innie_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.7,위키 없음 · 안으로 들어간 항문 모양 · puckered_anus 선례,,
+innie_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.7,위키 없음 · 안으로 들어간 항문 모양 · puckered_anus 선례,,
 innie_vulva,e621,,,,,,accepted,claude:2026-10-29,0.85,같은 뜻 — e621 별칭 cleft_of_venus,,cleft_of_venus
 innuendo,e621,meta/genre,,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 돌려 말하는 암시(대개 성적) · 선례 double_entendre,,
 insane,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 미친 표정,,crazy
@@ -4263,7 +4263,7 @@ knot_bulge,e621,body/torso,,e,front_torso,0,accepted,claude:2026-10-29,0.85,e621
 knot_fucking,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 매듭을 넣었다 뺐다 함 · knot 선례,,
 knot_grab,e621,action/interaction,action/sexual,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 남의 매듭(성기)을 쥠 · §8 X_grab(성적 부위),,
 knot_hanging,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 매듭 결합으로 매달림(함의 knotting),,
-knot_in_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 칼집 속 매듭이 불룩하게 보임,,
+knot_in_sheath,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 칼집 속 매듭이 불룩하게 보임,,
 knot_prodding,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 매듭을 구멍에 대고 누름(안에 넣지 않음) · 선례 knotting,,
 knot_root,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 개과 음경의 매듭 뿌리 · 선례 e621 knot,,
 knot_sitting,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 매듭을 몸에 대고 앉음(안에 넣지 않음) · 선례 knotting,,
@@ -4341,7 +4341,7 @@ layered_clothing,e621,,,,,,accepted,claude:2026-10-29,0.9,겹쳐 입은 옷,,lay
 leaf_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,위키 없음 · 잎으로 된 팔(별칭 leaf_hands) · 선례 e621 leaf_hair,,
 leaf_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,e621 위키: 잎으로 된 귀 — 선례 animal_ears,,
 leaf_hair,e621,body/hair,,g,head,1,accepted,claude:2026-10-29,0.9,e621 위키: 머리카락 대신 잎 · e621 함의 plant_hair · plant_hair 선례,,
-leaking_anus,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 항문에서 정액·윤활제가 흘러나옴 · cum_in_ass 선례,,
+leaking_anus,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 항문에서 정액·윤활제가 흘러나옴 · cum_in_ass 선례,,
 leaking_cum,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 질·항문·입에서 새는 정액(입 포함이라 cumdrip 보다 넓음) · 선례 cumdrip,,
 leaking_diaper,e621,clothes/state,,q,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 넘쳐 소변 등이 새는 기저귀 · 선례 wet_diaper(q),,
 leaking_milk,e621,object/fluid,,q,,,accepted,claude:2026-10-29,0.65,위키 없음 · 대개 젖이 새어 나옴 추정 — lactation 선례,,
@@ -4474,7 +4474,7 @@ living_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.75,위키 없
 living_sex_toy,e621,meta/genre,object/prop,q,,,accepted,claude:2026-10-29,0.7,e621 위키: 살아 있는·성인용품으로 변한 인물 · objectification·sex_doll 선례,,
 living_tail,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.85,e621 위키: 살아 있는(의지가 있는) 꼬리 · 선례 tail_mouth,,
 lmao,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.8,e621 위키: 크게 웃음(약어) — laughing 선례,,
-lock_bulge,e621,body/lower,clothes/accessory,q,hips,0,accepted,claude:2026-10-29,0.7,e621 위키: 자물쇠 기호가 있는 밋밋한 불룩함 · 선례 null_bulge,,
+lock_bulge,e621,body/lower,clothes/accessory,q,front_hips,0,accepted,claude:2026-11-04,0.7,e621 위키: 자물쇠 기호가 있는 밋밋한 불룩함 · 선례 null_bulge,,
 lock_symbol,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 padlock_symbol,,padlock_symbol
 locker_bench,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 탈의실 벤치 · 선례 bench,,
 loincloth_only,e621,clothes/state,,s,,,accepted,claude:2026-10-29,0.85,e621 위키: 로인클로스만(상의 없음) — loincloth·underwear_only 선례,,
@@ -4544,7 +4544,7 @@ looking_up_at_viewer,e621,action/gaze,,g,,,accepted,claude:2026-10-29,0.95,함�
 looming,e621,composition/angle,action/posture,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 올려다보는 시점으로 위에 선 인물 — from_below 선례,,
 looming_over,e621,action/posture,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 보는 이·작은 인물 위로 덮치듯 섬 · 선례 standing_over,,
 loop,e621,meta/technical,,,,,accepted,claude:2026-10-29,0.9,애니메이션 형식·속성(animated 는 Danbooru meta),,
-loose_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 느슨해 보이는 항문 · anus 선례,,
+loose_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 느슨해 보이는 항문 · anus 선례,,
 loose_feather,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 몸에 붙지 않은 깃털(깃펜·빠진 깃털) — Danbooru feathers(물건),,feathers
 loose_footwear,e621,clothes/state,,g,feet,,accepted,claude:2026-10-29,0.65,위키 없음 · 헐렁한 신발 · loose_clothes 선례,,
 loose_foreskin,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 늘어진 포피 · foreskin 선례,,
@@ -4564,7 +4564,7 @@ low-riding,e621,clothes/detail,,s,hips,,accepted,claude:2026-10-29,0.8,e621 위�
 low_res,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 500px 이하,,lowres
 lube_bottle,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.85,e621 위키: 윤활제 병 · 선례 lube,,
 lube_drip,e621,object/fluid,,q,,,accepted,claude:2026-10-29,0.8,e621 위키: 흘러내리는 윤활제 — 선례 lube(q)·lube_on_breasts,,
-lube_in_ass,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 항문 속 윤활제 · cum_in_ass 선례,,
+lube_in_ass,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 항문 속 윤활제 · cum_in_ass 선례,,
 lube_on_dildo,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.85,e621 위키: 딜도에 바른 윤활제 · 선례 lube·dildo,,
 lube_on_penis,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 음경에 바른 윤활제 · 선례 saliva_on_penis,,
 lube_on_sex_toy,e621,object/fluid,object/prop,q,,,accepted,claude:2026-10-29,0.8,e621 위키: 성인용품에 바른 윤활제 · lube 선례,,
@@ -4832,10 +4832,10 @@ money_in_cleavage,e621,object/prop,,s,front_torso,,accepted,claude:2026-10-29,0.
 money_in_clothes,e621,,,,,,accepted,claude:2026-10-29,0.9,옷 틈에 끼운 돈,,tucked_money
 money_rain,e621,,,,,,accepted,claude:2026-10-29,0.9,돈이 쏟아짐,,falling_money
 money_sign,e621,object/symbol,action/gesture,g,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 통화 기호, dollar_sign 선례",,
-monobutt,e621,body/lower,,g,hips,1,accepted,claude:2026-10-29,0.8,e621 위키: 볼기가 나뉘지 않은 엉덩이(그림체),,
+monobutt,e621,body/lower,,g,back_hips,1,accepted,claude:2026-11-04,0.8,e621 위키: 볼기가 나뉘지 않은 엉덩이(그림체),,
 monoglove,e621,,,,,,accepted,claude:2026-10-29,0.85,모노글러브,,armbinder
 monolith,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 거대한 돌기둥, monolith_(object) 선례",,
-monotone_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.7,e621 위키: 한 가지 색 항문(설명은 분홍 그라데이션) · 선례 e621 pink_anus,,
+monotone_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.7,e621 위키: 한 가지 색 항문(설명은 분홍 그라데이션) · 선례 e621 pink_anus,,
 monotone_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.8,위키 없음 · 한 가지 색 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 monotone_background,e621,background/bg_type,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 단색 배경(그라데이션 없음) · simple_background 선례(그보다 좁음),,
 monotone_balls,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 한 가지 색 고환 · 선례 e621 pink_anus,,
@@ -4844,7 +4844,7 @@ monotone_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위�
 monotone_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.85,e621 위키: 한 가지 색 하의 · 선례 black_skirt,,
 monotone_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 한 가지 색 가슴 · 선례 e621 red_butt,,
 monotone_briefs,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.9,함의 briefs · 한 가지 색 브리프 · 선례 briefs,,
-monotone_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 한 가지 색 엉덩이 · 선례 e621 red_butt·countershading,,
+monotone_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 한 가지 색 엉덩이 · 선례 e621 red_butt·countershading,,
 monotone_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 한 가지 색의 옷 · 선례 e621 yellow_clothes,,
 monotone_face,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴을 물들인 무늬 색 — 선례 e621 facial_markings,,
 monotone_feet,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.85,"e621 위키: 한 색 발 — §9 <색>_body, G1 monotone_hands 와 같게",,
@@ -4912,7 +4912,7 @@ mouth_closed,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 closed_mouth 
 mouth_full,e621,object/fluid,action/sexual,e,face,,accepted,claude:2026-10-29,0.8,e621 위키: 구강성교 중 입 안 가득한 정액 · Danbooru full_mouth(음식)와 다름 · cum_in_mouth 선례,,
 mouth_play,e621,action/sexual,,s,face,,accepted,claude:2026-10-29,0.7,e621 위키: 상대 입에 손가락을 넣음·삼키기 직전 놀림 · 선례 finger_in_another's_mouth(s),,
 mouth_scar,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 입가 흉터,,scar_on_mouth
-mouth_shot,e621,composition/focus,action/expression,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 벌린 입 속이 크게 보임(open_mouth 함의) — mouth_focus 보다 좁음,,
+mouth_shot,e621,composition/focus,action/expression,g,face,,accepted,claude:2026-11-04,0.85,e621 위키: 벌린 입 속이 크게 보임(open_mouth 함의) — mouth_focus 보다 좁음,,
 mouthguard,e621,clothes/accessory,,g,face,,accepted,claude:2026-10-29,0.85,위키 없음 · 마우스가드(입 보호대) — 선례 mouth_guard,,
 mouthless,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 no_mouth,,no_mouth
 movie_poster,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 영화 포스터(형식),,movie_poster_(medium)
@@ -4962,7 +4962,7 @@ multicolored_beak,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.9,e6
 multicolored_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 두 색 이상 몸 — §9 몸 색·무늬,,
 multicolored_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,e621 위키: 여러 색 하의 · 선례 multicolored_skirt,,
 multicolored_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 multicolored_bowtie,,multicolored_bowtie
-multicolored_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 여러 색 엉덩이 · 선례 e621 red_butt·countershading,,
+multicolored_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 여러 색 엉덩이 · 선례 e621 red_butt·countershading,,
 multicolored_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 두 가지 이상 색의 옷 · 선례 gradient_clothes,,
 multicolored_exoskeleton,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 여러 색 외골격(함의 multicolored_body) — §9 몸 색,,
 multicolored_eyelashes,e621,body/face,,g,eyes,1,accepted,claude:2026-10-29,0.9,e621 함의 eyelashes · 여러 색 속눈썹 · white_eyelashes·colored_eyelashes 선례,,
@@ -5032,10 +5032,10 @@ musical_symbol,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.9,e621 위�
 musician,e621,action/activity,,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 음악을 하는 인물 — 연주·노래 활동,,
 musk,e621,object/symbol,body/skin,s,,,accepted,claude:2026-10-29,0.75,e621 위키: 흥분 등으로 나는 체취(냄새 구름) — smell·smelly_armpits 선례,,
 musk_worship,e621,action/activity,action/sexual,s,,,accepted,claude:2026-10-29,0.7,e621 위키: 체취를 황홀하게 맡음 · smelling·foot_worship 선례,,
-musky_anus,e621,body/lower,object/symbol,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 사향 냄새 나는 항문 · 선례 e621 smelly_feet·smelly_armpits,,
+musky_anus,e621,body/lower,object/symbol,e,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 사향 냄새 나는 항문 · 선례 e621 smelly_feet·smelly_armpits,,
 musky_armpit,e621,body/limbs,object/symbol,s,arms,0,accepted,claude:2026-10-29,0.85,e621 위키: 사향 냄새 나는 겨드랑이 · smelly_armpits 선례,,
 musky_balls,e621,body/lower,object/symbol,e,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 사향 냄새 나는 고환 · 선례 smelly_penis·smelly_pussy,,
-musky_butt,e621,body/lower,object/symbol,s,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 사향 냄새 나는 엉덩이 · 선례 smelly_armpits·smelly_pussy,,
+musky_butt,e621,body/lower,object/symbol,s,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 사향 냄새 나는 엉덩이 · 선례 smelly_armpits·smelly_pussy,,
 musky_feet,e621,body/limbs,object/symbol,s,feet,,accepted,claude:2026-10-29,0.8,e621 위키: 사향 냄새 나는 발(발 페티시) — 선례 e621 smelly_feet,,
 musky_penis,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 사향(냄새) 나는 음경 — smelly_penis 와 같은 뜻,,smelly_penis
 musky_vulva,e621,body/lower,object/symbol,e,hips,,accepted,claude:2026-10-29,0.75,위키 없음 · 냄새 나는 음부(냄새 선) · e621 smelly_feet·body_odor 선례,,
@@ -5306,7 +5306,7 @@ open_:3,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.9,e621 위�
 open_back_dress,e621,,,,,,accepted,claude:2026-10-29,0.9,위키 없음 · 등 파인 드레스 — backless_dress 와 같은 뜻,,backless_dress
 open_beak,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.9,e621 위키: 부리를 벌림(open_mouth 함의) · 선례 open_mouth,,
 open_blouse,e621,clothes/state,clothes/top,g,front_torso,,accepted,claude:2026-10-29,0.85,위키 없음 · 앞이 열린 블라우스 · open_shirt 선례,,
-open_bottomwear,e621,clothes/state,,s,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 단추·지퍼를 푼 하의 · 선례 open_pants·open_shorts,,
+open_bottomwear,e621,clothes/state,,s,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 단추·지퍼를 푼 하의 · 선례 open_pants·open_shorts,,
 open_clothing,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 풀어헤친 옷,,open_clothes
 open_diaper,e621,clothes/state,,s,hips,,accepted,claude:2026-10-29,0.75,"함의 diaper · 펼친(벗기는 중인) 기저귀 — 노출 확정 아님, 낮은 쪽 s · 선례 diaper",,
 open_frown,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.9,e621 위키: 입 벌린 찡그림(함의 open_mouth·frown),,
@@ -5328,7 +5328,7 @@ oral_threading,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위�
 oral_vore,e621,meta/genre,,s,,,accepted,claude:2026-10-29,0.9,e621 위키: 입으로 삼키는 보어 · vore 선례,,
 oral_while_penetrating,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 삽입하며 구강성교도 함 · 선례 penetrating_while_penetrated,,
 orange_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,함의: monochrome — 두 색만,,
-orange_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 주황 항문 · 선례 e621 pink_anus,,
+orange_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 주황 항문 · 선례 e621 pink_anus,,
 orange_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 주황 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 orange_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 주황 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 orange_backpack,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.9,함의 backpack — <색>_bag 보다 좁음 · 선례 backpack,,
@@ -5342,7 +5342,7 @@ orange_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29
 orange_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 orange_bowtie,,orange_bowtie
 orange_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 orange_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 주황 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-orange_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 주황 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+orange_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 주황 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 orange_claws,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.9,색 수식어 + claws · 선례 blue_claws,,
 orange_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 orange_clouds,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,주황 구름 — 색 수식어(colorful_clouds 보다 좁음) · 선례 colorful_clouds,,
@@ -5411,7 +5411,7 @@ outside,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 야외,,outdoors
 outside_panel,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 인물·소품이 만화 칸 밖으로 나옴 · 선례 outside_border,,
 outside_sex,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 야외 성행위 · 선례 e621 public_sex,,
 over_edge,e621,action/posture,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 몸 일부가 표면 가장자리 밖으로 늘어짐,,
-over_sheath_chastity_cage,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 포피(sheath) 위에 씌운 정조대 · 선례 chastity_cage,,
+over_sheath_chastity_cage,e621,clothes/accessory,,e,front_hips,,accepted,claude:2026-11-04,0.85,위키 없음 · 포피(sheath) 위에 씌운 정조대 · 선례 chastity_cage,,
 overall_dress,e621,clothes/onepiece,,g,front_torso|back|hips|thighs,,accepted,claude:2026-10-29,0.85,e621 위키: 멜빵바지와 드레스를 합친 옷 — 원피스,,
 overalls_only,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 멜빵바지만,,naked_overalls
 overflow,e621,object/fluid,,e,,,accepted,claude:2026-10-29,0.65,위키 없음 · 구멍에서 넘쳐흐르는 체액 추정 · 선례 cum_overflow,,
@@ -5632,17 +5632,17 @@ penis_on_belly,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 자기·남
 penis_on_breast,e621,action/sexual,,e,front_torso,,accepted,claude:2026-10-29,0.85,e621 위키: 음경이 가슴에 놓이거나 닿음(파이즈리 아님) · 선례 penis_over_breasts,,
 penis_on_butt,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 엉덩이 위에 음경,,penis_on_ass
 penis_on_vulva,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 penis_on_pussy,,penis_on_pussy
-penis_outline,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 옷 위로 드러난 음경 윤곽 — 선례 bulge(q) · 별칭 camel_tail 의 분류는 뜻 다름,,
+penis_outline,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 옷 위로 드러난 음경 윤곽 — 선례 bulge(q) · 별칭 camel_tail 의 분류는 뜻 다름,,
 penis_poking_out,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 옷 틈(지퍼·다리 구멍)으로 나온 음경,,penis_out
 penis_riding,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 발기한 음경 위에 걸터앉아 몸을 실음(대개 거대 음경),,
 penis_shaped_bulge,e621,body/torso,,e,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 음경 모양으로 불룩한 배 · 선례 stomach_bulge,,
-penis_shot,e621,composition/focus,composition/framing,e,,,accepted,claude:2026-10-29,0.85,"e621 위키: 음경을 가까이 잘라 담음, 함의 genital_shot · 선례 penis_focus",,
+penis_shot,e621,composition/focus,composition/framing,e,hips,,accepted,claude:2026-11-04,0.85,"e621 위키: 음경을 가까이 잘라 담음, 함의 genital_shot · 선례 penis_focus",,
 penis_shrinking,e621,body/lower,action/activity,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 음경이 비현실적으로 줄어듦 · 선례 transformation,,
 penis_snake,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음 — 성기 모양 뱀(생물)인지 뱀 같은 성기인지 모름 · 참고 snake_penis,,
 penis_sniffing,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 smelling_penis,,smelling_penis
 penis_squeeze,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 자기·남의 음경을 쥐어짬 · 선례 squeezing_testicles,,
 penis_tentacles,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 끝이 성기인 촉수,,penis_tentacle
-penis_through_fly,e621,body/lower,clothes/state,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 바지·속옷 앞트임으로 나온 음경(함의 penis_poking_out=penis_out) · penis_out 선례,,
+penis_through_fly,e621,body/lower,clothes/state,e,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 바지·속옷 앞트임으로 나온 음경(함의 penis_poking_out=penis_out) · penis_out 선례,,
 penis_through_leghole,e621,body/lower,clothes/state,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 속옷·반바지 다리 구멍으로 음경이 나옴 · 함의 penis_poking_out — 선례 penis_peek,,
 penis_tip,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 칼집·총배설강에서 살짝 나온 음경 끝 · 선례 animal_penis,,
 penis_tongue,e621,body/features,,e,face,1,accepted,claude:2026-10-29,0.8,"e621 위키: 끝이 음경인 혀, 함의 penis · penis_tail 선례",,
@@ -5650,7 +5650,7 @@ penis_touching,e621,,,,,,accepted,claude:2026-10-29,0.85,음경끼리 닿음(e62
 penis_towards_viewer,e621,body/lower,composition/angle,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 음경이 보는 이 쪽을 향함 · penis 선례,,
 penis_tuck,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 음경을 허벅지 사이 뒤로 숨김,,tucked_penis
 penis_under_clothes,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.75,위키 없음 · 옷 밑으로 넣은 음경(누구 옷인지 한정 없음) — penis_under_another's_clothes 보다 넓음,,
-penis_under_clothing,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.8,"e621 위키 없음 — 옷 속 음경 윤곽, bulge 선례 q",,
+penis_under_clothing,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.8,"e621 위키 없음 — 옷 속 음경 윤곽, bulge 선례 q",,
 penis_worship,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 음경을 쓰다듬고 입맞추며 숭배 · penis_awe 선례,,
 pent_up,e621,action/expression,,s,face,,accepted,claude:2026-10-29,0.75,e621 위키: 오래 못 해 성적으로 몹시 달아오른 상태 · e621 in_heat 선례,,
 perching_position,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 발을 띄우고 상대 엉덩이 위에 올라탄 후배위 — 체위(§9 성행위),,
@@ -5707,7 +5707,7 @@ pin_accessory,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 옷에 꽂�
 pin_button,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 핀 배지,,button_badge
 pinch,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 손가락으로 꼬집음,,pinching
 pink_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,함의: monochrome — 두 색만,,
-pink_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 분홍 항문(anus 함의) — 색 수식어, anus·dark_nipples 선례",,
+pink_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 분홍 항문(anus 함의) — 색 수식어, anus·dark_nipples 선례",,
 pink_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 분홍 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 pink_armwear,e621,clothes/handwear,,g,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 분홍 팔 착용물 · 선례 e621 armwear·<색>_handwear,,
 pink_backpack,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.9,함의 backpack — <색>_bag 보다 좁음 · 선례 backpack,,
@@ -5729,9 +5729,9 @@ pink_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,�
 pink_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 분홍 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
 pink_chastity_cage,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.9,색 수식어 + chastity_cage 선례,,
 pink_cheeks,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.7,위키 없음 · 분홍 볼 색(red_cheeks 계열 — 홍조일 수도) · 선례 e621 facial_markings,,
-pink_clitoral_hood,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,위키 없음 · 분홍 음핵 포피 — 색 수식어 · 선례 clitoral_hood·e621 pink_anus,,
-pink_clitoris,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,색 수식어 + clitoris · 선례 blue_anus,,
-pink_cloaca,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 분홍 총배설강 · 선례 cloaca,,
+pink_clitoral_hood,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,위키 없음 · 분홍 음핵 포피 — 색 수식어 · 선례 clitoral_hood·e621 pink_anus,,
+pink_clitoris,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,색 수식어 + clitoris · 선례 blue_anus,,
+pink_cloaca,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 분홍 총배설강 · 선례 cloaca,,
 pink_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 pink_cloud,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,분홍 구름 — 색 수식어(colorful_clouds 보다 좁음) · 선례 colorful_clouds,,
 pink_clouds,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,분홍 구름 — 색 수식어(colorful_clouds 보다 좁음) · 선례 colorful_clouds,,
@@ -5846,7 +5846,7 @@ plug,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음 
 plug_(sex_toy),e621,object/prop,,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 구멍에 꽂아 두는 성인용품(하위 buttplug·urethral_plug) · butt_plug 선례,,
 plug_insertion,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 플러그형 성인용품이 몸 안에 · 선례 anal_object_insertion,,
 plugsuit,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 에반게리온 플러그 슈트,,plugsuit_(evangelion)
-plump_camel_toe,e621,clothes/state,,s,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 옷 위로 드러난 도톰한 음순 · 함의 camel_toe · 선례 cameltoe,,
+plump_camel_toe,e621,clothes/state,,s,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 옷 위로 드러난 도톰한 음순 · 함의 camel_toe · 선례 cameltoe,,
 plump_labia,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 도톰하게 부푼 대음순 · 함의 pussy — 선례 cleft_of_venus·long_labia,,
 plushie,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 봉제 인형 일반 — stuffed_animal 보다 stuffed_toy 가 같은 범위,,stuffed_toy
 plushie-like,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키 없음 · 봉제 인형 같은 몸(재질)인지 그림체인지 모름,,
@@ -5963,7 +5963,7 @@ pregnant_humanoid,e621,body/torso,,g,front_torso,,accepted,claude:2026-10-29,0.8
 pregnant_intersex,e621,body/torso,,g,front_torso,,accepted,claude:2026-10-29,0.85,e621 위키: 임신한 인터섹스 · 선례 pregnant,,
 pregnant_male,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 male_pregnancy — 같은 뜻,,male_pregnancy
 pregnant_sex,e621,action/sexual,body/torso,e,,,accepted,claude:2026-10-29,0.9,"e621 위키: 임신한 인물과 성행위, 함의 sex·pregnant",,
-prehensile_clitoral_hood,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 움직이는 촉수형 음핵 포피(세르갈) · 함의 clitoral_hood — §9 성기 형태,,
+prehensile_clitoral_hood,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 움직이는 촉수형 음핵 포피(세르갈) · 함의 clitoral_hood — 성기 형태,,
 prehensile_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 물건을 감아쥘 수 있는 음경 · 선례 penis 형태 계열(animal_penis 등),,
 presenting,e621,action/gesture,,q,,,accepted,claude:2026-10-29,0.8,"e621 위키: 드러난 신체 부위를 대놓고 보여 줌(옷으로 가리면 안 씀, 최소 Questionable) · 선례 presenting_own_body(s)",,
 presenting_another,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: presenting_partner(남의 몸을 내보임)와 같은 뜻,,presenting_another's_body
@@ -5971,12 +5971,12 @@ presenting_anus,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 자기 항
 presenting_armpit,e621,,,,,,accepted,claude:2026-10-29,0.9,자기 겨드랑이를 내보임,,presenting_own_armpit
 presenting_balls,e621,action/gesture,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 고환을 대놓고 내보이는 자세 · 선례 e621 presenting_vulva,,
 presenting_breasts,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 가슴을 내밀어 보이는 자세,,presenting_own_breasts
-presenting_buttplug,e621,action/gesture,object/prop,e,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 꽂은 플러그를 내보임 · 선례 e621 presenting_vulva·butt_plug(e),,
-presenting_cloaca,e621,action/gesture,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 총배설강을 내보이는 자세 · 선례 e621 presenting_vulva,,
-presenting_crotch,e621,action/gesture,,q,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 다리를 벌려 벗은 사타구니를 내보임(최소 Q) · 선례 e621 presenting(q),,
+presenting_buttplug,e621,action/gesture,object/prop,e,back_hips,,accepted,claude:2026-11-04,0.8,위키 없음 · 꽂은 플러그를 내보임 · 선례 e621 presenting_vulva·butt_plug(e),,
+presenting_cloaca,e621,action/gesture,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 총배설강을 내보이는 자세 · 선례 e621 presenting_vulva,,
+presenting_crotch,e621,action/gesture,,q,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 다리를 벌려 벗은 사타구니를 내보임(최소 Q) · 선례 e621 presenting(q),,
 presenting_cum_inside,e621,action/gesture,object/fluid|action/sexual,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 사정당한 입·항문·음부를 내보임 · 선례 e621 presenting_vulva·cum_inside,,
 presenting_genitalia,e621,action/gesture,,e,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 성기를 내보임 · presenting 선례(성기라 e),,
-presenting_hindquarters,e621,action/gesture,,q,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 엉덩이를 대놓고 성적으로 내밂 · 함의 presenting — 선례 e621 presenting(q)·presenting_own_ass,,
+presenting_hindquarters,e621,action/gesture,,q,back_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 엉덩이를 대놓고 성적으로 내밂 · 함의 presenting — 선례 e621 presenting(q)·presenting_own_ass,,
 presenting_mouth,e621,action/gesture,action/expression,g,face,,accepted,claude:2026-10-29,0.75,e621 위키: 입을 보여 주며 강조(구강 성행위 함의 없음) — 선례 e621 presenting,,
 presenting_panties,e621,action/gesture,,s,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 팬티를 보는 이에게 드러냄(치마 들추기 포함) — presenting_removed_panties(벗은 팬티 내밀기) 아님 · 선례 presenting_bra,,
 presenting_partner,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 상대를 내보이는 자세로 만듦 — 선례 e621 presenting_another 와 같은 뜻,,presenting_another's_body
@@ -6038,8 +6038,8 @@ psychic_powers,e621,effect/atmosphere,,,,,accepted,claude:2026-10-29,0.65,위키
 pub,e621,,,,,,accepted,claude:2026-10-29,0.9,술집,,bar_(place)
 pube_peek,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 pubic_hair_peek,,pubic_hair_peek
 pubes,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 음모,,pubic_hair
-pubes_exposed,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 음모가 드러남 — 선례 pubic_hair_peek,,
-pubic_boot,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.7,e621 위키: 일부 공룡의 넓게 튀어나온 치골 끝,,
+pubes_exposed,e621,body/lower,,q,front_hips,,accepted,claude:2026-11-04,0.8,위키 없음 · 음모가 드러남 — 선례 pubic_hair_peek,,
+pubic_boot,e621,body/features,,g,front_hips,1,accepted,claude:2026-11-04,0.7,e621 위키: 일부 공룡의 넓게 튀어나온 치골 끝,,
 pubic_mound,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 mons_pubis,,mons_pubis
 public,e621,background/location,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 사람이 다니는 공공장소(성적 뜻 없음) — public_indecency 와 다름 · 선례 outdoors,,
 public_bath,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 대중목욕탕 — bathhouse 와 같은 뜻,,bathhouse
@@ -6052,7 +6052,7 @@ public_transportation,e621,object/vehicle,,g,,,accepted,claude:2026-10-29,0.8,e6
 puff,e621,etc,,,,,accepted,claude:2026-10-29,,"의미 불확실 · e621 위키 없음, 연기·공기 한 줌 또는 캐릭터 이름 추정",,
 puffed_cheeks,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 볼을 부풀림,,puffy_cheeks
 puffer_jacket,e621,,,,,,accepted,claude:2026-10-29,0.9,패딩 재킷 = down_jacket,,down_jacket
-puffy_anus,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 부풀어 튀어나온 항문(도넛) · e621 함의 anus · puckered_anus 와 다름 · anus 선례,,
+puffy_anus,e621,body/lower,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 부풀어 튀어나온 항문(도넛) · e621 함의 anus · puckered_anus 와 다름 · anus 선례,,
 puffy_areola,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 부푼 유륜 — puffy_nipples 와 같은 뜻,,puffy_nipples
 pull-ups_(diaper),e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 팬티형 기저귀(diaper 함의) · diaper 선례,,
 pull_string,e621,,,,,,accepted,claude:2026-10-29,0.75,당기는 끈(위키 없음),,pull_cord
@@ -6061,7 +6061,7 @@ pulling_hair,e621,action/interaction,action/gesture,g,,,accepted,claude:2026-10-
 pulling_pants_down,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 바지를 끌어내림 — pants_pull 과 같은 뜻,,pants_pull
 pullover,e621,clothes/top,,g,front_torso|back|arms,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 머리로 입는 상의, sweater 선례",,
 pumpkin_basket,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.8,위키 없음 · 호박 모양 바구니 · halloween_bucket 선례,,
-pumpkin_butt,e621,body/skin,,s,hips,0,accepted,claude:2026-10-29,0.7,e621 위키: 엉덩이를 호박처럼 칠함(바디페인트) · 선례 bodypaint·writing_on_ass,,
+pumpkin_butt,e621,body/skin,,s,back_hips,0,accepted,claude:2026-11-04,0.7,e621 위키: 엉덩이를 호박처럼 칠함(바디페인트) · 선례 bodypaint·writing_on_ass,,
 pumpkin_fucking,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 별칭 pumpkin_masturbation — 호박으로 하는 성행위,,
 punch,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 주먹질,,punching
 punk_hair,e621,body/hair,,g,head,1,accepted,claude:2026-10-29,0.75,위키 없음 · 펑크 머리(모히칸·스파이크),,
@@ -6234,7 +6234,7 @@ realistic_fur,e621,body/features,style/art_style,g,,,accepted,claude:2026-10-29,
 realistic_penis_size,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 현실적인 크기의 음경 · 선례 large_penis·small_penis,,
 realistic_wings,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.8,e621 위키: 팔 자리에 난 손 없는 실제 동물식 날개 · winged_arms 선례,,
 rear_admiral_position,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 선 채로 엉덩이를 든 상대에게 하는 후배위 — 체위(§9 성행위),,
-rear_focus,e621,composition/focus,,g,,,accepted,claude:2026-10-29,0.65,위키 없음 · 뒷모습·엉덩이 쪽 초점 짐작 · back_focus(g)·ass_focus(s) 중 낮은 쪽,,
+rear_focus,e621,composition/focus,,g,back_hips,,accepted,claude:2026-11-04,0.65,위키 없음 · 뒷모습·엉덩이 쪽 초점 짐작 · back_focus(g)·ass_focus(s) 중 낮은 쪽,,
 rear_view,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 뒤에서 본 모습(from behind 의 별칭 대상),,from_behind
 reassuring,e621,action/interaction,text/in_image,g,,,accepted,claude:2026-10-29,0.75,"e621 위키: ""걱정 마"" 같은 말로 안심시킴 · 선례 comforting",,
 rebelle_(artwork),e621,style/medium,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 이 프로그램으로 만든 그림 — procreate_(software) 선례,,
@@ -6247,7 +6247,7 @@ recording_video,e621,action/activity,object/prop,g,,,accepted,claude:2026-10-29,
 rectangular_glasses,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 사각테 안경,,rectangular_eyewear
 recycling_bin,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 recycle_bin — 같은 뜻,,recycle_bin
 red_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,"e621 위키: 빨강·하양 두 색만, 함의 monochrome — Danbooru 별칭(작가)과 다름 · 선례 limited_palette",,
-red_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 빨간 항문 · 선례 e621 pink_anus,,
+red_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 빨간 항문 · 선례 e621 pink_anus,,
 red_apple,e621,object/food,,g,,,accepted,claude:2026-10-29,0.95,e621 위키: 빨간 사과 · e621 함의 apple · apple 선례,,
 red_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 빨간 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 red_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 빨간 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
@@ -6271,7 +6271,7 @@ red_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 
 red_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 red_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 빨간 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
 red_briefs,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.9,함의 briefs · 빨간 브리프 · 선례 briefs,,
-red_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.75,"e621 위키: 엉덩이 피부·털이 빨간 몸 색(맞은 자국 아님, 그건 butt_blush) — spanked 와 다름 · 지침 §9 몸 색",,
+red_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.75,"e621 위키: 엉덩이 피부·털이 빨간 몸 색(맞은 자국 아님, 그건 butt_blush) — spanked 와 다름 · 몸 색",,
 red_cheeks,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.8,"e621 위키: 빨간 볼 색(피카츄처럼 타고난·칠한 것, 홍조 아님) · 선례 e621 facial_markings",,
 red_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
 red_clouds,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.9,빨간 구름 — 색 수식어(colorful_clouds 보다 좁음) · 선례 colorful_clouds,,
@@ -6338,7 +6338,7 @@ red_underwear,e621,clothes/underwear,,s,front_torso|hips,,accepted,claude:2026-1
 red_uniform,e621,clothes/onepiece,,g,front_torso|back,,accepted,claude:2026-10-29,0.8,빨간 제복 · uniform·military_uniform 선례,,
 red_vulva,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,색 수식어 + vulva(e621 vulva = pussy) · blue_pussy·colored_pussy 선례,,
 red_wristband,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,빨간 손목밴드 · wristband 선례,,
-reddened_butt,e621,body/skin,,s,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 맞거나 거친 성행위로 붉어진 엉덩이 · 선례 spanked,,
+reddened_butt,e621,body/skin,,s,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 맞거나 거친 성행위로 붉어진 엉덩이 · 선례 spanked,,
 redraw,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.75,e621 위키: 기존 장면·그림을 다시 그림 — redraw 계열 선례,,
 reference_image,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 참고한 원본 이미지를 함께 실음,,reference_inset
 regalia,e621,clothes,object/prop,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 왕관·홀 같은 왕권 상징물 · 선례 crown·scepter,,
@@ -6367,7 +6367,7 @@ restroom_stall,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 화장실 
 reticle,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 조준선,,crosshair
 retracted_balls,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 사정 때 고환이 몸 쪽으로 당겨 올라감(거고근 반사),,rising_testicles
 retracted_foreskin,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 젖혀져 귀두가 다 드러난 포피 · foreskin 선례,,
-retracted_sheath,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 칼집이 젖혀져 음경이 드러남,,
+retracted_sheath,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 칼집이 젖혀져 음경이 드러남,,
 retracting_foreskin,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 포피를 젖히는 동작 · foreskin_pull 선례,,
 retro,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 일부러 옛날 느낌으로 그림,,retro_artstyle
 revamped_anthros,e621,style/art_style,,,,,accepted,claude:2026-10-29,0.7,e621 위키: SFM·Blender 3D 몸 모델 라인 Revamped · 모델 양식,,
@@ -6485,7 +6485,7 @@ saint_andrew's_cross,e621,object/prop,action/sexual,q,,,accepted,claude:2026-10-
 sake_dish,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 술잔 — sakazuki 와 같은 뜻,,sakazuki
 salamander_tail,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.85,도롱뇽 꼬리 · 선례 lizard_tail,,
 saliva_drip,e621,object/fluid,action/expression,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 입에서 떨어지는 침(drooling 과 다름) · e621 함의 saliva·dripping · saliva 선례,,
-saliva_on_anus,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 항문에 묻은 침 · cum_on_X 선례,,
+saliva_on_anus,e621,object/fluid,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 항문에 묻은 침 · cum_on_X 선례,,
 saliva_on_balls,e621,object/fluid,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 고환에 묻은 침 · 선례 saliva_on_breasts,,
 saliva_on_face,e621,object/fluid,,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴에 묻은 침(핥기·침 흘림) — 선례 saliva,,
 saliva_on_foot,e621,object/fluid,,g,feet,,accepted,claude:2026-10-29,0.8,위키 없음 · 발에 묻은 침 · blood_on_feet·chocolate_on_foot 선례,,
@@ -6610,7 +6610,7 @@ sex_shot,e621,composition/focus,action/sexual,e,,,accepted,claude:2026-10-29,0.8
 sex_swing,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.75,e621 위키: 천장에 거는 성행위용 그네 · 선례 spreader_bar(q),,
 sex_toy_background,e621,object/prop,background/scenery,q,,,accepted,claude:2026-10-29,0.75,e621 위키: 쓰지 않고 놓인 성인용품·BDSM 도구 · 성인용품 q(§2),,
 sex_toy_fellatio,e621,action/sexual,,q,face,,accepted,claude:2026-10-29,0.8,e621 위키: 딜도 등 성인용품에 펠라치오 · 선례 dildo_in_mouth,,
-sex_toy_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 항문에 든 성인용품 · anal_object_insertion 선례(그보다 좁음),,
+sex_toy_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 항문에 든 성인용품 · anal_object_insertion 선례(그보다 좁음),,
 sex_toy_in_mouth,e621,object/prop,,q,face,,accepted,claude:2026-10-29,0.85,e621 위키: 입 안의 성인용품 — dildo_in_mouth 선례,,
 sex_toy_in_urethra,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 요도에 넣은 성인용품 · urethral_insertion 선례,,
 sex_toy_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 sex_toy_in_pussy — 질에 성인용품 · vaginal_object_insertion 선례,,
@@ -6646,12 +6646,12 @@ shattered,e621,object,effect/atmosphere,g,,,accepted,claude:2026-10-29,0.7,"e621
 shattered_glass,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 산산조각 난 유리 — broken_glass 와 같은 뜻,,broken_glass
 shaved,e621,body/skin,,g,,0,accepted,claude:2026-10-29,0.7,e621 위키: 털·머리를 밀어 일부가 없음 · 선례 shaved_head,,
 shaved_vulva,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,별칭 shaved_pussy — 털 민 음부 · pussy 선례,,
-sheath_chastity_cage,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 포피(sheath)용 정조대 · 선례 chastity_cage,,
-sheath_outline,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 옷 위로 성기 칼집(sheath) 윤곽 · 선례 e621 penis_outline(q),,
+sheath_chastity_cage,e621,clothes/accessory,,e,front_hips,,accepted,claude:2026-11-04,0.85,위키 없음 · 포피(sheath)용 정조대 · 선례 chastity_cage,,
+sheath_outline,e621,body/lower,,q,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 옷 위로 성기 칼집(sheath) 윤곽 · 선례 e621 penis_outline(q),,
 sheath_penetration,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,e621 위키: 성기 칼집(sheath)에 삽입 — 선례 e621 penetration,,
-sheath_piercing,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 성기 칼집(sheath) 피어싱 · 선례 penis_piercing,,
-sheath_play,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 성기 칼집을 가지고 노는 성행위 · 선례 e621 penetration,,
-sheath_slit,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 털 없는 칼집 입구 — §9 성기 형태,,
+sheath_piercing,e621,clothes/accessory,,e,front_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 성기 칼집(sheath) 피어싱 · 선례 penis_piercing,,
+sheath_play,e621,action/sexual,,e,front_hips,,accepted,claude:2026-11-04,0.85,e621 위키: 성기 칼집을 가지고 노는 성행위 · 선례 e621 penetration,,
+sheath_slit,e621,body/lower,,e,front_hips,,accepted,claude:2026-11-04,0.8,e621 위키: 털 없는 칼집 입구 — 성기 형태,,
 sheathed_humanoid_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 칼집(sheath)에서 나오는 인간형 음경 · 선례 penis 형태 계열(animal_penis 등),,
 sheathed_tapering_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 칼집에서 나오는 끝이 가는 음경 · 선례 penis 형태 계열,,
 sheathed_weapon,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 칼집·홀스터에 넣은 무기,,sheathed
@@ -6733,7 +6733,7 @@ side-tie_bikini,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 엉덩이
 side-tie_swimwear,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 옆끈 수영복 — swimwear=swimsuit,,side-tie_swimsuit
 side_bangs,e621,body/hair,,g,head,1,accepted,claude:2026-10-29,0.8,e621 위키: 머리 양옆으로 길게 내린 앞머리 · 선례 sidelocks,,
 side_boob,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 옆가슴,,sideboob
-side_butt,e621,body/lower,,g,hips,0,accepted,claude:2026-10-29,0.75,e621 위키: 옆에서 보이는 엉덩이 윤곽(옷 위 포함) · 선례 sideboob,,
+side_butt,e621,body/lower,,g,back_hips,0,accepted,claude:2026-11-04,0.75,e621 위키: 옆에서 보이는 엉덩이 윤곽(옷 위 포함) · 선례 sideboob,,
 side_by_side,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 나란히,,side-by-side
 side_by_side_stereogram,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.8,함의: stereogram — 그 선례,,
 side_cap,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 garrison_cap — 같은 뜻,,garrison_cap
@@ -6863,7 +6863,7 @@ sm,e621,action/sexual,,s,,,accepted,claude:2026-10-29,0.7,"e621 위키 없음 �
 smack_(sound_effect),e621,text/in_image,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 때리는 효과음 smack · sound_effects 선례,,
 small_balls,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 평균보다 작은 고환,,small_testicles
 small_but_hung,e621,body/lower,body/skin,e,hips,,accepted,claude:2026-10-29,0.8,e621 위키: 키가 작은데 음경(대개 고환도)이 아주 큰 인물 · 선례 large_penis·shortstack,,
-small_butt,e621,body/lower,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 평균보다 작은 엉덩이 · 선례 flat_ass,,
+small_butt,e621,body/lower,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 평균보다 작은 엉덩이 · 선례 flat_ass,,
 small_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.8,위키 없음 · 작은 귀 — 선례 e621 big_ears(large_ears),,
 small_eyes,e621,body/eyes,,g,eyes,,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴 비례상 작은 눈 — 선례 e621 big_eyes,,
 small_feet,e621,body/limbs,,g,feet,1,accepted,claude:2026-10-29,0.85,e621 위키: 몸에 비해 작은 발 — 선례 small_hands,,
@@ -6890,7 +6890,7 @@ smaller_pred,e621,meta/genre,subject,s,,,accepted,claude:2026-10-29,0.75,"e621 �
 smaller_raped,e621,action/sexual,subject,e,,,accepted,claude:2026-10-29,0.85,위키 없음 · 작은 쪽이 강간당함(크기 차이) · 선례 rape,,
 smaller_version_at_source,e621,meta/technical,,,,,accepted,claude:2026-10-29,0.95,다른 판·출처 안내 — 사이트 관리,,
 smelly,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 고약한 냄새(냄새 표시) · 선례 smell,,
-smelly_butt,e621,body/lower,object/symbol,s,hips,0,accepted,claude:2026-10-29,0.75,위키 없음 · 냄새 나는 엉덩이 · 선례 smelly_armpits·smelly_pussy,,
+smelly_butt,e621,body/lower,object/symbol,s,back_hips,0,accepted,claude:2026-11-04,0.75,위키 없음 · 냄새 나는 엉덩이 · 선례 smelly_armpits·smelly_pussy,,
 smelly_feet,e621,body/limbs,object/symbol,s,feet,0,accepted,claude:2026-10-29,0.85,e621 위키: 발 냄새(묘사·페티시) — smelly_armpits 선례,,
 smiling_at_another,e621,action/expression,action/gaze,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 다른 인물에게 미소(smile 함의) · smile 선례,,
 smiling_at_each_other,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.9,e621 위키: 둘 이상이 서로 보고 웃음(함의 smiling_at_another) · 선례 smile,,
@@ -6975,7 +6975,7 @@ spades_(suit),e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 카드 무�
 spandex_shorts,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 자전거 반바지,,bike_shorts
 spanish,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.75,e621 위키: 스페인 국기·전통 의상·명소(spanish_text 와 다름) · 나라 형용사 태그 — 사람·말·국기 등 나라 테마(글자만이 아님) · 선례 soviet,,
 spanish_description,e621,meta/technical,,,,,accepted,claude:2026-10-29,0.9,게시물 설명·출처의 글 — 사이트 관리,,
-spank_marks,e621,body/skin,,s,hips,0,accepted,claude:2026-10-29,0.8,e621 위키: 맞아서 남은 자국 — 지침 §6 피부 표식 · 별칭 spanked(행위)와 다름,,
+spank_marks,e621,body/skin,,s,back_hips,0,accepted,claude:2026-11-04,0.8,e621 위키: 맞아서 남은 자국 — 피부 표식 · 별칭 spanked(행위)와 다름,,
 spanked_butt,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 맞은 엉덩이,,spanked
 sparklefur,e621,meta/genre,,,,,accepted,claude:2026-10-29,0.75,e621 위키: 원색·장신구·복잡한 무늬로 꾸민 캐릭터 디자인 장르,,
 sparklers,e621,,,,,,accepted,claude:2026-10-29,0.95,단수·복수,,sparkler
@@ -7029,7 +7029,7 @@ sports_uniform,e621,clothes,,g,,,accepted,claude:2026-10-29,0.85,운동부 유�
 spotted_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 팔의 점무늬(털·피부·비늘) · 선례 e621 stripes(몸 무늬),,
 spotted_back,e621,body/features,,g,back,1,accepted,claude:2026-10-29,0.85,위키 없음 · 등의 점무늬 · 선례 e621 stripes(몸 무늬),,
 spotted_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 점박이 무늬 몸(markings 함의) — §9 몸 색·무늬,,
-spotted_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 점박이 엉덩이 · 선례 e621 red_butt·countershading,,
+spotted_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 점박이 엉덩이 · 선례 e621 red_butt·countershading,,
 spotted_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 물방울·동물 반점 무늬 옷 · 선례 polka_dot,,
 spotted_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.85,위키 없음 · 반점 무늬 귀 — 선례 multicolored_ears,,
 spotted_face,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.8,위키 없음 · 얼굴 반점 무늬 — 선례 e621 facial_markings,,
@@ -7043,7 +7043,7 @@ spotted_shoulders,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.75,위�
 spotted_thighs,e621,body/features,,g,thighs,1,accepted,claude:2026-10-29,0.8,위키 없음 · 허벅지의 반점 무늬 — 몸 무늬,,
 spray,e621,,,,,,accepted,claude:2026-10-29,0.7,위키 없음 · 별칭 spraying,,spraying
 spread_butt,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 spread_ass — 같은 뜻,,spread_ass
-spread_cloaca,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,함의 spreading·cloaca · 선례 spread_pussy,,
+spread_cloaca,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.85,함의 spreading·cloaca · 선례 spread_pussy,,
 spread_eagle,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 팔다리를 X자로 벌림,,spread_eagle_position
 spread_knees,e621,action/gesture,,s,thighs|lower_legs,,accepted,claude:2026-10-29,0.8,e621 위키: 무릎을 굽혀 벌림(다리 벌리기의 한 형태) · 선례 spread_legs(s),,
 spread_slit,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 생식 틈을 벌림 · 선례 spread_pussy,,
@@ -7113,7 +7113,7 @@ sticker_pack,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.65,위키
 stinger_tail,e621,,,,,,accepted,claude:2026-10-29,0.85,같은 뜻 — e621 별칭 scorpion_tail,,scorpion_tail
 stink_fumes,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 악취를 나타내는 김 표시(하위 stink_lines) · smell 선례,,
 stink_lines,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.85,"위키 없음 · 함의 stink_fumes — 악취 표시선, smell 선례",,
-stinkface,e621,action/interaction,,s,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 엉덩이를 남의 얼굴에 밀어붙여 굴욕 줌 · 선례 face_in_ass,,
+stinkface,e621,action/interaction,,s,back_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 엉덩이를 남의 얼굴에 밀어붙여 굴욕 줌 · 선례 face_in_ass,,
 stippling,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 점묘 — 별칭 pointillism,,pointillism
 stirrup_socks,e621,clothes/legwear,,g,lower_legs|feet,,accepted,claude:2026-10-29,0.9,e621 위키: 발가락·뒤꿈치가 트인 양말 · 선례 stirrup_legwear(레그웨어 전반이라 넓음),,
 stirrup_stockings,e621,clothes/legwear,,g,lower_legs|feet,,accepted,claude:2026-10-29,0.9,e621 위키: 발가락·뒤꿈치가 트인 스타킹 · 함의 stirrup_legwear · 선례 stirrup_legwear,,
@@ -7141,7 +7141,7 @@ straining_buttons,e621,clothes/state,clothes/detail,g,,,accepted,claude:2026-10-
 strapless_clothing,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 strapless — 같은 뜻,,strapless
 strapless_underwear,e621,clothes/underwear,,s,front_torso|hips,,accepted,claude:2026-10-29,0.85,어깨끈 없는 속옷(하위 strapless_bra) · strapless_bra 선례,,
 strapon,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 스트랩온,,strap-on
-strapon_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,"위키 없음 · 스트랩온으로 항문 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+strapon_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.85,"위키 없음 · 스트랩온으로 항문 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 strapon_in_pussy,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,위키 없음 · 스트랩온 질 삽입 · 선례 pegging,,
 strapon_insertion,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.85,위키 없음 · 스트랩온 삽입 · 선례 object_insertion·strap-on,,
 strapon_sex,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,e621 위키: 스트랩온으로 삽입 · 선례 pegging(더 좁음),,
@@ -7152,7 +7152,7 @@ stray_pubes,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 흩어진 음
 stream_chat,e621,text/in_image,composition/format,,,,accepted,claude:2026-10-29,0.85,e621 위키: 라이브 방송 채팅창 · 선례 chat_log·livestream,,
 street_lamp,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 가로등,,lamppost
 street_sign,e621,,,,,,accepted,claude:2026-10-29,0.85,도로 표지판,,road_sign
-stretched_anus,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.75,e621 위키: 한계 이상으로 늘어난 항문(큰 삽입) · large_insertion 선례,,
+stretched_anus,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.75,e621 위키: 한계 이상으로 늘어난 항문(큰 삽입) · large_insertion 선례,,
 stretched_clothing,e621,clothes/state,,g,,,accepted,claude:2026-10-29,0.85,위키 없음 · 늘어난 옷 · 선례 tight_clothes,,
 stretched_mouth,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.65,e621 위키: 큰 물체로 입이 한계 이상 늘어남 — open_mouth 계열,,
 stretched_urethra,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 늘어난 요도 · urethra 선례,,
@@ -7278,14 +7278,14 @@ sweater_only,e621,,,,,,accepted,claude:2026-10-29,0.9,위키 없음 · 스웨터
 sweating_profusely,e621,,,,,,accepted,claude:2026-10-29,0.7,위키 없음 · 땀을 줄줄 흘림(Danbooru 별칭),,nervous_sweating
 sweatshirt,e621,clothes/top,,g,front_torso|back|arms,,accepted,claude:2026-10-29,0.9,e621 위키: 운동용 두꺼운 풀오버(맨투맨) · 선례 sweater,,
 sweaty_abs,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀 젖은 복근 · sweaty_<부위> 선례(sweaty_breasts·sweaty_feet),,
-sweaty_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀에 젖은 항문(sweat 함의) · sweaty_<부위> 선례,,
+sweaty_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 땀에 젖은 항문(sweat 함의) · sweaty_<부위> 선례,,
 sweaty_armpit,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 sweaty_armpits — 같은 뜻,,sweaty_armpits
 sweaty_arms,e621,body/limbs,,g,arms,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀에 젖은 팔(sweat 함의) · sweaty_<부위> 선례,,
 sweaty_back,e621,body/torso,,g,back,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀에 젖은 등 · sweaty_<부위> 선례,,
 sweaty_balls,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀에 젖은 고환 · 선례 sweaty_breasts(부위 + 땀),,
 sweaty_belly,e621,body/torso,,g,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 배의 땀 · 선례 sweaty_breasts(부위 + 땀),,
 sweaty_body,e621,body/skin,object/fluid,g,,0,accepted,claude:2026-10-29,0.85,e621 위키: 온몸에 땀 · 선례 sweat·wet,,
-sweaty_butt,e621,body/lower,,s,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 땀에 젖은 엉덩이 · 선례 sweaty_breasts,,
+sweaty_butt,e621,body/lower,,s,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 땀에 젖은 엉덩이 · 선례 sweaty_breasts,,
 sweaty_chest,e621,body/torso,object/fluid,g,front_torso,0,accepted,claude:2026-10-29,0.85,e621 위키: 흉부의 땀(함의 sweat) · 선례 sweaty_breasts(가슴은 s),,
 sweaty_clothing,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 sweaty_clothes — 같은 뜻,,sweaty_clothes
 sweaty_face,e621,object/fluid,,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 얼굴의 땀(함의 sweat) — 선례 sweat,,
@@ -7352,7 +7352,7 @@ tail_heart,e621,body/features,action/gesture,g,,0,accepted,claude:2026-10-29,0.8
 tail_hold,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · e621 위키가 모호 태그(carrying_tail·holding_tail·lifted_by_tail 등으로 갈림),,
 tail_hug,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 꼬리를 끌어안음,,hugging_tail
 tail_in_mouth,e621,action/holding,action/interaction,g,face,,accepted,claude:2026-10-29,0.85,e621 위키: 입에 문 꼬리(자기·남) — biting_own_tail 선례,,
-tail_in_own_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 자기 꼬리를 항문에 넣음 · tail_in_ass 선례,,
+tail_in_own_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,e621 위키: 자기 꼬리를 항문에 넣음 · tail_in_ass 선례,,
 tail_in_own_pussy,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 자기 꼬리로 질을 자극, 함의 tail_in_pussy · 선례 tail_insertion",,
 tail_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 tail_in_pussy — 질에 꼬리 삽입 · tail_insertion 선례,,
 tail_jewelry,e621,clothes/accessory,,g,,,accepted,claude:2026-10-29,0.9,e621 위키: 꼬리에 단 장신구(고리) · 선례 tail_ring,,
@@ -7388,7 +7388,7 @@ talking_to_viewer,e621,action/activity,action/gaze,g,,,accepted,claude:2026-10-2
 tall,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.85,e621 위키: 키 큰 인물 · 선례 tall_female,,
 tally_marks,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 바를 정(正)·그어 세기 표시,,tally
 talon_hands,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.85,e621 위키: 맹금 발톱 재질의 손 · claws 선례,,
-tan_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 황갈색 항문 · 선례 e621 pink_anus,,
+tan_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 황갈색 항문 · 선례 e621 pink_anus,,
 tan_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 황갈색 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 tan_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 베이지 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 tan_background,e621,background/bg_type,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 황갈·베이지 단색 배경(simple_background 함의),,
@@ -7397,7 +7397,7 @@ tan_belly,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e6
 tan_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 황갈색 몸(털·비늘·피부 상위) — §9 <색>_body · 선례 e621 white_body,,
 tan_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,e621 위키: 황갈색 하의 · 선례 black_skirt·black_shorts,,
 tan_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 황갈색 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-tan_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 황갈색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+tan_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 황갈색 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 tan_chest,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 흉부의 몸 색 — §9 <색>_body,,
 tan_claws,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.9,색 수식어 + claws · 선례 blue_claws,,
 tan_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
@@ -7428,7 +7428,7 @@ tan_penis,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.9,색 수식어 
 tan_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 tan_scales,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,"e621 위키: 황갈색 비늘, 함의 tan_body · §9 <색>_scales",,
 tan_sclera,e621,body/eyes,,g,eyes,1,accepted,claude:2026-10-29,0.85,위키 없음 · 황갈색 흰자 · 선례 colored_sclera,,
-tan_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 황갈색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+tan_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 황갈색 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 tan_shirt,e621,clothes/top,,g,front_torso|back,,accepted,claude:2026-10-29,0.85,e621 위키: 황갈색 셔츠(tan_topwear 함의) — 색 수식어 + shirt,,
 tan_shorts,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,"e621 위키: 황갈색 반바지, 함의 shorts · 선례 shorts",,
 tan_skin,e621,body/skin,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 황갈색 피부(선탠 tanned 와 다름) — §9 <색>_skin,,
@@ -7494,7 +7494,7 @@ tears_of_pain,e621,object/fluid,action/expression,g,face,,accepted,claude:2026-1
 tears_of_pleasure,e621,object/fluid,action/expression,s,face,,accepted,claude:2026-10-29,0.85,e621 위키: 성적 쾌감으로 흘리는 눈물(함의 tears) · 선례 tears(§6 눈물),,
 teary_eyes,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.8,위키 없음 · 눈물 고인 눈 — 선례 e621 watery_eyes,,
 teasing_viewer,e621,action/interaction,,g,,,accepted,claude:2026-10-29,0.85,"e621 위키: 보는 이를 놀림(대사) — bullying_viewer 와 뜻이 다름, teasing 선례",,
-teasing_with_butt,e621,action/gesture,,s,hips,,accepted,claude:2026-10-29,0.65,위키 없음 · 엉덩이로 유혹·약 올림 · 선례 flexing_ass,,
+teasing_with_butt,e621,action/gesture,,s,back_hips,,accepted,claude:2026-11-04,0.65,위키 없음 · 엉덩이로 유혹·약 올림 · 선례 flexing_ass,,
 teasing_with_feet,e621,action/sexual,action/gesture,s,feet,,accepted,claude:2026-10-29,0.7,"위키 없음 · 별칭 foot_tease — 발로 하는 성적 놀림, 선례 foot_worship(s)",,
 teat_growth,e621,body/torso,,q,front_torso,,accepted,claude:2026-10-29,0.7,"위키 없음 · 젖꼭지(teats)가 생김 · breast_growth 계열, 유두라 q",,
 teats,e621,body/features,,s,,1,accepted,claude:2026-10-29,0.8,e621 위키: 사타구니 쪽에 난 젖·젖꼭지(말·소·양) · 선례 udder,,
@@ -7513,7 +7513,7 @@ tentacle_around_penis,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.8
 tentacle_around_waist,e621,object,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 허리에 감긴 촉수 · tentacle_around_neck 선례,,
 tentacle_fellatio,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 촉수가 성기를 빪 — 선례 e621 tentaclejob,,
 tentacle_grab,e621,action/holding,,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 인물이 촉수를 손에 쥠(반대는 coiling) — grabbed_by_tentacles 와 방향이 반대 · 선례 tentacles(g),,
-tentacle_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 촉수가 항문에 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+tentacle_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,"e621 위키: 촉수가 항문에 삽입 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 tentacle_in_urethra,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,e621 위키: 요도에 들어간 촉수 · urethral_penetration·tentacle_sex 선례,,
 tentacle_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 tentacle_in_pussy — 질에 촉수 · tentacle_sex 선례,,
 tentacle_lick,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 licking_tentacle — 같은 뜻,,licking_tentacle
@@ -7525,7 +7525,7 @@ tentacles_around_arms,e621,object,,g,arms,,accepted,claude:2026-10-29,0.8,위키
 tentacles_around_legs,e621,object,,g,thighs|lower_legs,,accepted,claude:2026-10-29,0.8,위키 없음 · 다리를 감은 촉수 — G1 tentacles_around_arms 와 같게(tentacles 선례),,
 tentacles_everywhere,e621,object,background/scenery,g,,,accepted,claude:2026-10-29,0.75,e621 위키: 배경까지 촉수로 가득(함의 tentacles) — 선례 tentacles,,
 tentacles_on_female,e621,action/sexual,,q,,,accepted,claude:2026-10-29,0.7,위키 없음 · 여성을 촉수가 휘감음 — 선례 tentacles_on_male(q),,
-tenting,e621,body/lower,,q,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: 발기로 옷·이불이 텐트처럼 솟음 · 선례 erection_under_clothes,,
+tenting,e621,body/lower,,q,front_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: 발기로 옷·이불이 텐트처럼 솟음 · 선례 erection_under_clothes,,
 term_of_endearment,e621,text/in_image,action/interaction,,,,accepted,claude:2026-10-29,0.75,e621 위키: 애칭으로 부르는 대사 — 선례 dialogue,,
 terra_macro,e621,body/skin,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 행성만 한 거대 캐릭터(함의 macro) — e621 macro 선례,,
 testicle_cuff,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 고환만 두르는 고리 · 선례 penis_ornament,,
@@ -7611,7 +7611,7 @@ throwing_pokeball,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 �
 thrown,e621,etc,,,,,accepted,claude:2026-10-29,,"의미 불확실 · 던져지는 사람·물체(수동) 추정 — throwing 과 다름, 위키 없음",,
 thrust_lines,e621,effect/motion,,q,,,accepted,claude:2026-10-29,0.7,위키 없음 · 허리 찌르기 움직임 선(주로 성행위) — 성적 함의라 등급 q,,
 thrusting,e621,action/sexual,,q,,,accepted,claude:2026-10-29,0.75,e621 위키: 허리를 앞뒤로 흔듦(주로 성적) · 선례 humping(q),,
-thumb_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.85,"위키 없음 · 엄지로 항문 애무(anal_fingering 함의) · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+thumb_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.85,"위키 없음 · 엄지로 항문 애무(anal_fingering 함의) · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 thumb_in_mouth,e621,action/gesture,action/interaction,g,hands,,accepted,claude:2026-10-29,0.8,위키 없음 · 함의 finger_in_mouth — 선례 e621 finger_in_mouth,,
 thumb_suck,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 thumb_sucking,,thumb_sucking
 thumbnail,e621,meta/quality,,,,,accepted,claude:2026-10-29,0.8,"e621 위키: 250px 이하 — 함의 low_res, lowres 선례",,
@@ -7705,10 +7705,10 @@ torn_stockings,e621,clothes/state,,g,thighs|lower_legs,,accepted,claude:2026-10-
 torn_thigh_highs,e621,,,,,,accepted,claude:2026-10-29,0.95,찢어진 사이하이,,torn_thighhighs
 torn_topwear,e621,clothes/state,,g,front_torso|back,,accepted,claude:2026-10-29,0.9,e621 위키: 찢어진 상의 · torn_shirt 선례,,
 torn_wing,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 torn_wings,,torn_wings
-torso_shot,e621,composition/focus,composition/framing,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 목~사타구니 몸통만 담음(얼굴은 잘림) · 선례 e621 mouth_shot,,
+torso_shot,e621,composition/focus,composition/framing,g,front_torso|back,,accepted,claude:2026-11-04,0.8,e621 위키: 목~사타구니 몸통만 담음(얼굴은 잘림) · 선례 e621 mouth_shot,,
 totem_pole,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.85,토템 기둥 · 선례 totem,,
-touching_bulge,e621,action/gesture,action/sexual,q,hands,,accepted,claude:2026-10-29,0.75,위키 없음 · 불룩함을 만짐 · 선례 e621 bulge_grab,,
-touching_butt,e621,action/gesture,action/sexual,s,hands,,accepted,claude:2026-10-29,0.75,위키 없음 · 엉덩이를 만짐 — hand_on_butt 와 같게,,
+touching_bulge,e621,action/gesture,action/sexual,q,front_hips,,accepted,claude:2026-11-04,0.75,위키 없음 · 불룩함을 만짐 · 선례 e621 bulge_grab,,
+touching_butt,e621,action/gesture,action/sexual,s,back_hips,,accepted,claude:2026-11-04,0.75,위키 없음 · 엉덩이를 만짐 — hand_on_butt 와 같게,,
 touching_chest,e621,action/gesture,action/interaction,g,,,accepted,claude:2026-10-29,0.85,위키 없음 · 자기·남의 가슴팍을 만짐 — §8 손 동작 · 선례 e621 hand_on_chest,,
 touching_diaper,e621,action/gesture,action/interaction,s,hands,,accepted,claude:2026-10-29,0.8,함의 diaper · 기저귀를 만짐 — §8 손 동작 · 선례 diaper(s),,
 touching_ears,e621,action/interaction,,g,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 귀를 만짐(남 쪽 다수), hand_on_another's_ear 선례",,
@@ -7781,7 +7781,7 @@ transparent_dildo,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.9,e621 위�
 transparent_sex_toy,e621,object/prop,,q,,,accepted,claude:2026-10-29,0.9,e621 위키: 투명한 성인용품 · sex_toy 선례,,
 trap_(contrivance),e621,object/prop,,g,,,accepted,claude:2026-10-29,0.7,e621 위키: 덫 장치(하위 mouse_trap·bear_trap) 또는 덫에 걸린 상황 · mousetrap 선례,,
 trapdoor,e621,,,,,,accepted,claude:2026-10-29,0.95,표기만 다름,,trap_door
-trapped_in_butt,e621,action/interaction,,s,hips,,accepted,claude:2026-10-29,0.7,e621 위키: 엉덩이 사이에 끼어 갇힘(대개 크기 차) · 선례 face_in_ass,,
+trapped_in_butt,e621,action/interaction,,s,back_hips,,accepted,claude:2026-11-04,0.7,e621 위키: 엉덩이 사이에 끼어 갇힘(대개 크기 차) · 선례 face_in_ass,,
 trapped_in_clothing,e621,action/posture,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 작은 인물이 큰 인물의 옷에 갇힘 · 선례 trapped,,
 treasure_hoard,e621,object/prop,background/scenery,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 한곳에 쌓인 금·보석 더미 · 선례 treasure,,
 tree_house,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 treehouse — 같은 뜻,,treehouse
@@ -7838,7 +7838,7 @@ two_tone_beak,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.85,위�
 two_tone_body,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 정확히 두 색 몸 — §9 몸 색·무늬,,
 two_tone_bodysuit,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 두 색 바디슈트,,two-tone_bodysuit
 two_tone_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29,0.9,e621 위키: 두 색 하의 · 선례 two-tone_skirt,,
-two_tone_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 두 색 엉덩이 · 선례 e621 red_butt·countershading,,
+two_tone_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 두 색 엉덩이 · 선례 e621 red_butt·countershading,,
 two_tone_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 정확히 두 색의 옷 · 선례 gradient_clothes,,
 two_tone_dress,e621,,,,,,accepted,claude:2026-10-29,0.95,표기 차이(함의 two_tone_clothing),,two-tone_dress
 two_tone_ears,e621,body/features,,g,head,1,accepted,claude:2026-10-29,0.9,e621 위키: 두 색 귀(함의 multicolored_ears) — 선례 multicolored_ears,,
@@ -7997,7 +7997,7 @@ user_avatar,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.7,e621 위
 using_diaper,e621,action/sexual,clothes/underwear,q,hips,,accepted,claude:2026-10-29,0.75,위키 없음 · 기저귀에 볼일을 봄(별칭 diaper_use) · 선례 peeing·defecating(q),,
 usp,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · H&K USP 권총,,h&k_usp
 uterine_prolapse,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,자궁 탈출(vaginal_prolapse 와 비슷) · 선례 vaginal_prolapse,,
-v-cut,e621,body/torso,,g,front_torso|hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 복근 아래 V자 골반 근육선 · abs 선례,,
+v-cut,e621,body/torso,,g,front_torso|front_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 복근 아래 V자 골반 근육선 · abs 선례,,
 v_sign,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 브이,,v
 vaginal_birth,e621,action/activity,,e,hips,,accepted,claude:2026-10-29,0.8,위키 없음 · 질로 출산(birth 함의) · 선례 giving_birth,,
 vaginal_canal,e621,body/lower,,e,,0,accepted,claude:2026-10-29,0.85,e621 위키: 질 안쪽 관(내부) · 선례 cervix,,
@@ -8051,7 +8051,7 @@ versatile,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.7,e621 위키: �
 versus,e621,,,,,,accepted,claude:2026-10-29,0.85,대결,,vs
 vertical_bar_eyes,e621,body/eyes,,g,eyes,,accepted,claude:2026-10-29,0.75,e621 위키: 세로로 긴 막대 모양 눈 — 선례 solid_oval_eyes,,
 vertical_blockage,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.85,e621 위키: 큰 칸 왼쪽·오른쪽에 작은 칸이 나란한 칸 배치 · 선례 comic 형식,,
-vertical_cloaca,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 몸과 나란히 놓인 총배설강 · 선례 cloaca,,
+vertical_cloaca,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 몸과 나란히 놓인 총배설강 · 선례 cloaca,,
 vertical_diphallism,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 위아래로 놓인 음경 두 개(함의 diphallism),,
 vertical_splits,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 한 다리를 위로 든 세로 다리 찢기(함의 standing) — standing_split 과 같은 뜻,,standing_split
 vertical_stereogram,e621,composition/format,,g,,,accepted,claude:2026-10-29,0.8,함의: stereogram — 그 선례,,
@@ -8060,7 +8060,7 @@ vest_only,e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 조끼만 입�
 vhs_filter,e621,,,,,,accepted,claude:2026-10-29,0.8,e621 위키: VHS 테이프로 녹화한 듯한 필터,,vhs_artifacts
 vibrating,e621,effect/motion,,,,,accepted,claude:2026-10-29,0.75,e621 위키: 바이브레이터 등이 떨림(움직임 선) · motion_lines 선례,,
 vibrating_phone,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.8,e621 위키: 진동하는 휴대폰(알림·알람·성인용품 대용 포함) — ringing_phone 과 따로 씀 · 선례 incoming_call,,
-vibrator_in_ass,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,"e621 위키: 항문에 든 바이브레이터 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
+vibrator_in_ass,e621,action/sexual,,e,back_hips,,accepted,claude:2026-11-04,0.9,"e621 위키: 항문에 든 바이브레이터 · *_in_ass 선례(tail_in_ass·food_in_ass, anal_object_insertion)",,
 vibrator_in_vagina,e621,action/sexual,,e,hips,,accepted,claude:2026-10-29,0.9,별칭 vibrator_in_pussy — 질에 바이브레이터 · vaginal_object_insertion 선례,,
 vibrator_on_pussy,e621,object/prop,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 음부에 댄 바이브레이터 · 선례 vibrator_on_clitoris,,
 victory_position,e621,action/sexual,,e,,,accepted,claude:2026-10-29,0.9,"e621 위키: 다리를 V자로 든 정면 체위, 함의 from_front_position",,
@@ -8102,10 +8102,10 @@ vulva_blush,e621,body/skin,action/expression,e,hips,0,accepted,claude:2026-10-29
 vulva_close-up,e621,composition/framing,composition/focus,e,,,accepted,claude:2026-10-29,0.85,별칭 pussy_close-up · 음부 클로즈업,,
 vulva_focus,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 pussy_focus — 같은 뜻,,pussy_focus
 vulva_on_glass,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 별칭 pussy_on_glass — 같은 뜻,,pussy_on_glass
-vulva_outline,e621,body/lower,,q,hips,,accepted,claude:2026-10-29,0.75,위키 없음 · 옷 위로 음부 윤곽(별칭 pussy_outline) · 성기 윤곽 계열 e621 penis_outline(q)에 맞춤(cameltoe 는 s),,
+vulva_outline,e621,body/lower,,q,front_hips,,accepted,claude:2026-11-04,0.75,위키 없음 · 옷 위로 음부 윤곽(별칭 pussy_outline) · 성기 윤곽 계열 e621 penis_outline(q)에 맞춤(cameltoe 는 s),,
 vulva_piercing,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 pussy_piercing,,pussy_piercing
 vulva_ring,e621,clothes/accessory,,e,hips,,accepted,claude:2026-10-29,0.85,위키 없음 · 음부 고리 피어싱(별칭 pussy_ring) · 선례 pussy_piercing,,
-vulva_shot,e621,composition/focus,composition/framing,e,,,accepted,claude:2026-10-29,0.85,위키 없음 · 음부 클로즈업(별칭 pussy_shot) · 선례 pussy_focus,,
+vulva_shot,e621,composition/focus,composition/framing,e,hips,,accepted,claude:2026-11-04,0.85,위키 없음 · 음부 클로즈업(별칭 pussy_shot) · 선례 pussy_focus,,
 wagasa,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 일본 종이우산,,oil-paper_umbrella
 waist_accessory,e621,clothes/accessory,,g,hips,,accepted,claude:2026-10-29,0.85,e621 위키: 허리에 다는 장신구 · waist_bow·waist_jewel 선례,,
 waist_chain,e621,,,,,,accepted,claude:2026-10-29,0.85,위키 없음 · 허리 사슬 — belly_chain 과 같은 뜻,,belly_chain
@@ -8190,7 +8190,7 @@ whining,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.8,e621 위�
 whip_mark,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 whip_marks — 같은 뜻,,whip_marks
 whisker_spots,e621,body/face,,g,face,1,accepted,claude:2026-10-29,0.85,e621 위키: 수염 뿌리의 점 · 선례 whisker_markings·whiskers,,
 whistle_(object),e621,,,,,,accepted,claude:2026-10-29,0.85,e621 위키: 호루라기 — 같은 뜻,,whistle
-white_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 흰 항문 · 선례 e621 pink_anus,,
+white_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 흰 항문 · 선례 e621 pink_anus,,
 white_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 흰 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 white_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 흰 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 white_armwear,e621,clothes/handwear,,g,arms,,accepted,claude:2026-10-29,0.9,e621 위키: 흰 팔 착용물 · 선례 e621 armwear·<색>_handwear,,
@@ -8210,7 +8210,7 @@ white_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별�
 white_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 white_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 흰 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
 white_briefs,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.9,함의 briefs · 흰 브리프 · 선례 briefs,,
-white_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 흰 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+white_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 흰 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 white_chest,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 흉부의 몸 색 — §9 <색>_body,,
 white_claws,e621,body/features,,g,hands,1,accepted,claude:2026-10-29,0.9,색 수식어 + claws · 선례 blue_claws,,
 white_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
@@ -8261,7 +8261,7 @@ white_pubes,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 
 white_scar,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 white_scars,,white_scars
 white_sclera,e621,body/eyes,,g,eyes,1,accepted,claude:2026-10-29,0.8,e621 위키: 흰자가 흰색(보통 다른 색인 캐릭터일 때) · 선례 colored_sclera,,
 white_seam_underwear,e621,clothes/underwear,,s,hips,,accepted,claude:2026-10-29,0.85,함의 colored_seam_underwear — 솔기가 흰 남성 속옷 · male_underwear 선례,,
-white_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 흰 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+white_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 흰 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 white_soles,e621,body/features,,g,feet,1,accepted,claude:2026-10-29,0.8,위키 없음 · 흰 발바닥 — 몸 색 무늬(e621 관례),,
 white_speech_bubble,e621,text/in_image,,,,,accepted,claude:2026-10-29,0.9,e621 위키: 흰 말풍선 · 선례 colored_speech_bubble,,
 white_spikes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.7,위키 없음 · 색 수식어 + 신체 가시 · 선례 spines·back_spikes,,
@@ -8332,7 +8332,7 @@ witch_costume,e621,,,,,,accepted,claude:2026-10-29,0.8,위키 없음 · 마녀 �
 wizard_robe,e621,clothes/outer,,g,front_torso|back|arms,,accepted,claude:2026-10-29,0.85,위키 없음 · 마법사 로브 · 선례 robe,,
 wobble,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키·함의 없음 — 살·몸이 출렁임 또는 비틀거림 추정,,
 wobbling,e621,etc,,,,,accepted,claude:2026-10-29,,의미 불확실 · 위키·함의 없음 — 살·몸이 출렁임 또는 비틀거림 추정,,
-womb_tattoo,e621,body/skin,,s,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 자궁 모양 음문(淫紋) 문신 · 선례 pubic_tattoo,,
+womb_tattoo,e621,body/skin,,s,front_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 자궁 모양 음문(淫紋) 문신 · 선례 pubic_tattoo,,
 women_livestock,e621,meta/genre,,q,,,accepted,claude:2026-10-29,0.7,e621 위키 없음 — 인간 가축 페티시 설정,,
 wood,e621,background/scenery,,,,,accepted,claude:2026-10-29,0.7,e621 위키: 알아볼 수 있는 나무 재질(통나무·나무 바닥 등) · log·wooden_floor 선례,,
 wood_bench,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 별칭 wooden_bench — 같은 뜻,,wooden_bench
@@ -8393,14 +8393,14 @@ x_scar,e621,,,,,,accepted,claude:2026-10-29,0.9,e621 위키: X 자 흉터,,cross
 xenophilia,e621,action/sexual,subject,e,,,accepted,claude:2026-10-29,0.8,e621 위키: 외계인과의 성행위 · teratophilia·pokephilia 선례(*philia → action/sexual),,
 y2k_(fashion),e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 2000년 무렵 유행 패션,,y2k_fashion
 y2k_(graphic_design),e621,style/art_style,,,,,accepted,claude:2026-10-29,0.8,e621 위키: 2000년 무렵 그래픽 디자인 양식 · heisei_retro 선례,,
-y_anus,e621,body/lower,,e,hips,0,accepted,claude:2026-10-29,0.85,e621 위키: Y자 모양 항문 — triangle_anus 와 별개 태그 · 선례 triangular_anus,,
-y_shaped_butt_crack,e621,body/lower,,s,hips,0,accepted,claude:2026-10-29,0.75,위키 없음 · 위쪽이 Y자로 갈라진 엉덩이 골 · 선례 butt_crack,,
+y_anus,e621,body/lower,,e,back_hips,0,accepted,claude:2026-11-04,0.85,e621 위키: Y자 모양 항문 — triangle_anus 와 별개 태그 · 선례 triangular_anus,,
+y_shaped_butt_crack,e621,body/lower,,s,back_hips,0,accepted,claude:2026-11-04,0.75,위키 없음 · 위쪽이 Y자로 갈라진 엉덩이 골 · 선례 butt_crack,,
 yawn,e621,,,,,,accepted,claude:2026-10-29,1.0,e621 위키: 하품,,yawning
 year,e621,text/in_image,text/mark,,,,accepted,claude:2026-10-29,0.7,e621 위키: 그림 속에 쓴 연도(달력·서명 날짜),,
 yelling,e621,,,,,,accepted,claude:2026-10-29,0.95,e621 위키: 소리침,,shouting
 yelling_at_another,e621,action/expression,,g,face,,accepted,claude:2026-10-29,0.85,위키 없음 · 다른 인물에게 소리침 · shouting 선례,,
 yellow_and_white,e621,style/color,,,,,accepted,claude:2026-10-29,0.9,함의: monochrome — 두 색만,,
-yellow_anus,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.9,e621 위키: 노란 항문 · 선례 e621 pink_anus,,
+yellow_anus,e621,body/lower,,e,back_hips,1,accepted,claude:2026-11-04,0.9,e621 위키: 노란 항문 · 선례 e621 pink_anus,,
 yellow_areola,e621,body/torso,,q,front_torso,1,accepted,claude:2026-10-29,0.9,e621 위키: 노란 유륜 · blue_nipples·dark_areolae 선례(색 수식어 id 1),,
 yellow_arms,e621,body/features,,g,arms,1,accepted,claude:2026-10-29,0.85,e621 위키: 노란 팔 · §9 몸 색(<색>_body 계열) — 팔 털·비늘·피부 색,,
 yellow_backpack,e621,object/prop,,g,,,accepted,claude:2026-10-29,0.9,e621 함의 backpack · 노란 배낭 · backpack 선례(bag 보다 좁음),,
@@ -8416,7 +8416,7 @@ yellow_bottomwear,e621,clothes/bottom,,g,hips|thighs,,accepted,claude:2026-10-29
 yellow_bow_tie,e621,,,,,,accepted,claude:2026-10-29,0.9,같은 뜻 — e621 별칭 yellow_bowtie,,yellow_bowtie
 yellow_bracelet,e621,clothes/accessory,,g,hands,,accepted,claude:2026-10-29,0.9,색 수식어 + bracelet 선례(e621 함의 bracelet),,
 yellow_breasts,e621,body/features,,g,front_torso,1,accepted,claude:2026-10-29,0.85,e621 위키: 노란 가슴(피부·털 몸 색) · 선례 e621 red_butt,,
-yellow_butt,e621,body/features,,g,hips,1,accepted,claude:2026-10-29,0.85,e621 위키: 노란 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
+yellow_butt,e621,body/features,,g,back_hips,1,accepted,claude:2026-11-04,0.85,e621 위키: 노란 엉덩이(피부·털 몸 색) · 선례 e621 red_butt,,
 yellow_cheeks,e621,body/features,body/face,g,face,1,accepted,claude:2026-10-29,0.75,위키 없음 · 노란 볼 색(털·무늬) · red_cheeks 와 같게,,
 yellow_clothes,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.75,"e621 위키 없음 — 노란 옷(색 일반), gradient_clothes 선례",,
 yellow_clothing,e621,clothes/detail,,g,,,accepted,claude:2026-10-29,0.85,색 수식어 옷 상위(함의 clothing) · 선례 e621 yellow_clothes,,
@@ -8450,7 +8450,7 @@ yellow_nose,e621,body/features,,g,face,1,accepted,claude:2026-10-29,0.9,e621 위
 yellow_pawpads,e621,body/features,,g,hands|feet,1,accepted,claude:2026-10-29,0.9,"색 수식어 + pawpads(함의 pawpads) · 선례 pawpads, e621 paws(hands|feet)",,
 yellow_perineum,e621,body/lower,,e,hips,,accepted,claude:2026-10-29,0.85,"색 수식어 + perineum · 선례 perineum, dark_penis 계열",,
 yellow_scutes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,함의 scutes · 색 수식어,,
-yellow_sheath,e621,body/lower,,e,hips,1,accepted,claude:2026-10-29,0.85,"e621 위키: 노란 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
+yellow_sheath,e621,body/lower,,e,front_hips,1,accepted,claude:2026-11-04,0.85,"e621 위키: 노란 칼집, 함의 sheath · 선례 e621 pink_anus(색 수식어)",,
 yellow_spikes,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.7,위키 없음 · 색 수식어 + 신체 가시 · 선례 spines·back_spikes,,
 yellow_spots,e621,body/features,,g,,1,accepted,claude:2026-10-29,0.9,e621 위키: 털·피부의 yellow 반점 — 몸 무늬(e621 관례) · 선례 e621 facial_markings,,
 yellow_star,e621,object/symbol,,g,,,accepted,claude:2026-10-29,0.8,색 별 기호 — star_(symbol) 선례(e621 위키 없음),,

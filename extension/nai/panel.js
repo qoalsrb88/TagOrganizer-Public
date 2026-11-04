@@ -2,7 +2,7 @@
 // 페이지는 이 iframe 안을 볼 수 없다. 패널을 닫으면 프레임째 사라져 팩이 차지한 메모리도 돌아간다.
 
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
-import { Model, gazeToggle, splitItems } from "../editor/model.js";
+import { Model, gazeToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadPack, loadSettings, putImported, saveBoxSetting } from "../engine/store.js";
 import { boxGroup, boxSettings, optionsFor, sameLines } from "../engine/text.js";
@@ -18,7 +18,7 @@ const EDITOR_PREVIEW_DELAY = 60;
 const NOTICE_MS = 6000;
 const PORT_NAME = "nai-panel";
 const DIALECT_NAMES = { nai: "NAI", comfyui: "ComfyUI", anima: "Anima" };
-const OVERRIDES = ["framing", "view"];
+const OVERRIDES = ["framing"];
 const APPLIED = "적용했습니다. 되돌리기는 입력창에서 Ctrl+Z 입니다.";
 const FALLBACK_COLOR = "#7a7c99";
 
@@ -26,7 +26,7 @@ const $ = (id) => document.getElementById(id);
 
 let pack = null;
 let quick = { framing: [], view: [], gaze: [] };
-let gazePalette = { quick, gaze_conflicts: {} };
+let chipPalette = { quick, gaze_conflicts: {}, view_conflicts: {}, view_lift: [] };
 let settings = null;
 let stored = {};
 let presets = [];
@@ -87,17 +87,35 @@ function renderGaze(group, blocked) {
     render();
   };
   const chips = quick.gaze.filter((tag) => !blocked.includes(tag)).map((tag) =>
-    quickChip(tag, selected.includes(tag), () => set(gazeToggle(gazePalette, selected, tag))));
+    quickChip(tag, selected.includes(tag), () => set(gazeToggle(chipPalette, selected, tag))));
   // 고른 것이 모두 막히면 프롬프트 그대로이므로 자동으로 보인다
   const auto = !selected.some((tag) => !blocked.includes(tag));
   $("gaze").replaceChildren(quickChip("자동", auto, () => set([])), ...chips);
   $("gaze").parentElement.hidden = !quick.gaze.length;
 }
 
-function renderOverrides(box, blocked = []) {
+// 시점도 여러 개를 고른다. 부딪치는 칩을 켜면 앞의 칩이 꺼지고, lift 칩(multiple views)을 켜면 함께 고를 수 있다.
+function renderView(group, lifted) {
+  const selected = splitItems(overrides[group]?.view);
+  const set = (tags) => {
+    overrides[group] = { ...overrides[group], view: tags.join(", ") };
+    render();
+  };
+  const toggle = (tag) => {
+    const next = viewToggle(chipPalette, selected, tag, lifted);
+    const dropped = selected.filter((t) => t !== tag && !next.includes(t));
+    if (dropped.length) setNotice(`${dropped.join(", ")}: ${tag} 와 함께 쓸 수 없어 껐습니다. ${chipPalette.view_lift.join(", ")} 를 켜면 함께 고를 수 있습니다.`);
+    set(next);
+  };
+  const chips = quick.view.map((tag) => quickChip(tag, selected.includes(tag), () => toggle(tag)));
+  $("view").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
+}
+
+function renderOverrides(box, blocked = [], lifted = false) {
   const group = boxGroup(box.kind);
   $("overrides").hidden = group === "uc";
   renderGaze(group, blocked);
+  renderView(group, lifted);
   for (const name of OVERRIDES) {
     const current = overrides[group]?.[name] || "";
     const chips = [["", "자동"], ...quick[name].map((tag) => [tag, tag])].map(([value, label]) =>
@@ -222,7 +240,7 @@ function render() {
   const ms = performance.now() - started;
   const unchanged = sameLines(box.text, sorted.text);
   result = { box, output: sorted.text, unchanged };
-  renderOverrides(box, sorted.report.gaze_blocked);
+  renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted);
   renderChips(sorted.report);
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));
@@ -533,8 +551,8 @@ try {
   [settings, stored, presets] = await Promise.all([loadSettings(), loadBoxSettings(), listPresets()]);
   fillPresets();
   pack = await loadPack();
-  gazePalette = palette(pack);
-  ({ quick } = gazePalette);
+  chipPalette = palette(pack);
+  ({ quick } = chipPalette);
   const saved = await chrome.storage.local.get([DRAFT_KEY, EDITING_KEY]);
   draft = saved[DRAFT_KEY] || null;     // 저장하지 않고 닫은 변경을 잇는다
   render();

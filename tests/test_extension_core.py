@@ -72,12 +72,16 @@ OPTIONS: List[Dict[str, Any]] = [
     {"view": "straight-on", "gaze": "looking back, looking at viewer"},
     {"framing": "head out of frame", "gaze": "facing viewer, looking at viewer", "rules": "report"},
     {"view": "from side", "gaze": "looking back, sideways glance", "rules": {"view": "off"}},
+    {"view": "from behind, from side", "gaze": "looking at viewer"},
+    {"view": "front view, from behind, multiple views", "framing": "upper body"},
+    {"view": "multiple views"},
+    {"view": "three quarter view, dutch angle"},
 ]
 
 INVALID_OPTIONS: List[Dict[str, Any]] = [
     {"preset": "nope"}, {"layout": "nope"}, {"max_rating": "x"}, {"input_dialect": "x"}, {"output_dialect": "x"},
     {"comments": "x"}, {"order": "x"}, {"rules": "x"}, {"exclude": "nope"}, {"exclude": "clothes/nope"},
-    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"gaze": "smile"}, {"nope": 1},
+    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"gaze": "smile"}, {"view": "reference sheet"}, {"nope": 1},
     {"arrangement": "{"}, {"arrangement": []}, {"arrangement": {"format": "x", "rows": [["a"]]}},
     {"arrangement": {"rows": [["a"]], "chunks": {}}},
     {"arrangement": {"rows": [["a"], ["a"]], "chunks": {"a": {"members": ["body"]}}}},
@@ -230,6 +234,11 @@ class ParityTest(unittest.TestCase):
             toggles = [{"want": "gaze_toggle", "selected": s, "tag": t} for s in selections for t in pal["quick"]["gaze"]]
             self.assertEqual(self.run_js(path, toggles),
                              [core.gaze_toggle(pal, c["selected"], c["tag"]) for c in toggles])
+            view_sets = [[], ["front view"], ["from behind", "from side"], ["from above"], ["front view", "from behind", "multiple views"]]
+            toggles = [{"want": "view_toggle", "selected": s, "tag": t, "lifted": lifted}
+                       for s in view_sets for t in pal["quick"]["view"] for lifted in (False, True)]
+            self.assertEqual(self.run_js(path, toggles),
+                             [core.view_toggle(pal, c["selected"], c["tag"], c["lifted"]) for c in toggles])
             self.compare_layouts(path, pack)
 
     def test_layout_with_identity_and_except(self):

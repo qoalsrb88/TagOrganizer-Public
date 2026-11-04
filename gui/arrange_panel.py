@@ -5,8 +5,9 @@
   공유·파일 메뉴: 공유로 올리기, 클립보드 복사·붙여넣기(파일 없이 주고받기), 파일 가져오기·내보내기(다른 툴로).
   같은 JSON 을 ComfyUI 노드·Studio 가 읽는다(docs/arrangement.md).
 - 다른 PC·옛 분류 체계의 배열은 지금 없는 분류만 빼고 연다(빠진 칸의 태그는 '나머지' 줄로, 무엇을 뺐는지 알림).
-- 크롭/시점: 고르면 프롬프트의 크롭·시점 태그를 그 태그로 바꿔 미리보기에 바로 반영한다(organize 의 framing·view).
+- 크롭: 고르면 프롬프트의 크롭 태그를 그 태그로 바꿔 미리보기에 바로 반영한다(organize 의 framing).
   "자동"은 프롬프트 그대로. 프롬프트에 있는 태그는 테두리로 표시한다.
+- 시점: 여러 개를 고른다(organize 의 view). 부딪치는 시점은 켜는 순간 꺼지고, multiple views 를 켜면 함께 고를 수 있다.
 - 시선: 여러 개를 고른다(organize 의 gaze). 함께 쓸 수 없는 태그는 켜는 순간 꺼지고, 지금 크롭·시점과 맞지 않는 태그는
   숨긴다(report 의 gaze_blocked). 숨겨도 선택은 남아 시점을 되돌리면 다시 든다.
 - 팩에 없는 토큰 추정(guess)은 켜고 끄는 미리보기 옵션이고, 추정 규칙(내 패턴)은 배열에 저장된다.
@@ -328,6 +329,7 @@ class ArrangementPanel(QWidget):
         self.framing = ""
         self.view = ""
         self.gaze = ""                          # 고른 시선 태그(쉼표로 여럿)
+        self._view_lifted = False               # 프롬프트에 시점 규칙을 끄는 형식이 있음(report 의 view_lifted)
         self.source = "layout:default"          # layout:<id> / 파일 경로 / ""(가져왔고 아직 저장 안 함)
         self.undo_stack: List[str] = []
         self.redo_stack: List[str] = []
@@ -389,7 +391,7 @@ class ArrangementPanel(QWidget):
         for gate in (rules.get("framing") or {}).get("gates", ()) + (rules.get("view") or {}).get("gates", ()):
             for tag in gate.get("tags", ()):
                 hides[tag] = ", ".join(gate.get("hide", ())) or "없음"
-        for group, title in (("framing", "크롭"), ("view", "시점")):
+        for group, title in (("framing", "크롭"),):
             flow = FlowLayout(spacing=theme.SPACE[0])
             label = theme.caption(title, "field")
             label.setMinimumWidth(28)
@@ -412,7 +414,16 @@ class ArrangementPanel(QWidget):
             holder = QWidget()
             holder.setLayout(flow)
             layout.addWidget(holder)
-        self._build_gaze(layout)
+        lift = set(self.palette.get("view_lift") or ())
+        self._build_multi(layout, "view", "시점", {
+            tag: "부딪치는 시점도 함께 고를 수 있게 합니다(크롭·시점 규칙을 끔)" if tag in lift
+            else "프롬프트의 시점 태그를 고른 태그들로 바꿉니다 — 여러 개 고를 수 있음"
+            + (f" — 가리는 부위: {hides[tag]}" if tag in hides else "")
+            for tag in self.palette["quick"].get("view") or ()})
+        self._build_multi(layout, "gaze", "시선", {
+            tag: "프롬프트의 시선 태그를 고른 태그들로 바꿉니다("
+            + ("눈을 감거나 가렸을 때" if tag.startswith("facing") else "눈이 보일 때") + ") — 여러 개 고를 수 있음"
+            for tag in self.palette["quick"].get("gaze") or ()})
 
         opts = QHBoxLayout()
         self.sub_order_box = QCheckBox("청크 안은 서브 순서대로")
@@ -462,13 +473,12 @@ class ArrangementPanel(QWidget):
         self.warning.hide()
         self.canvas.set_model(self.model, self.config["taxonomy"])
 
-    def _build_gaze(self, layout) -> None:
-        """시선 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
-        tags = self.palette["quick"].get("gaze") or ()
-        if not tags:
+    def _build_multi(self, layout, group: str, title: str, tips: Mapping[str, str]) -> None:
+        """시점·시선 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
+        if not tips:
             return
         flow = FlowLayout(spacing=theme.SPACE[0])
-        label = theme.caption("시선", "field")
+        label = theme.caption(title, "field")
         label.setMinimumWidth(28)
         flow.addWidget(label)
         buttons = QButtonGroup(self)
@@ -477,13 +487,12 @@ class ArrangementPanel(QWidget):
         auto.setChecked(True)
         buttons.addButton(auto)
         flow.addWidget(auto)
-        for tag in tags:
-            what = "눈을 감거나 가렸을 때" if tag.startswith("facing") else "눈이 보일 때"
-            chip = _chip(tag, tag, f"프롬프트의 시선 태그를 고른 태그들로 바꿉니다({what}) — 여러 개 고를 수 있음")
+        for tag, tip in tips.items():
+            chip = _chip(tag, tag, tip)
             buttons.addButton(chip)
             flow.addWidget(chip)
-        buttons.buttonClicked.connect(lambda b: self._gaze_clicked(b.property("tag")))
-        self._chips["gaze"] = buttons
+        buttons.buttonClicked.connect(lambda b, g=group: self._multi_clicked(g, b.property("tag")))
+        self._chips[group] = buttons
         holder = QWidget()
         holder.setLayout(flow)
         layout.addWidget(holder)
@@ -512,6 +521,7 @@ class ArrangementPanel(QWidget):
                 if b.property("present") != mark:
                     b.setProperty("present", mark)
                     theme.repolish(b)
+        self._view_lifted = bool(report.get("view_lifted"))
         if "gaze" in self._chips:
             blocked = set(report.get("gaze_blocked", ()))
             active = set(split_items(self.gaze)) - blocked
@@ -541,25 +551,31 @@ class ArrangementPanel(QWidget):
         self.changed.emit()
 
     def set_quick(self, group: str, tag: str) -> None:
-        if group == "gaze":
-            self._set_gaze(split_items(tag))
+        if group in ("view", "gaze"):
+            self._set_multi(group, split_items(tag))
             return
         for b in self._chips[group].buttons():
             if (b.property("tag") or "") == tag:
                 b.setChecked(True)
         self._quick(group, tag)
 
-    def _gaze_clicked(self, tag: str) -> None:
-        selected = split_items(self.gaze)
-        self._set_gaze(core.gaze_toggle(self.palette, selected, tag) if tag else [])
+    def _multi_clicked(self, group: str, tag: str) -> None:
+        selected = split_items(getattr(self, group))
+        if not tag:
+            tags: List[str] = []
+        elif group == "view":
+            tags = core.view_toggle(self.palette, selected, tag, self._view_lifted)
+        else:
+            tags = core.gaze_toggle(self.palette, selected, tag)
+        self._set_multi(group, tags)
 
-    def _set_gaze(self, tags: Sequence[str]) -> None:
-        for b in self._chips["gaze"].buttons():
+    def _set_multi(self, group: str, tags: Sequence[str]) -> None:
+        for b in self._chips[group].buttons():
             tag = b.property("tag")
             on = tag in tags if tag else not tags
             b.setChecked(on)
             b.setText(("✓ " if on else "") + tag if tag else "자동")
-        self._quick("gaze", ", ".join(tags))
+        self._quick(group, ", ".join(tags))
 
     def _sub_order(self, on: bool) -> None:
         if on != self.model.sub_order:

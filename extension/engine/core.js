@@ -1016,11 +1016,12 @@ function guessTokens(tokens, pack, rules, heads) {
 function overridesOf(pack, opts) {
   const out = [];
   for (const [group, target] of OVERRIDE_TARGETS) {
+    const lifts = pack.rules?.quick?.[`${group}_lift`] ?? [];
     const infos = [];
     for (const name of String(opts[group] || "").split(/[,\n]/)) {
       if (!strip(name)) continue;
       const [info] = pack.resolve(normalizeKey(name, pack.kaomoji));
-      if (info === null || info.primary !== target) {
+      if (info === null || (info.primary !== target && !lifts.includes(info.key))) {
         throw new Error(`${group} 덮어쓰기는 ${target} 태그여야 합니다: ${strip(name)}`);
       }
       if (!infos.some((i) => i.key === info.key)) infos.push(info);
@@ -1040,11 +1041,12 @@ function applyOverrides(input, overrides, inject, pack, opts) {
       if (!infos.length) continue;
     }
     const keys = new Set(infos.map((i) => i.key));
+    const replacing = infos.some((i) => i.primary === target);   // lift 태그만 골랐으면 프롬프트의 시점을 둔다
     let pos = null;
     tokens.forEach((t, idx) => {
       if (t.removed || t.kind === "special" || t.primary !== target) return;
       pos = idx;
-      if (!(t.kind === "tag" && keys.has(t.key))) t.removed = `override:${group}`;
+      if (replacing && !(t.kind === "tag" && keys.has(t.key))) t.removed = `override:${group}`;
     });
     if (pos === null && !inject) continue;
     const have = new Set(tokens.filter((t) => t.kind === "tag" && !t.removed).map((t) => t.key));
@@ -1126,7 +1128,7 @@ function applyRules(tokens, pack, opts) {
 
   const hidden = new Map();
   for (const [group, mode, cfg] of ruleGroups(present, pack, opts)) {
-    const active = (cfg.gates || []).filter((g) => anyIn(g.tags, present));
+    const active = (cfg.gates || []).filter((g) => anyIn(g.tags, present) && !anyIn(g.unless_any, present));
     if (!active.length) continue;
     let regions = new Set(active[0].hide || []);
     for (const g of active.slice(1)) {
@@ -1503,6 +1505,7 @@ export function organize(text, pack, options = null) {
   const chunkTexts = [];
   const arranged = [];
   let firstPresent = new Set();
+  let firstTyped = new Set();
   let taken = 0;
   body.split(new RegExp(BREAK_SRC, "u")).forEach((chunk, ci) => {
     const count = chunk.split(COMMENT_MARK).length - 1;
@@ -1520,7 +1523,10 @@ export function organize(text, pack, options = null) {
     });
     if (opts.dedupe) dedupe(tokens);
     applyFilters(tokens, sels, opts);
-    if (ci === 0) firstPresent = aliveKeys(tokens);
+    if (ci === 0) {
+      firstPresent = aliveKeys(tokens);
+      firstTyped = new Set(tokens.filter((t) => t.kind === "tag" && !t.removed && !t.injected).map((t) => t.key));
+    }
     applyRules(tokens, pack, opts);
     place(tokens, plan, pack);
     const [lines, renderedRows] = render(tokens, plan, opts, outDialect);
@@ -1546,6 +1552,7 @@ export function organize(text, pack, options = null) {
   // 시선 칩에서 지금 고를 수 없는 태그: 칩이 늘 넣는 첫 구간의 크롭·시점으로 판단한다
   const blocked = blockedTags(firstPresent, pack, opts);
   report.gaze_blocked = (pack.rules.quick?.gaze ?? []).filter((tag) => blocked.has(tag));
+  report.view_lifted = (pack.rules.view?.exempt ?? []).some((tag) => firstTyped.has(tag));
   return { text: chunkTexts.join(joiner), removed_text: removedText, report, tokens: allTokens };
 }
 
@@ -1607,6 +1614,8 @@ export function palette(pack) {
   return { format: PALETTE_FORMAT, categories: cats,
     quick: Object.fromEntries(OVERRIDE_TARGETS.map(([group]) => [group, [...(quick[group] ?? [])]])),
     gaze_conflicts: Object.fromEntries(Object.entries(quick.gaze_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
+    view_conflicts: Object.fromEntries(Object.entries(quick.view_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
+    view_lift: [...(quick.view_lift ?? [])],
     layouts: Object.fromEntries(Object.entries(pack.layouts).map(([lid, lay]) => [lid, lay.label ?? lid])) };
 }
 
