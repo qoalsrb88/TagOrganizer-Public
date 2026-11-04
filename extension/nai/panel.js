@@ -5,7 +5,7 @@ import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/e
 import { Model, gazeToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
-import { boxGroup, boxSettings, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, sourceText } from "../engine/text.js";
+import { boxGroup, boxSettings, fieldText, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, sourceText, tidyMasters } from "../engine/text.js";
 
 const HOSTNAME = "novelai.net";
 const DRAFT_KEY = "nai_draft";
@@ -43,6 +43,7 @@ let masterSaveTimer = 0;
 let mastersDirty = false;
 let dirtyMasters = new Set();   // 저장할 입력창 id. 아직 저장하지 않은 글은 다른 탭의 변경이 와도 지킨다
 let confirmedImport = null;
+let pendingImport = null;       // 머리글의 → 원본을 눌렀는데 입력창 목록이나 팩이 아직 오지 않았다
 let pendingApply = null;        // 응답이 올 때까지 대상과 결과를 보관한다
 let view = "chips";             // 보이는 탭: chips·text·master. 배열 편집 중에는 청크 화면이 chips·text 자리에 든다
 let naiGenerate = null;         // NovelAI 의 Generate 버튼 {ready, label, cost}. 못 찾으면 null
@@ -129,21 +130,43 @@ function renderTabs(box) {
   $("master_body").hidden = view !== "master";
 }
 
-function importMaster() {
-  const box = activeBox();
-  const master = masterFor(box);
-  if (!master?.on) return;
-  if (master.text !== box.text && !(confirmedImport?.id === box.id && confirmedImport.text === box.text
-    && confirmedImport.previous === master.text && confirmedImport.until > performance.now())) {
-    confirmedImport = { id: box.id, text: box.text, previous: master.text, until: performance.now() + NOTICE_MS };
-    setNotice("원본을 바꾸려면 입력창에서 가져오기를 한 번 더 누르세요.", true);
+// 입력창 글을 원본으로. 보관한 원본과 다르면 한 번 더 눌러야 바꾼다(풀버전 원본을 실수로 덮지 않게).
+function importMaster(box) {
+  if (!box || boxGroup(box.kind) === "uc") return;
+  if (!box.text.trim()) {
+    setNotice(`${box.label} 입력창이 비어 있어 가져오지 않았습니다.`, true);
     return;
   }
-  masters[box.id] = { ...master, text: box.text };
+  const master = masterFor(box) || { on: false, text: "", lastApplied: "" };
+  const kept = master.text?.trim() && !sameLines(box.text, master.text);
+  if (kept && !(confirmedImport?.id === box.id && confirmedImport.text === box.text
+    && confirmedImport.previous === master.text && confirmedImport.until > performance.now())) {
+    confirmedImport = { id: box.id, text: box.text, previous: master.text, until: performance.now() + NOTICE_MS };
+    setNotice("보관한 원본과 다릅니다. 원본을 바꾸려면 한 번 더 누르세요.", true);
+    return;
+  }
+  masters[box.id] = { ...master, on: true, group: boxGroup(box.kind), lines: true, text: fieldText(box.text) };
   confirmedImport = null;
   storeMasters(box.id);
+  view = "master";
   render();
   setNotice("입력창 글을 원본으로 가져왔습니다.");
+}
+
+function flushImport() {
+  const box = boxes.find((b) => b.id === pendingImport);
+  if (!pack || !box) return;
+  pendingImport = null;
+  importMaster(box);
+}
+
+// 입력창의 글꼴·줄 높이·여백을 원본 칸에 그대로 쓴다(NovelAI 테마를 따라가도록 값을 받아서).
+function applyFieldLook(look) {
+  const { padding, background, ...text } = look ?? {};
+  const area = $("master_text");
+  Object.assign(area.style, text);
+  if (padding) area.style.padding = padding;
+  if (background) area.style.background = background;
 }
 
 function renderBoxButtons() {
@@ -696,7 +719,17 @@ port.onMessage.addListener((message) => {
     boxes = message.boxes;
     activeId = message.active;
     naiGenerate = message.generate ?? null;
+    applyFieldLook(message.look);
     render();
+    flushImport();
+  } else if (message.type === "import") {
+    pendingImport = message.id;
+    flushImport();
+  } else if (message.type === "fonts") {
+    // 글꼴은 확장 쪽 문서에 따로 올려야 쓸 수 있다. 쓰는 글자 범위의 파일만 브라우저가 읽는다.
+    for (const { family, weight, range, src } of message.faces) {
+      document.fonts.add(new FontFace(family, `url("${src}")`, { weight, unicodeRange: range }));
+    }
   } else if (message.type === "applied") {
     const done = pendingApply;
     // 원본을 켜지 않은 입력창의 글은 저장하지 않는다
@@ -727,7 +760,7 @@ $("master_on").addEventListener("change", () => {
   if (!box || boxGroup(box.kind) === "uc") return;
   const master = masterFor(box) || { on: false, text: "", lastApplied: "" };
   const on = $("master_on").checked;
-  masters[box.id] = { ...master, on, group: boxGroup(box.kind), text: on && !master.text.trim() ? box.text : master.text };
+  masters[box.id] = { ...master, on, group: boxGroup(box.kind), lines: true, text: on && !master.text.trim() ? fieldText(box.text) : master.text };
   confirmedImport = null;
   storeMasters(box.id);
   if (on && !masters[box.id].text.trim()) view = "master";     // 붙여 넣을 자리를 바로 보여 준다
@@ -744,7 +777,7 @@ $("master_text").addEventListener("input", () => {
   render();
 });
 $("master_text").addEventListener("change", flushMasters);
-$("master_import").addEventListener("click", importMaster);
+$("master_import").addEventListener("click", () => importMaster(activeBox()));
 addEventListener("pagehide", flushMasters);
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) flushMasters();
@@ -787,7 +820,7 @@ chrome.storage.onChanged.addListener(async (changes) => {
   if (changes.nai_masters) {
     // 다른 탭이 고친 원본을 받되, 이 패널에서 아직 저장하지 않은 글은 둔다
     const pending = Object.fromEntries([...dirtyMasters].map((id) => [id, masters[id]]));
-    masters = { ...(changes.nai_masters.newValue || {}), ...pending };
+    masters = { ...tidyMasters(changes.nai_masters.newValue || {}), ...pending };
   }
   if (!changes.settings && !changes.nai_boxes && !changes.imported_arrangements && !changes.nai_masters) return;
   if (changes.settings) settings = await loadSettings();
@@ -810,6 +843,7 @@ try {
   draft = saved[DRAFT_KEY] || null;     // 저장하지 않고 닫은 변경을 잇는다
   render();
   if (saved[EDITING_KEY]) await setEditing(true);
+  flushImport();
 } catch (e) {
   console.error(e);
   clearResult(e.message, true);

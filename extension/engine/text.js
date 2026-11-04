@@ -26,26 +26,42 @@ export function boxSettings(settings, stored, kind) {
   return { ...settings, preset: settings.default_preset, ...BOX_DEFAULTS[group], ...stored?.[group] };
 }
 
-// 입력창 글과 정렬 결과가 줄 구성까지 같은지. 입력창(문단 편집기)의 글은 문단 사이가 \n 두 개이고 빈 문단마다
-// \n 세 개가 더 붙는다. 결과 글은 \n 하나가 줄바꿈이고 하나 더 붙으면 빈 줄이다.
-export function sameLines(fieldText, output) {
-  const newlines = (run) => run.split("\n").length - 1;
-  const field = fieldText.replace(/\n\n[^\S\n]+(?=\n\n)/g, "\n\n\n").replace(/\s*\n\s*/g, (run) => "\n".repeat(1 + Math.max(0, Math.floor((newlines(run) - 2) / 3)))).trim();
-  const result = output.replace(/\s*\n\s*/g, (run) => "\n".repeat(newlines(run))).trim();
-  return field === result;
+const newlines = (run) => run.split("\n").length - 1;
+const blankParagraphs = (text) => text.replace(/\n\n[^\S\n]+(?=\n\n)/g, "\n\n\n");
+
+// 입력창(문단 편집기)의 innerText 를 보이는 그대로의 글로 바꾼다. 문단 사이는 \n 두 개이고 빈 문단마다 \n 세 개가 더 붙는다.
+export function fieldText(text) {
+  return blankParagraphs(text).replace(/\s*\n\s*/g, (run) => "\n".repeat(1 + Math.max(0, Math.floor((newlines(run) - 2) / 3)))).trim();
+}
+
+// 입력창 글과 정렬 결과가 줄 구성까지 같은지. 결과 글은 \n 하나가 줄바꿈이고 하나 더 붙으면 빈 줄이다.
+export function sameLines(boxText, output) {
+  return fieldText(boxText) === output.replace(/\s*\n\s*/g, (run) => "\n".repeat(newlines(run))).trim();
 }
 
 export const sourceText = (boxText, master) => master?.on ? master.text ?? "" : boxText;
 
 // 빈 입력창이나 아직 적용하지 않은 원본은 직접 고친 것으로 보지 않는다. 입력창 글을 원본으로 가져온 뒤에도 사라질 변경이 없다.
 export function masterDrift(boxText, master, output) {
-  return Boolean(master?.on && master.lastApplied && boxText.trim() && boxText.trim() !== (master.text ?? "").trim()
+  return Boolean(master?.on && master.lastApplied && boxText.trim() && !sameAsMaster(boxText, master)
     && !sameLines(boxText, master.lastApplied) && !sameLines(boxText, output));
+}
+
+const sameAsMaster = (boxText, master) => boxText.trim() === (master.text ?? "").trim() || sameLines(boxText, master.text ?? "");
+
+// 입력창 글을 그대로 넣어 줄바꿈이 두 배가 된 옛 원본을 정리한다. 줄바꿈이 전부 그 모양일 때만, 한 입력창에 한 번만.
+export function tidyMasters(masters) {
+  return Object.fromEntries(Object.entries(masters).map(([id, master]) => {
+    if (master.lines) return [id, master];
+    const runs = blankParagraphs(master.text ?? "").match(/\s*\n\s*/g);
+    const doubled = Boolean(runs) && runs.every((run) => newlines(run) % 3 === 2);
+    return [id, { ...master, lines: true, text: doubled ? fieldText(master.text) : master.text }];
+  }));
 }
 
 // 패널에서 안 보이는 입력창에 쓸 때의 판단: 아직 적용한 적 없는 원본도 입력창의 다른 글을 덮으면 고친 것으로 본다.
 export function masterWouldOverwrite(boxText, master, output) {
-  if (!master?.on || !boxText.trim() || boxText.trim() === (master.text ?? "").trim() || sameLines(boxText, output)) return false;
+  if (!master?.on || !boxText.trim() || sameAsMaster(boxText, master) || sameLines(boxText, output)) return false;
   return !master.lastApplied || !sameLines(boxText, master.lastApplied);
 }
 

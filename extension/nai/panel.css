@@ -78,8 +78,10 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 #master[hidden], #master_body[hidden], #master_warning[hidden], #show_master[hidden], #show_text[hidden], #generate[hidden] { display: none; }
 #master_body { display: flex; flex-direction: column; gap: 6px; height: 100%; }
 #master_import { flex: 0 0 auto; align-self: flex-start; font-size: 12px; }
-#master_text { flex: 1 1 auto; display: block; width: 100%; min-height: 64px; padding: 6px 8px; resize: none; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--field); color: var(--fg); font: 12px/1.5 Consolas, monospace; }
-#master_text:focus-visible, #master_on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* NovelAI 입력창과 같은 모양. 글꼴·줄 높이·여백·색은 실제 입력창의 값을 받아 덮어쓴다(panel.js 의 applyFieldLook) */
+#master_text { flex: 1 1 auto; display: block; width: 100%; min-height: 64px; padding: 5px 12px; resize: none; border: 0; border-radius: 0; background: #0e0f21; color: #fff; font: 400 16px/26px "Source Sans Pro", -apple-system, "Segoe UI", sans-serif; font-feature-settings: "liga" 0; word-break: break-word; overflow-wrap: break-word; }
+#master_text:focus-visible { outline: 1px solid var(--line-strong); outline-offset: -1px; }
+#master_on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 #master_warning { padding: 4px 10px; color: var(--warn); font-size: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 
 #state { padding: 4px 10px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }

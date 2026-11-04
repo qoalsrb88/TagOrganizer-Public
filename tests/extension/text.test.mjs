@@ -1,7 +1,7 @@
 // extension/engine/text.js — node --test (tests/test_extension_core.py 가 부른다)
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_SETTINGS, boxGroup, boxSettings, isSortableSelection, keepEdges, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, selectionProblem, sourceText, summary } from "../../extension/engine/text.js";
+import { DEFAULT_SETTINGS, boxGroup, boxSettings, fieldText, isSortableSelection, keepEdges, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, selectionProblem, sourceText, summary, tidyMasters } from "../../extension/engine/text.js";
 
 test("구분 표기가 없는 조각은 정렬할 것이 없다", () => {
   assert.equal(isSortableSelection("smile"), false);
@@ -170,4 +170,34 @@ test("아직 적용하지 않은 원본이 입력창의 다른 글을 덮는지 
   assert.equal(masterWouldOverwrite("1girl, red hair", applied, output), true);
   assert.equal(masterWouldOverwrite("1girl, red hair", { ...first, on: false }, output), false);
   assert.equal(masterWouldOverwrite("1girl, red hair", undefined, output), false);
+});
+
+test("입력창의 문단 줄바꿈을 보이는 그대로의 글로 바꾼다", () => {
+  assert.equal(fieldText("a,\n\nb"), "a,\nb");                      // 줄바꿈 하나
+  assert.equal(fieldText("a,\n\n\n\n\nb"), "a,\n\nb");              // 빈 문단 하나
+  assert.equal(fieldText("a,\n\n\n\n\n\n\n\nb"), "a,\n\n\nb");      // 빈 문단 둘
+  assert.equal(fieldText("a,\n\n \n\nb"), "a,\n\nb");               // 빈칸만 든 문단
+  assert.equal(fieldText("  a, b  "), "a, b");
+  assert.equal(sameLines("a,\n\nb", "a,\nb"), true);
+  assert.equal(sameLines("a,\n\nb", "a,\n\nb"), false);
+});
+
+test("입력창에서 가져온 원본은 줄바꿈이 달라도 입력창과 같은 글이다", () => {
+  const output = "b,\na";
+  const master = { on: true, text: "a,\nb", lastApplied: "c" };
+  assert.equal(masterDrift("a,\n\nb", master, output), false);
+  assert.equal(masterWouldOverwrite("a,\n\nb", { ...master, lastApplied: "" }, output), false);
+  assert.equal(masterDrift("a,\n\nb,\n\nc", master, output), true);
+});
+
+test("줄바꿈이 두 배로 저장된 옛 원본만 한 번 정리한다", () => {
+  const old = (text) => tidyMasters({ prompt: { on: true, text } }).prompt.text;
+  assert.equal(old("a,\n\nb,\n\n\n\n\nc"), "a,\nb,\n\nc");
+  assert.equal(old("a,\nb,\n\nc"), "a,\nb,\n\nc");                   // 손으로 쓴 줄바꿈이 섞여 있으면 그대로
+  assert.equal(old("a, b"), "a, b");
+  assert.equal(old(""), "");
+  assert.equal(tidyMasters({ prompt: { on: true, text: undefined } }).prompt.text, undefined);
+  const done = tidyMasters({ prompt: { on: true, text: "a,\n\nb" } }).prompt;
+  assert.equal(done.lines, true);
+  assert.equal(tidyMasters({ prompt: { ...done, text: "x,\n\ny" } }).prompt.text, "x,\n\ny");   // 정리한 뒤에 쓴 빈 줄은 둔다
 });

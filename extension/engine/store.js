@@ -2,7 +2,7 @@
 // 서비스 워커는 쉬면 내려가므로 팩은 쓸 때 읽는다(읽는 데 0.5초 안쪽). 패널도 같은 모듈을 쓴다.
 
 import { TagPack } from "./core.js";
-import { DEFAULT_SETTINGS, masterOverrides } from "./text.js";
+import { DEFAULT_SETTINGS, masterOverrides, tidyMasters } from "./text.js";
 
 const IMPORTED_KEY = "imported_arrangements";
 const SETTINGS_KEY = "settings";
@@ -59,7 +59,7 @@ export async function saveBoxSetting(group, patch) {
 
 export async function loadMasters() {
   const stored = await chrome.storage.local.get(MASTERS_KEY);
-  return stored[MASTERS_KEY] || {};
+  return tidyMasters(stored[MASTERS_KEY] || {});
 }
 
 export async function loadMasterOverrides(masters) {

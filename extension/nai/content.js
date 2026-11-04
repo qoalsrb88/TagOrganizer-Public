@@ -23,7 +23,7 @@
   const STAGE_MIN = 320;       // 붙였을 때 그림 칸에 남길 폭. 이만큼 남지 않으면 떠 있는 창으로 돌아간다
   const PORT_NAME = "nai-panel";
   const IMAGE_PATH = "/image";
-  const COMPACT_BELOW = 460;   // 머리글이 이보다 좁으면 글자를 빼서 탭이 다음 줄로 밀리지 않게 한다
+  const COMPACT_BELOW = 520;   // 머리글이 이보다 좁으면 글자와 작은 단추를 빼서 탭이 다음 줄로 밀리지 않게 한다
   const PANEL_SIZE = { width: 760, height: 600 };
   const PANEL_EDIT_SIZE = { width: 980, height: 760 };   // 배열 편집을 켜면 이 크기까지 늘린다
   const PANEL_MIN = { width: 420, height: 300 };
@@ -43,7 +43,9 @@
     button:focus-visible { outline: 2px solid #f5f3c2; outline-offset: -2px; }
     button + button { border-left: 1px solid #44466a; padding: 0 6px; }
     button[aria-busy="true"] { opacity: .6; cursor: progress; }
-    :host(.compact) .label, :host(.compact) .open { display: none; }
+    :host(.compact) .label, :host(.compact) .open, :host(.compact) .to-master { display: none; }
+    button[disabled] { opacity: .45; cursor: default; }
+    button[disabled]:hover { background: #13152c; }
     :host(.compact) button { padding: 0 4px; }
   `;
   const MENU_CSS = `
@@ -180,7 +182,7 @@
 
   // ─── 버튼 ────────────────────────────────────────────────────────
 
-  const ui = { host: null, main: null };
+  const ui = { host: null, main: null, toMaster: null };
 
   function buildButton() {
     const host = make("span", { id: BUTTON_ID });
@@ -193,7 +195,8 @@
     more.setAttribute("aria-haspopup", "menu");
     const open = make("button", { className: "open", type: "button", textContent: "▤", title: "미리보기 패널" });
     open.setAttribute("aria-label", "미리보기 패널");
-    const split = make("div", { className: "split" }, main, more, open);
+    const toMaster = make("button", { className: "to-master", type: "button", textContent: "→ 원본" });
+    const split = make("div", { className: "split" }, main, more, open, toMaster);
     root.append(split);
     // 입력창의 포커스와 선택을 빼앗지 않는다(고른 부분만 정렬하려면 선택이 남아 있어야 한다)
     split.addEventListener("mousedown", (event) => event.preventDefault());
@@ -206,7 +209,8 @@
       closeMenu();
       openPanel();
     });
-    Object.assign(ui, { host, main });
+    toMaster.addEventListener("click", sendToMaster);
+    Object.assign(ui, { host, main, toMaster });
   }
 
   const headerOf = (group) => group?.parentElement || null;
@@ -251,6 +255,25 @@
     }
     const box = targetBox(list);
     ui.main.title = box ? `${box.label} 정렬` : "프롬프트 정렬";
+    const uc = box?.kind === "uc" || box?.kind === "character-uc";
+    ui.toMaster.disabled = !box || uc;
+    ui.toMaster.title = uc ? "UC 에는 원본이 없습니다" : `${box?.label ?? "입력창"} 글을 TagOrganize 원본으로 가져옵니다`;
+    ui.toMaster.setAttribute("aria-label", ui.toMaster.title);
+  }
+
+  // 머리글의 → 원본: 패널을 열고 지금 입력창의 글을 원본으로 넣는다. 입력창 글은 그대로 둔다.
+  let pendingImport = null;
+  async function sendToMaster() {
+    closeMenu();
+    const box = targetBox();
+    if (!box || box.kind === "uc" || box.kind === "character-uc") return;
+    if (!alive()) {
+      field.toast(STALE, "warn");
+      return;
+    }
+    await openPanel();
+    if (panelPort) panelPort.postMessage({ type: "import", id: box.id });
+    else pendingImport = box.id;      // 패널이 연결되면 보낸다
   }
 
   // ─── 메뉴 ────────────────────────────────────────────────────────
@@ -315,6 +338,7 @@
       closeMenu();
       openPanel();
     }));
+    if (target && target.kind !== "uc" && target.kind !== "character-uc") menu.append(menuItem("입력창 글을 원본으로", sendToMaster));
     root.append(menu);
     document.documentElement.append(host);
     const rect = anchor.getBoundingClientRect();
@@ -588,11 +612,56 @@
     for (const el of watched) textWatcher.observe(el, { characterData: true, childList: true, subtree: true });
   }
 
+  // 입력창의 모양. 글자 줄은 문단(p)에, 여백과 바탕은 입력창을 감싼 칸에 있다.
+  function fieldLook(box) {
+    if (!box) return null;
+    const text = getComputedStyle(box.el.querySelector("p") || box.el);
+    const wrap = box.el.parentElement ? getComputedStyle(box.el.parentElement) : null;
+    return { fontFamily: text.fontFamily, fontSize: text.fontSize, fontWeight: text.fontWeight, lineHeight: text.lineHeight,
+      letterSpacing: text.letterSpacing, color: text.color, fontFeatureSettings: text.fontFeatureSettings, wordBreak: text.wordBreak,
+      overflowWrap: text.overflowWrap, padding: wrap?.padding, background: wrap?.backgroundColor };
+  }
+
+  // 입력창 글꼴의 파일들. 패널은 확장 쪽 문서라 페이지의 글꼴을 그대로 쓸 수 없어 주소를 넘긴다(같은 사이트의 글꼴만).
+  function fieldFaces(box) {
+    const text = getComputedStyle(box.el);
+    const family = text.fontFamily.split(",")[0].replace(/["']/g, "").trim();
+    const faces = [];
+    for (const sheet of document.styleSheets) {
+      let rules;
+      try {
+        rules = sheet.cssRules;
+      } catch {
+        continue;       // 다른 사이트의 스타일시트는 읽을 수 없다
+      }
+      for (const rule of rules) {
+        if (!(rule instanceof CSSFontFaceRule) || rule.style.getPropertyValue("font-weight") !== text.fontWeight) continue;
+        if (rule.style.getPropertyValue("font-family").replace(/["']/g, "").trim() !== family) continue;
+        const src = /url\(["']?([^"')]+)/.exec(rule.style.getPropertyValue("src"))?.[1];
+        if (!src) continue;
+        const url = new URL(src, sheet.href || location.href);
+        if (url.origin === location.origin) {
+          faces.push({ family, weight: text.fontWeight, range: rule.style.getPropertyValue("unicode-range") || "U+0-10FFFF", src: url.href });
+        }
+      }
+    }
+    return faces;
+  }
+
+  let fontsSent = false;
   function pushBoxes(list) {
     if (!panelPort) return;
     const button = generateButton();
     watchGenerate(button);
-    const payload = JSON.stringify({ type: "boxes", active: targetBox(list)?.id || null, generate: generateState(button),
+    const target = targetBox(list);
+    if (!fontsSent && target) {
+      const faces = fieldFaces(target);
+      if (faces.length) {
+        panelPort.postMessage({ type: "fonts", faces });
+        fontsSent = true;
+      }
+    }
+    const payload = JSON.stringify({ type: "boxes", active: target?.id || null, generate: generateState(button), look: fieldLook(target),
       boxes: list.map(({ id, kind, label, el }) => ({ id, kind, label, text: el.innerText })) });
     if (payload === lastPushed) return;
     lastPushed = payload;
@@ -627,6 +696,7 @@
     if (port.name !== PORT_NAME) return;
     panelPort = port;
     lastPushed = "";
+    fontsSent = false;
     port.onMessage.addListener(onPanelMessage);
     port.onDisconnect.addListener(() => {
       if (panelPort !== port) return;
@@ -637,6 +707,10 @@
       if (!alive()) closePanel();
     });
     schedule();
+    if (pendingImport) {
+      port.postMessage({ type: "import", id: pendingImport });
+      pendingImport = null;
+    }
   });
 
   // ─── 화면 변화 따라가기 ──────────────────────────────────────────

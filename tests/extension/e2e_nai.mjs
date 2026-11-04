@@ -582,6 +582,76 @@ try {
   await closePanel();
   await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");
 
+  // 입력창 머리글의 → 원본: 줄바꿈을 보이는 그대로 옮기고 원본 탭을 연다
+  const pasteBox = (index, text) => ev(`(() => { const el = ${VISIBLE}[${index}]; el.focus(); getSelection().selectAllChildren(el); const data = new DataTransfer(); data.setData('text/plain', ${JSON.stringify(text)}); el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true })); })()`);
+  const MULTI_LINE = "anime coloring,\n\n\n1girl,\nsolo, full body,\n\nstanding";
+  await type(0, "");
+  await pasteBox(0, MULTI_LINE);
+  await sleep(300);
+  check("입력창 innerText 의 줄바꿈은 문단 때문에 늘어남", (await boxText(0)).includes("\n\n\n\n\n\n\n\n"), await boxText(0));
+  const toMasterMenu = async () => {
+    await openMenu();
+    await clickExpr(menuItem("입력창 글을 원본으로"));
+    await sleep(200);
+  };
+  check("머리글이 좁으면 → 원본은 숨고 메뉴에 있음", await ev(`getComputedStyle(${part("to-master")}).display === 'none'`));
+  await toMasterMenu();
+  await waitFor(() => ev(`!!${PANEL}`), "패널");
+  frame = await attachFrame();
+  await frameReady(frame);
+  await waitFor(() => inFrame(frame, "document.getElementById('master_on').checked"), "원본 켜짐");
+  check("→ 원본: 줄바꿈이 보이는 그대로 들어가고 원본 탭이 열림", (await masterText()) === MULTI_LINE && await inFrame(frame, "!document.getElementById('master_body').hidden"), await masterText());
+  check("→ 원본: 입력창 글은 그대로", squeeze(await boxText(0)) === squeeze(MULTI_LINE));
+  check("가져온 직후에는 직접 수정 경고 없음", await inFrame(frame, "document.getElementById('master_warning').hidden"));
+  const LOOK = "(() => { const c = getComputedStyle(TARGET); return [c.fontFamily, c.fontSize, c.fontWeight, c.lineHeight, c.letterSpacing, c.color, c.wordBreak, c.fontFeatureSettings].join(' | '); })()";
+  const areaLook = await inFrame(frame, LOOK.replace("TARGET", "document.getElementById('master_text')"));
+  const boxLook = await ev(LOOK.replace("TARGET", `${VISIBLE}[0].querySelector('p')`));
+  check("원본 칸의 글자 모양이 입력창과 같음", areaLook === boxLook, { areaLook, boxLook });
+  const padding = await inFrame(frame, "getComputedStyle(document.getElementById('master_text')).padding");
+  check("원본 칸의 여백이 입력창과 같음", padding === await ev(`getComputedStyle(${VISIBLE}[0].parentElement).padding`), padding);
+  await waitFor(() => inFrame(frame, "[...document.fonts].some((f) => f.family.includes('Source Sans Pro') && f.status === 'loaded')"), "입력창 글꼴 읽음", 6000);
+  const WIDTH = "(() => { const c = document.createElement('canvas').getContext('2d'); c.font = '16px \"Source Sans Pro\"'; return c.measureText('anime coloring, 1girl, solo').width; })()";
+  check("패널에서 입력창과 같은 글꼴 파일을 씀", Math.abs(await inFrame(frame, WIDTH) - await ev(WIDTH)) < 0.01, [await inFrame(frame, WIDTH), await ev(WIDTH)]);
+  await screenshot("nai_master_look.png");
+  await type(0, "1girl, blue hair");
+  await toMasterMenu();
+  check("→ 원본: 보관한 원본과 다르면 첫 클릭은 지킴", (await masterText()) === MULTI_LINE && (await inFrame(frame, "document.getElementById('notice').textContent")).includes("한 번 더"));
+  await toMasterMenu();
+  check("→ 원본: 두 번째 클릭으로 바꿈", (await masterText()) === "1girl, blue hair");
+  await type(1, "lowres");
+  await sleep(200);
+  check("UC 에서는 → 원본이 꺼짐", await ev(`${part("to-master")}.disabled`));
+  await openMenu();
+  check("UC 에서는 메뉴에도 없음", !(await ev(`!!${menuItem("입력창 글을 원본으로")}`)));
+  await key("Escape", "Escape", 27);
+  await type(1, "");
+  await type(0, "1girl");
+  await closePanel();
+  // 머리글이 넓으면 → 원본 단추가 바로 보인다
+  await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides'])");
+  await ev("document.getElementById('tagorg-nai-button').classList.remove('compact')");
+  check("머리글이 넓으면 → 원본이 보임", await ev(`getComputedStyle(${part("to-master")}).display !== 'none' && ${part("to-master")}.textContent === '→ 원본'`));
+  await screenshot("nai_to_master_button.png");
+  await clickExpr(part("to-master"));
+  await waitFor(() => ev(`!!${PANEL}`), "패널");
+  frame = await attachFrame();
+  await frameReady(frame);
+  await waitFor(() => inFrame(frame, "document.getElementById('master_on').checked"), "단추로 원본 켜짐");
+  check("→ 원본 단추로 가져옴", squeeze(await masterText()) === squeeze(await boxText(0)) && (await masterText()).length > 0, await masterText());
+  await closePanel();
+  await ev("document.getElementById('tagorg-nai-button').classList.add('compact')");
+  // 줄바꿈이 두 배로 저장된 옛 원본은 정리하고, 정리한 뒤에 쓴 빈 줄은 둔다
+  await evaluate(sw, `chrome.storage.local.set({ nai_masters: { prompt: { on: true, group: 'prompt', text: ${JSON.stringify("a,\n\nb,\n\n\n\n\nc")}, lastApplied: '' } } })`);
+  frame = await openEditor();
+  check("옛 원본의 늘어난 줄바꿈을 정리", (await masterText()) === "a,\nb,\n\nc", await masterText());
+  await inFrame(frame, "document.getElementById('master_text').value = 'x,\\n\\ny'; document.getElementById('master_text').dispatchEvent(new Event('input')); document.getElementById('master_text').dispatchEvent(new Event('change'))");
+  await waitFor(async () => (await stored("nai_masters"))?.prompt?.text === "x,\n\ny", "원본 저장");
+  await closePanel();
+  frame = await openEditor();
+  check("정리한 뒤에 쓴 빈 줄은 그대로", (await masterText()) === "x,\n\ny", await masterText());
+  await closePanel();
+  await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");
+
   // 적용 후 생성: NovelAI 의 Generate 를 한 번 누른다. 시험에서는 눌림만 세고 NovelAI 로 넘기지 않는다(생성 요청 없음)
   await ev(`document.addEventListener('click', (e) => {
     if (!e.target.closest?.('.image-gen-generate-button')) return;
