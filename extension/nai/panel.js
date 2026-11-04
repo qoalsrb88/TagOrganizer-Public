@@ -2,7 +2,7 @@
 // 페이지는 이 iframe 안을 볼 수 없다. 패널을 닫으면 프레임째 사라져 팩이 차지한 메모리도 돌아간다.
 
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
-import { Model, gazeToggle, splitItems, viewToggle } from "../editor/model.js";
+import { Model, gazeToggle, poseToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
 import { boxGroup, boxSettings, fieldText, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, sourceText, tidyMasters } from "../engine/text.js";
@@ -29,15 +29,15 @@ const FALLBACK_COLOR = "#7a7c99";
 const $ = (id) => document.getElementById(id);
 
 let pack = null;
-let quick = { framing: [], view: [], gaze: [] };
-let chipPalette = { quick, gaze_conflicts: {}, view_conflicts: {}, view_lift: [] };
+let quick = { framing: [], view: [], gaze: [], pose: [] };
+let chipPalette = { quick, gaze_conflicts: {}, pose_conflicts: {}, view_conflicts: {}, view_lift: [] };
 let settings = null;
 let stored = {};
 let presets = [];
 let boxes = [];
 let activeId = null;
 let result = null;              // 지금 보이는 정렬 결과 {box, output, unchanged}
-const overrides = {};           // 묶음별 크롭·시점·시선. 원본이 켜진 묶음만 저장한다(버튼 정렬에는 쓰지 않는다)
+const overrides = {};           // 묶음별 크롭·시점·시선·포즈. 원본이 켜진 묶음만 저장한다(버튼 정렬에는 쓰지 않는다)
 let masters = {};               // 입력창 id 별 {on, text, lastApplied}
 let masterSaveTimer = 0;
 let mastersDirty = false;
@@ -194,19 +194,19 @@ const quickChip = (label, pressed, onClick) => {
   return chip;
 };
 
-// 시선은 여러 개를 고른다. 지금 크롭·시점이 막는 태그는 숨기되 선택은 두어, 시점을 되돌리면 다시 든다.
-function renderGaze(group, blocked) {
-  const selected = splitItems(overrides[group]?.gaze);
+// 시선·포즈는 여러 개를 고른다. 지금 크롭·시점이 막는 태그는 숨기되 선택은 두어, 크롭·시점을 되돌리면 다시 든다.
+function renderBlockable(name, toggle, group, blocked) {
+  const selected = splitItems(overrides[group]?.[name]);
   const set = (tags) => {
-    overrides[group] = { ...overrides[group], gaze: tags.join(", ") };
+    overrides[group] = { ...overrides[group], [name]: tags.join(", ") };
     render();
   };
-  const chips = quick.gaze.filter((tag) => !blocked.includes(tag)).map((tag) =>
-    quickChip(tag, selected.includes(tag), () => set(gazeToggle(chipPalette, selected, tag))));
+  const chips = quick[name].filter((tag) => !blocked.includes(tag)).map((tag) =>
+    quickChip(tag, selected.includes(tag), () => set(toggle(chipPalette, selected, tag))));
   // 고른 것이 모두 막히면 프롬프트 그대로이므로 자동으로 보인다
   const auto = !selected.some((tag) => !blocked.includes(tag));
-  $("gaze").replaceChildren(quickChip("자동", auto, () => set([])), ...chips);
-  $("gaze").parentElement.hidden = !quick.gaze.length;
+  $(name).replaceChildren(quickChip("자동", auto, () => set([])), ...chips);
+  $(name).parentElement.hidden = !quick[name].length;
 }
 
 // 시점도 여러 개를 고른다. 부딪치는 칩을 켜면 앞의 칩이 꺼지고, lift 칩(multiple views)을 켜면 함께 고를 수 있다.
@@ -226,10 +226,11 @@ function renderView(group, lifted) {
   $("view").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
 }
 
-function renderOverrides(box, blocked = [], lifted = false) {
+function renderOverrides(box, gazeBlocked = [], lifted = false, poseBlocked = []) {
   const group = boxGroup(box.kind);
   $("overrides").hidden = group === "uc";
-  renderGaze(group, blocked);
+  renderBlockable("gaze", gazeToggle, group, gazeBlocked);
+  renderBlockable("pose", poseToggle, group, poseBlocked);
   renderView(group, lifted);
   for (const name of OVERRIDES) {
     const current = overrides[group]?.[name] || "";
@@ -360,7 +361,7 @@ function render() {
   const unchanged = sameLines(box.text, sorted.text);
   result = { box, output: sorted.text, unchanged };
   renderMaster(box, sorted.text);
-  renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted);
+  renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted, sorted.report.pose_blocked);
   renderChips(sorted.report);
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));

@@ -44,10 +44,12 @@ test("크롭·시점·시선 덮어쓰기는 준 때만 옵션에 들어간다",
   assert.equal("framing" in plain, false);
   assert.equal("view" in plain, false);
   assert.equal("gaze" in plain, false);
-  const set = optionsFor({ ...DEFAULT_SETTINGS, framing: "upper body", view: "pov", gaze: "looking back, looking down" }, null, "default", "novelai.net");
+  assert.equal("pose" in plain, false);
+  const set = optionsFor({ ...DEFAULT_SETTINGS, framing: "upper body", view: "pov", gaze: "looking back, looking down", pose: "lying, on back" }, null, "default", "novelai.net");
   assert.equal(set.framing, "upper body");
   assert.equal(set.view, "pov");
   assert.equal(set.gaze, "looking back, looking down");
+  assert.equal(set.pose, "lying, on back");
 });
 
 test("입력창 묶음: UC 는 구도 규칙을 끄고, 저장값이 이긴다", () => {
@@ -129,7 +131,7 @@ test("직접 고친 입력창은 마지막 적용과 현재 결과 모두 다를
 
 test("원본이 켜진 묶음의 칩만 남긴다", () => {
   const overrides = {
-    prompt: { framing: "upper body", view: "from side", gaze: "looking back" },
+    prompt: { framing: "upper body", view: "from side", gaze: "looking back", pose: "kneeling" },
     character: { view: "from behind" },
     uc: { view: "front view" },
   };
@@ -141,10 +143,10 @@ test("원본이 켜진 묶음의 칩만 남긴다", () => {
   };
   assert.deepEqual(masterOverrides(masters, overrides), {
     prompt: overrides.prompt,
-    character: { framing: "", view: "from behind", gaze: "" },
+    character: { framing: "", view: "from behind", gaze: "", pose: "" },
   });
   assert.deepEqual(masterOverrides({ ...masters, "base-prompt": { on: false, group: "prompt" } }, overrides), {
-    character: { framing: "", view: "from behind", gaze: "" },
+    character: { framing: "", view: "from behind", gaze: "", pose: "" },
   });
   assert.deepEqual(masterOverrides({}, overrides), {});
   assert.deepEqual(masterOverrides(masters, {}), {});

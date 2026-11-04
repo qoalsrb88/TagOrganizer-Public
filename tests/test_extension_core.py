@@ -84,12 +84,17 @@ OPTIONS: List[Dict[str, Any]] = [
     {"view": "front view, from behind, multiple views", "framing": "upper body"},
     {"view": "multiple views"},
     {"view": "three quarter view, dutch angle"},
+    {"pose": "lying, on back"},
+    {"pose": "standing", "framing": "portrait"},
+    {"pose": "kneeling, leaning forward", "framing": "close-up", "rules": "report"},
+    {"pose": "sitting", "rules": {"framing": "off"}, "view": "from side"},
+    {"pose": "all fours", "max_rating": "g"},
 ]
 
 INVALID_OPTIONS: List[Dict[str, Any]] = [
     {"preset": "nope"}, {"layout": "nope"}, {"max_rating": "x"}, {"input_dialect": "x"}, {"output_dialect": "x"},
     {"comments": "x"}, {"order": "x"}, {"rules": "x"}, {"exclude": "nope"}, {"exclude": "clothes/nope"},
-    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"gaze": "smile"}, {"view": "reference sheet"}, {"nope": 1},
+    {"dialect_priority": "nai, nai"}, {"framing": "smile"}, {"gaze": "smile"}, {"pose": "smile"}, {"view": "reference sheet"}, {"nope": 1},
     {"arrangement": "{"}, {"arrangement": []}, {"arrangement": {"format": "x", "rows": [["a"]]}},
     {"arrangement": {"rows": [["a"]], "chunks": {}}},
     {"arrangement": {"rows": [["a"], ["a"]], "chunks": {"a": {"members": ["body"]}}}},
@@ -244,11 +249,16 @@ class ParityTest(unittest.TestCase):
             self.assertEqual(list(diff(core.palette(pack), js_palette)), [])
             self.assertTrue(js_palette["quick"]["framing"], "크롭 퀵 목록이 비었음")
             self.assertTrue(js_palette["quick"]["gaze"], "시선 퀵 목록이 비었음")
+            self.assertTrue(js_palette["quick"]["pose"], "포즈 퀵 목록이 비었음")
             pal = core.palette(pack)
             selections = [[], ["looking back"], ["looking back", "looking at viewer"], ["facing away"], ["looking up", "sideways glance"]]
             toggles = [{"want": "gaze_toggle", "selected": s, "tag": t} for s in selections for t in pal["quick"]["gaze"]]
             self.assertEqual(self.run_js(path, toggles),
                              [core.gaze_toggle(pal, c["selected"], c["tag"]) for c in toggles])
+            pose_sets = [[], ["standing"], ["lying", "on back"], ["sitting", "wariza"], ["kneeling", "leaning forward"]]
+            toggles = [{"want": "pose_toggle", "selected": s, "tag": t} for s in pose_sets for t in pal["quick"]["pose"]]
+            self.assertEqual(self.run_js(path, toggles),
+                             [core.pose_toggle(pal, c["selected"], c["tag"]) for c in toggles])
             view_sets = [[], ["front view"], ["from behind", "from side"], ["from above"], ["front view", "from behind", "multiple views"]]
             toggles = [{"want": "view_toggle", "selected": s, "tag": t, "lifted": lifted}
                        for s in view_sets for t in pal["quick"]["view"] for lifted in (False, True)]

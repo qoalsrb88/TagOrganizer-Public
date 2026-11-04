@@ -330,6 +330,30 @@ try {
   await sleep(100);
   check("시선 자동으로 해제", !(await previewText(frame)).includes("looking back"));
 
+  // 포즈 덮어쓰기: 여러 개, 몸이 동시에 못 하는 자세는 꺼지고, 얼굴 크롭에서는 사라진다
+  const poseChip = (text) => `[...document.querySelectorAll('#pose button')].find((b) => b.textContent === '${text}')`;
+  const posePressed = (text) => inFrame(frame, `${poseChip(text)}?.getAttribute('aria-pressed') === 'true'`);
+  await clickInFrame(frame, poseChip("lying"));
+  await sleep(100);
+  await clickInFrame(frame, poseChip("on back"));
+  await sleep(100);
+  preview = await previewText(frame);
+  check("함의 관계인 포즈는 함께 고름", preview.includes("lying") && preview.includes("on back"), preview);
+  await clickInFrame(frame, poseChip("standing"));
+  await sleep(100);
+  check("함께 못 하는 포즈는 꺼짐", (await posePressed("standing")) && !(await posePressed("lying")) && !(await posePressed("on back")));
+  await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === 'portrait')");
+  await sleep(100);
+  check("얼굴 크롭이면 포즈 칩이 사라짐", await inFrame(frame, `!${poseChip("standing")}`));
+  check("고른 포즈가 모두 막히면 자동으로 보임", await posePressed("자동"));
+  check("막힌 포즈는 프롬프트에 넣지 않음", !(await previewText(frame)).includes("standing"));
+  await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === '자동')");
+  await sleep(100);
+  check("크롭을 되돌리면 포즈 선택이 돌아옴", await posePressed("standing"));
+  await clickInFrame(frame, poseChip("자동"));
+  await sleep(100);
+  check("포즈 자동으로 해제", !(await previewText(frame)).includes("standing"));
+
   // 구도 규칙·추정·프리셋: 입력창 묶음별로 저장
   await inFrame(frame, "(() => { const el = document.getElementById('rules'); el.value = 'off'; el.dispatchEvent(new Event('change')); })()");
   await sleep(150);

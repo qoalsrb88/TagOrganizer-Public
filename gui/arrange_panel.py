@@ -1,4 +1,4 @@
-"""미리보기 탭의 배열 세팅 패널 — 배열 고르기·저장, 크롭/시점/시선 퀵 덮어쓰기, 청크 화면, 커스텀 청크·추정 규칙.
+"""미리보기 탭의 배열 세팅 패널 — 배열 고르기·저장, 크롭/시점/시선/포즈 퀵 덮어쓰기, 청크 화면, 커스텀 청크·추정 규칙.
 
 - 배열: 레이아웃 프리셋(기본·간단히), 공유 프리셋(data/arrangements, git 으로 배포), 내 배열(local/arrangements,
   이 PC 전용) 중에서 고른다. 저장은 언제나 내 배열로(공유 프리셋을 고쳐도) — 공유본은 "공유로 올리기"로만 쓴다.
@@ -10,6 +10,7 @@
 - 시점: 여러 개를 고른다(organize 의 view). 부딪치는 시점은 켜는 순간 꺼지고, multiple views 를 켜면 함께 고를 수 있다.
 - 시선: 여러 개를 고른다(organize 의 gaze). 함께 쓸 수 없는 태그는 켜는 순간 꺼지고, 지금 크롭·시점과 맞지 않는 태그는
   숨긴다(report 의 gaze_blocked). 숨겨도 선택은 남아 시점을 되돌리면 다시 든다.
+- 포즈: 시선과 같게 고른다(organize 의 pose, report 의 pose_blocked). 장소·구속 태그는 프롬프트에 그대로 남는다.
 - 팩에 없는 토큰 추정(guess)은 켜고 끄는 미리보기 옵션이고, 추정 규칙(내 패턴)은 배열에 저장된다.
 되돌리기(Ctrl+Z, 청크 화면에서)는 이 패널의 기록이다 — 분류 편집의 되돌리기와 따로 간다.
 """
@@ -354,6 +355,7 @@ class ArrangementPanel(QWidget):
         self.framing = ""
         self.view = ""
         self.gaze = ""                          # 고른 시선 태그(쉼표로 여럿)
+        self.pose = ""                          # 고른 포즈 태그(쉼표로 여럿)
         self._view_lifted = False               # 프롬프트에 시점 규칙을 끄는 형식이 있음(report 의 view_lifted)
         self.source = "layout:default"          # layout:<id> / 파일 경로 / ""(가져왔고 아직 저장 안 함)
         self.undo_stack: List[str] = []
@@ -463,6 +465,9 @@ class ArrangementPanel(QWidget):
             tag: "프롬프트의 시선 태그를 고른 태그들로 바꿉니다("
             + ("눈을 감거나 가렸을 때, 눈 색·눈매 태그를 뺌" if tag.startswith("facing") else "눈이 보일 때") + ") — 여러 개 고를 수 있음"
             for tag in self.palette["quick"].get("gaze") or ()})
+        self._build_multi(layout, "pose", "포즈", {
+            tag: "프롬프트의 자세 태그를 고른 태그들로 바꿉니다(장소 태그는 남김) — 여러 개 고를 수 있음"
+            for tag in self.palette["quick"].get("pose") or ()})
 
         # 청크 화면은 따로(self.board): 미리보기 탭이 색 미리보기 옆에 놓는다
         self.board = QWidget()
@@ -504,7 +509,7 @@ class ArrangementPanel(QWidget):
         self.canvas.set_model(self.model, self.config["taxonomy"])
 
     def _build_multi(self, layout, group: str, title: str, tips: Mapping[str, str]) -> None:
-        """시점·시선 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
+        """시점·시선·포즈 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
         if not tips:
             return
         flow = FlowLayout(spacing=theme.SPACE[0])
@@ -531,7 +536,7 @@ class ArrangementPanel(QWidget):
 
     def options(self) -> Dict[str, Any]:
         return {"arrangement": self.model.to_json(), "framing": self.framing, "view": self.view, "gaze": self.gaze,
-                "guess": self.guess_box.isChecked()}
+                "pose": self.pose, "guess": self.guess_box.isChecked()}
 
     def set_report(self, report: Mapping[str, Any]) -> None:
         """미리보기 결과로 청크별 태그 수와 프롬프트에 있는 크롭·시점 태그를 보여 준다."""
@@ -552,10 +557,12 @@ class ArrangementPanel(QWidget):
                     b.setProperty("present", mark)
                     theme.repolish(b)
         self._view_lifted = bool(report.get("view_lifted"))
-        if "gaze" in self._chips:
-            blocked = set(report.get("gaze_blocked", ()))
-            active = set(split_items(self.gaze)) - blocked
-            for b in self._chips["gaze"].buttons():
+        for group in ("gaze", "pose"):
+            if group not in self._chips:
+                continue
+            blocked = set(report.get(f"{group}_blocked", ()))
+            active = set(split_items(getattr(self, group))) - blocked
+            for b in self._chips[group].buttons():
                 tag = b.property("tag")
                 b.setVisible(tag not in blocked)
                 if not tag:
@@ -574,14 +581,14 @@ class ArrangementPanel(QWidget):
         self.canvas.set_model(self.model, self.config["taxonomy"])
         self._update_state()
 
-    # ---- 크롭·시점·시선·옵션 ----
+    # ---- 크롭·시점·시선·포즈·옵션 ----
 
     def _quick(self, group: str, tag: str) -> None:
         setattr(self, group, tag or "")
         self.changed.emit()
 
     def set_quick(self, group: str, tag: str) -> None:
-        if group in ("view", "gaze"):
+        if group in ("view", "gaze", "pose"):
             self._set_multi(group, split_items(tag))
             return
         for b in self._chips[group].buttons():
@@ -595,6 +602,8 @@ class ArrangementPanel(QWidget):
             tags: List[str] = []
         elif group == "view":
             tags = core.view_toggle(self.palette, selected, tag, self._view_lifted)
+        elif group == "pose":
+            tags = core.pose_toggle(self.palette, selected, tag)
         else:
             tags = core.gaze_toggle(self.palette, selected, tag)
         self._set_multi(group, tags)

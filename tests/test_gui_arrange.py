@@ -602,6 +602,44 @@ class PreviewArrangeTests(unittest.TestCase):
         self.page.run()
         self.assertTrue(chips["looking back"].isHidden())
 
+    def test_pose_chips_select_several_and_keep_place_tags(self):
+        self.run_page("1girl, sitting, on bed")
+        chips = {b.property("tag"): b for b in self.panel._chips["pose"].buttons()}
+        self.assertEqual(len(chips), 18)
+        self.assertTrue(chips[""].isChecked())
+        self.assertTrue(chips["sitting"].property("present"))
+        chips["lying"].click()
+        chips["on back"].click()
+        self.assertEqual(self.panel.pose, "lying, on back")
+        self.assertFalse(chips[""].isChecked())
+        self.page.run()
+        self.assertIn("sitting  # override:pose", self.page.removed.toPlainText())
+        output = self.page.output.toPlainText()
+        for tag in ("lying", "on back", "on bed"):
+            self.assertIn(tag, output)
+        chips["standing"].click()
+        self.assertEqual(self.panel.pose, "standing")
+        self.assertFalse(chips["lying"].isChecked())
+        chips[""].click()
+        self.assertEqual(self.panel.pose, "")
+        self.assertTrue(chips[""].isChecked())
+
+    def test_pose_chips_follow_framing(self):
+        chips = {b.property("tag"): b for b in self.panel._chips["pose"].buttons()}
+        self.panel.set_quick("pose", "standing")
+        self.panel.set_quick("framing", "portrait")
+        self.run_page("1girl, smile")
+        self.assertTrue(chips["standing"].isHidden())
+        self.assertFalse(chips[""].isHidden())
+        self.assertTrue(chips["standing"].isChecked())                         # 숨겨도 선택은 남는다
+        self.assertTrue(chips[""].isChecked())                                 # 고른 것이 모두 막히면 자동
+        self.assertNotIn("standing", self.page.output.toPlainText())
+        self.panel.set_quick("framing", "upper body")
+        self.page.run()
+        self.assertFalse(chips["standing"].isHidden())
+        self.assertFalse(chips[""].isChecked())
+        self.assertIn("standing", self.page.output.toPlainText())
+
     def test_view_chips_combine_and_conflict(self):
         chips = {b.property("tag"): b for b in self.panel._chips["view"].buttons()}
         self.run_page("1girl, ass, groin")

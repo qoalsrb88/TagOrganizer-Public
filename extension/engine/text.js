@@ -69,7 +69,7 @@ export function masterWouldOverwrite(boxText, master, output) {
 export function masterOverrides(masters, overrides) {
   const groups = new Set(Object.values(masters).filter((master) => master.on).map((master) => master.group));
   return Object.fromEntries(Object.entries(overrides).filter(([group]) => groups.has(group))
-    .map(([group, value]) => [group, { framing: value.framing || "", view: value.view || "", gaze: value.gaze || "" }]));
+    .map(([group, value]) => [group, { framing: value.framing || "", view: value.view || "", gaze: value.gaze || "", pose: value.pose || "" }]));
 }
 
 // 구분 표기 없는 조각 하나는 정렬할 것이 없다(오른쪽 클릭이 단어를 잡는 경우도 있다). 이때는 입력창 전체를 정렬한다.
@@ -121,6 +121,7 @@ export function optionsFor(settings, arrangement, layout, hostname) {
   if (settings.framing) options.framing = settings.framing;
   if (settings.view) options.view = settings.view;
   if (settings.gaze) options.gaze = settings.gaze;
+  if (settings.pose) options.pose = settings.pose;
   return options;
 }
 

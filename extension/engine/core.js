@@ -30,7 +30,7 @@ const TYPE_GUESS = -2;
 const ARRANGEMENT_FORMAT = "tagorg-arrangement";
 const ARRANGEMENT_VERSION = 1;
 const PALETTE_FORMAT = "tagorg-palette";
-const OVERRIDE_TARGETS = [["framing", "composition/framing"], ["view", "composition/angle"], ["gaze", "action/gaze"]];
+const OVERRIDE_TARGETS = [["framing", "composition/framing"], ["view", "composition/angle"], ["gaze", "action/gaze"], ["pose", "action/posture"]];
 const REST_CHUNK = "rest";
 const DEFAULT_GUESS_HEADS = ["composition", "action", "clothes", "body", "object", "effect", "background"];
 
@@ -290,6 +290,7 @@ const OPTION_DEFAULTS = {
   framing: "",
   view: "",
   gaze: "",
+  pose: "",
   guess: false,
 };
 
@@ -1011,7 +1012,7 @@ function guessTokens(tokens, pack, rules, heads) {
   }
 }
 
-// ─── 크롭·시점·시선 덮어쓰기 ──────────────────────────────────────
+// ─── 크롭·시점·시선·포즈 덮어쓰기 ─────────────────────────────────
 
 function overridesOf(pack, opts) {
   const out = [];
@@ -1031,11 +1032,21 @@ function overridesOf(pack, opts) {
   return out;
 }
 
+// 이 토큰이 덮어쓰기의 대상인가. 포즈는 action/posture 의 장소·구속 태그를 남기려고 정해 둔 범위만 본다.
+function overrideCovers(t, group, target, pack) {
+  if (t.primary !== target) return false;
+  if (group !== "pose") return true;
+  const quick = pack.rules?.quick ?? {};
+  const scope = quick.pose_scope ?? {};
+  return (quick.pose ?? []).includes(t.key) || (scope.tags ?? []).includes(t.key)
+    || (scope.prefix ?? []).some((prefix) => t.key.startsWith(prefix));
+}
+
 function applyOverrides(input, overrides, inject, pack, opts) {
   let tokens = input;
   for (const [group, target, chosen] of overrides) {
     let infos = chosen;
-    if (group === "gaze") {
+    if (group === "gaze" || group === "pose") {
       const blocked = blockedTags(aliveKeys(tokens), pack, opts);
       infos = infos.filter((i) => blocked.get(i.key)?.[1] !== "remove");
       if (!infos.length) continue;
@@ -1044,7 +1055,7 @@ function applyOverrides(input, overrides, inject, pack, opts) {
     const replacing = infos.some((i) => i.primary === target);   // lift 태그만 골랐으면 프롬프트의 시점을 둔다
     let pos = null;
     tokens.forEach((t, idx) => {
-      if (t.removed || t.kind === "special" || t.primary !== target) return;
+      if (t.removed || t.kind === "special" || !overrideCovers(t, group, target, pack)) return;
       pos = idx;
       if (replacing && !(t.kind === "tag" && keys.has(t.key))) t.removed = `override:${group}`;
     });
@@ -1580,9 +1591,10 @@ export function organize(text, pack, options = null) {
   const report = makeReport(allTokens, pack, opts, outDialect, detected);
   report.arrangement = hasArrangement(opts.arrangement) ? plan.label : "";
   report.arranged = arranged;
-  // 시선 칩에서 지금 고를 수 없는 태그: 칩이 늘 넣는 첫 구간의 크롭·시점으로 판단한다
+  // 시선·포즈 칩에서 지금 고를 수 없는 태그: 칩이 늘 넣는 첫 구간의 크롭·시점으로 판단한다
   const blocked = blockedTags(firstPresent, pack, opts);
   report.gaze_blocked = (pack.rules.quick?.gaze ?? []).filter((tag) => blocked.has(tag));
+  report.pose_blocked = (pack.rules.quick?.pose ?? []).filter((tag) => blocked.has(tag));
   report.view_lifted = (pack.rules.view?.exempt ?? []).some((tag) => firstTyped.has(tag));
   return { text: chunkTexts.join(joiner), removed_text: removedText, report, tokens: allTokens };
 }
@@ -1645,6 +1657,7 @@ export function palette(pack) {
   return { format: PALETTE_FORMAT, categories: cats,
     quick: Object.fromEntries(OVERRIDE_TARGETS.map(([group]) => [group, [...(quick[group] ?? [])]])),
     gaze_conflicts: Object.fromEntries(Object.entries(quick.gaze_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
+    pose_conflicts: Object.fromEntries(Object.entries(quick.pose_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
     view_conflicts: Object.fromEntries(Object.entries(quick.view_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
     view_lift: [...(quick.view_lift ?? [])],
     layouts: Object.fromEntries(Object.entries(pack.layouts).map(([lid, lay]) => [lid, lay.label ?? lid])) };

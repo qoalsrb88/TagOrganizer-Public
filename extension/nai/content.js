@@ -24,8 +24,8 @@
   const PORT_NAME = "nai-panel";
   const IMAGE_PATH = "/image";
   const COMPACT_BELOW = 520;   // 머리글이 이보다 좁으면 글자와 작은 단추를 빼서 탭이 다음 줄로 밀리지 않게 한다
-  const PANEL_SIZE = { width: 760, height: 600 };
-  const PANEL_EDIT_SIZE = { width: 980, height: 760 };   // 배열 편집을 켜면 이 크기까지 늘린다
+  const PANEL_SIZE = { width: 760, height: 680 };
+  const PANEL_EDIT_SIZE = { width: 980, height: 820 };   // 배열 편집을 켜면 이 크기까지 늘린다
   const PANEL_MIN = { width: 420, height: 300 };
   const PANEL_MARGIN = 8;
   const PANEL_TOP = 60;

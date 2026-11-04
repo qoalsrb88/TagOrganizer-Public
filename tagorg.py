@@ -7,7 +7,7 @@
     python tagorg.py e621 batch export --select conflict suspect auto meta hint --size 150 --name F1 [--group]
     python tagorg.py e621 batch apply "work/results/F1-*.csv"   # → e621.csv(status llm), 그다음 e621 accept
     python tagorg.py organize [-i 파일 | -t "프롬프트"] [--preset ID] [--exclude "a, b"] ...
-                              [--arrangement 배열.json] [--framing "upper body"] [--view "from behind"] [--gaze "looking back, looking at viewer"] [--guess]
+                              [--arrangement 배열.json] [--framing "upper body"] [--view "from behind"] [--gaze "looking back, looking at viewer"] [--pose "lying, on back"] [--guess]
     python tagorg.py lookup <태그> [<태그> ...]
     python tagorg.py batch export --top 500 --size 100 --name M1
     python tagorg.py batch apply work/results/M1-*.csv [--by claude:YYYY-MM-DD]
@@ -138,7 +138,7 @@ def _cmd_organize(args: argparse.Namespace) -> int:
             line_per_section=not args.one_line, trailing_comma=not args.no_trailing_comma,
             dedupe=not args.no_dedupe, resolve_aliases=not args.keep_aliases, order=args.order,
             arrangement=Path(args.arrangement).read_text(encoding="utf-8-sig") if args.arrangement else None,
-            framing=args.framing or "", view=args.view or "", gaze=args.gaze or "", guess=args.guess,
+            framing=args.framing or "", view=args.view or "", gaze=args.gaze or "", pose=args.pose or "", guess=args.guess,
             dialect_priority=args.priority or "", comments=args.comments, sentences=not args.no_sentences,
         )
         result = core.organize(_read_input(args), pack, options)
@@ -1031,6 +1031,7 @@ def main(argv=None) -> int:
     s.add_argument("--framing", help='크롭 덮어쓰기, 예: "upper body" (프롬프트의 크롭 태그를 바꿈)')
     s.add_argument("--view", help='시점 덮어쓰기, 예: "from behind"')
     s.add_argument("--gaze", help='시선 덮어쓰기(쉼표로 여럿), 예: "looking back, looking at viewer"')
+    s.add_argument("--pose", help='포즈 덮어쓰기(쉼표로 여럿), 예: "lying, on back" (장소 태그는 남김)')
     s.add_argument("--guess", action="store_true", help="팩에 없는 토큰의 분류를 패턴·끝말로 추정")
     s.add_argument("--json", action="store_true", help="보고서(JSON)만 출력")
     s.add_argument("-q", "--quiet", action="store_true")

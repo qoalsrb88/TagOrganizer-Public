@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from fixtures import core, pack
+from fixtures import build, core, pack
 from tools import tagdb
 
 S2 = ("park, leaf, white shirt, sagisawa fumika, dappled sunlight, autumn leaves, shirt, on bench, black hair, smile, "
@@ -629,7 +629,118 @@ class GazeTests(unittest.TestCase):
         named = {name for tag, others in quick["gaze_conflicts"].items() for name in (tag, *others)}
         for group in ("framing", "view"):
             named |= {tag for block in rules[group]["blocks"] for tag in block["block"]}
-        self.assertEqual(named - set(quick["gaze"]), set())
+        self.assertEqual(named - set(quick["gaze"]) - set(quick["pose"]), set())
+
+
+class PoseTests(unittest.TestCase):
+    def test_replaces_pose_tags_with_several_chosen(self):
+        r = run("1girl, sitting, wariza, smile", pose="lying, on back")
+        self.assertEqual(reasons(r), {"sitting": "override:pose", "wariza": "override:pose"})
+        injected = [(row["text"], row["injected"]) for row in r.report["tokens"] if row.get("injected")]
+        self.assertEqual(injected, [("lying", "pose"), ("on back", "pose")])
+
+    def test_place_and_restraint_tags_stay(self):
+        r = run("1girl, sitting, on bed, on bench, bound", pose="kneeling")
+        self.assertEqual(reasons(r), {"sitting": "override:pose"})
+        for tag in ("on bed", "on bench", "bound", "kneeling"):
+            self.assertIn(tag, r.text)
+
+    def test_pose_tags_outside_the_chips_are_replaced(self):
+        r = run("1girl, yokozuwari, sitting on stairs", pose="standing")
+        self.assertEqual(reasons(r), {"yokozuwari": "override:pose", "sitting on stairs": "override:pose"})
+
+    def test_chosen_tag_already_in_prompt_stays_in_place(self):
+        r = run("1girl, lying, sitting", pose="lying")
+        self.assertEqual(reasons(r), {"sitting": "override:pose"})
+        self.assertEqual([row for row in r.report["tokens"] if row.get("injected")], [])
+
+    def test_alias_is_replaced_too(self):
+        r = run("1girl, crouching", pose="standing")
+        self.assertEqual(reasons(r), {"squatting": "override:pose"})
+
+    def test_only_first_section_gets_injected(self):
+        r = run("1girl, sitting BREAK smile BREAK lying", pose="standing")
+        kept = [row["text"] for row in r.report["tokens"] if not row.get("removed")]
+        self.assertEqual(kept.count("standing"), 2)
+        self.assertEqual(reasons(r), {"sitting": "override:pose", "lying": "override:pose"})
+
+    def test_must_be_posture_tag(self):
+        with self.assertRaises(ValueError) as cm:
+            run("1girl", pose="smile")
+        self.assertIn("action/posture", str(cm.exception))
+
+    def test_blocked_by_face_crops(self):
+        for crop in ("portrait", "close-up"):
+            with self.subTest(crop=crop):
+                r = run("1girl, smile", framing=crop, pose="standing")
+                self.assertNotIn("standing", r.text)
+                self.assertEqual(r.report["pose_blocked"], list(core.palette(pack())["quick"]["pose"]))
+
+    def test_prompt_pose_is_dropped_under_face_crop_and_place_stays(self):
+        r = run("1girl, portrait, sitting, on bed")
+        self.assertEqual(reasons(r), {"sitting": "rule:framing(portrait)"})
+
+    def test_other_crops_do_not_block(self):
+        for crop in ("upper body", "cowboy shot", "full body", "lower body"):
+            with self.subTest(crop=crop):
+                r = run("1girl", framing=crop, pose="kneeling")
+                self.assertIn("kneeling", r.text)
+                self.assertEqual(r.report["pose_blocked"], [])
+
+    def test_block_follows_rule_modes_and_people(self):
+        r = run("1girl, portrait", rules="off", pose="sitting")
+        self.assertIn("sitting", r.text)
+        self.assertEqual(r.report["pose_blocked"], [])
+        r = run("2girls, portrait", pose="sitting")
+        self.assertIn("sitting", r.text)
+        self.assertEqual(r.report["pose_blocked"], [])
+        r = run("1girl, portrait, multiple views", pose="sitting")
+        self.assertIn("sitting", r.text)
+
+    def test_rating_filter_applies_to_chosen_pose(self):
+        r = run("1girl", pose="all fours", max_rating="g")
+        self.assertNotIn("all fours", r.text)
+        self.assertIn("all fours", r.report["removed"][0]["tag"])
+
+    def test_old_pack_without_scope_only_adds(self):
+        data = build()[0]
+        del data["rules"]["quick"]["pose"], data["rules"]["quick"]["pose_scope"]
+        r = core.organize("1girl, sitting, on bed", core.TagPack(data), {"pose": "kneeling"})
+        self.assertEqual({row["tag"] for row in r.report["removed"]}, set())
+        self.assertIn("kneeling", r.text)
+
+    def test_toggle_keeps_implied_pairs_and_turns_off_conflicts_both_ways(self):
+        pal = core.palette(pack())
+        toggle = core.pose_toggle
+        self.assertEqual(toggle(pal, [], "lying"), ["lying"])
+        self.assertEqual(toggle(pal, ["lying"], "on back"), ["lying", "on back"])
+        self.assertEqual(toggle(pal, ["lying", "on back"], "on back"), ["lying"])
+        self.assertEqual(toggle(pal, ["on back"], "on stomach"), ["on stomach"])
+        self.assertEqual(toggle(pal, ["sitting"], "wariza"), ["sitting", "wariza"])
+        self.assertEqual(toggle(pal, ["wariza"], "seiza"), ["seiza"])
+        self.assertEqual(toggle(pal, ["sitting", "wariza"], "standing"), ["standing"])
+        self.assertEqual(toggle(pal, ["standing"], "sitting"), ["sitting"])
+        self.assertEqual(toggle(pal, ["kneeling"], "on one knee"), ["kneeling", "on one knee"])
+        self.assertEqual(toggle(pal, ["kneeling"], "squatting"), ["squatting"])
+        self.assertEqual(toggle(pal, ["standing"], "leaning forward"), ["standing", "leaning forward"])
+        self.assertEqual(toggle(pal, ["leaning forward"], "leaning back"), ["leaning back"])
+        self.assertEqual(toggle(pal, ["lying"], "leaning back"), ["leaning back"])
+        self.assertEqual(toggle(pal, ["standing on one leg"], "contrapposto"), ["contrapposto"])
+        self.assertEqual(toggle(pal, ["standing"], "contrapposto"), ["standing", "contrapposto"])
+
+    def test_rule_tags_are_real_posture_tags(self):
+        rows = {**tagdb.read_overlay(tagdb.E621_OVERLAY, tagdb.SITE_FIELDS), **tagdb.read_overlay()}
+        quick = tagdb.load_config()["rules"]["quick"]
+        self.assertEqual(len(quick["pose"]), 17)
+        for tag in quick["pose"] + quick["pose_scope"]["tags"]:
+            row = rows[tag.replace(" ", "_")]
+            primary = rows[row["same_as"]]["primary"] if row.get("same_as") else row["primary"]
+            self.assertEqual(primary, "action/posture", tag)
+        named = {name for tag, others in quick["pose_conflicts"].items() for name in (tag, *others)}
+        self.assertEqual(named - set(quick["pose"]), set())
+        self.assertEqual(set(quick["pose"]) & set(quick["pose_scope"]["tags"]), set())
+        for tag in ("on bed", "bound", "against wall", "floating"):
+            self.assertNotIn(tag, quick["pose_scope"]["tags"])
 
 
 class GuessTests(unittest.TestCase):

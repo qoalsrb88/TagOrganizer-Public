@@ -2,7 +2,7 @@
 // 사용: node run_core.mjs <tagpack.json 또는 .gz> <cases.json> <out.json>
 import { readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
-import { gazeToggle, viewToggle } from "../../extension/editor/model.js";
+import { gazeToggle, poseToggle, viewToggle } from "../../extension/editor/model.js";
 import { TagPack, arrangementFromLayout, organize, palette } from "../../extension/engine/core.js";
 
 const [packPath, casesPath, outPath] = process.argv.slice(2);
@@ -12,6 +12,7 @@ const cases = JSON.parse(readFileSync(casesPath, "utf-8"));
 const results = cases.map(({ text, options, want, selected, tag, lifted }) => {
   if (want === "palette") return palette(pack);
   if (want === "gaze_toggle") return gazeToggle(palette(pack), selected, tag);
+  if (want === "pose_toggle") return poseToggle(palette(pack), selected, tag);
   if (want === "view_toggle") return viewToggle(palette(pack), selected, tag, lifted);
   if (want === "layouts") return Object.fromEntries(Object.keys(pack.layouts).map((id) => [id, arrangementFromLayout(pack, id)]));
   try {

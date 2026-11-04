@@ -294,7 +294,7 @@ def build_pack(
     if "sort_only" not in config["presets"]:
         errors.append("presets 에 sort_only 가 없습니다")
 
-    # 배열 세팅의 크롭/시점 퀵 목록과 팩에 없는 토큰 추정(guess.json)
+    # 배열 세팅의 크롭/시점/시선/포즈 퀵 목록과 팩에 없는 토큰 추정(guess.json)
     quick = rules.get("quick") or {}
     for group, target in core.OVERRIDE_TARGETS.items():
         _check_rule_tags(f"rules.quick.{group}", quick.get(group, ()), rows, aliases, warnings)
@@ -302,14 +302,16 @@ def build_pack(
         for tag in quick.get(group, ()):
             if tag in rows and rows[tag][3] != target and tag not in lifts:
                 warnings.append(f"rules.quick.{group} '{tag}' 는 {target} 가 아닙니다({rows[tag][3]}) — 덮어쓸 수 없음")
-    for tag, others in (quick.get("gaze_conflicts") or {}).items():
-        for name in (tag, *others):
-            if name not in quick.get("gaze", ()):
-                warnings.append(f"rules.quick.gaze_conflicts '{name}' 는 시선 퀵 목록에 없습니다")
-    for tag, others in (quick.get("view_conflicts") or {}).items():
-        for name in (tag, *others):
-            if name not in quick.get("view", ()):
-                warnings.append(f"rules.quick.view_conflicts '{name}' 는 시점 퀵 목록에 없습니다")
+    for group, title in (("gaze", "시선"), ("view", "시점"), ("pose", "포즈")):
+        for tag, others in (quick.get(f"{group}_conflicts") or {}).items():
+            for name in (tag, *others):
+                if name not in quick.get(group, ()):
+                    warnings.append(f"rules.quick.{group}_conflicts '{name}' 는 {title} 퀵 목록에 없습니다")
+    pose_scope = (quick.get("pose_scope") or {}).get("tags", ())
+    _check_rule_tags("rules.quick.pose_scope", pose_scope, rows, aliases, warnings)
+    for tag in pose_scope:
+        if tag in rows and rows[tag][3] != core.OVERRIDE_TARGETS["pose"]:
+            warnings.append(f"rules.quick.pose_scope '{tag}' 는 {core.OVERRIDE_TARGETS['pose']} 가 아닙니다({rows[tag][3]}) — 바뀌지 않음")
     guess = dict(config.get("guess") or {})
     try:
         core.compile_guess_rules(guess.get("patterns", ()), SimpleNamespace(rules=rules, categories=cats), "guess")
