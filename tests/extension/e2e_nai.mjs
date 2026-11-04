@@ -654,6 +654,32 @@ try {
   await waitFor(async () => (await genPressed()) === genCount + 1, "UC 를 그대로 두고 Generate 눌림");
   await sleep(200);
   check("다른 입력창만 넣어도 대상은 그대로", squeeze(await boxText(0)) === squeeze(genMasterPlanned) && await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), await boxText(0));
+  // 넣은 뒤 누르기 전에 글이 바뀌면 누르지 않는다
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "잠금 풀림", 4000);
+  await type(0, "");
+  await clickInFrame(frame, "document.querySelector('#boxes button:nth-child(2)')");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로 돌아옴", 3000);
+  genCount = await genPressed();
+  await ev(`(() => { const el = ${VISIBLE}[0]; const seen = new MutationObserver(() => { seen.disconnect(); setTimeout(() => el.querySelector('p').append(' extra'), 120); }); seen.observe(el, { childList: true, subtree: true, characterData: true }); })()`);
+  await clickInFrame(frame, genButton);
+  await sleep(900);
+  check("넣은 뒤 글이 바뀌면 누르지 않음", (await genPressed()) === genCount && (await genNotice()).includes("글이 바뀌어서"), await genNotice());
+  await waitFor(() => inFrame(frame, `!${genButton}.disabled`), "버튼이 다시 켜짐", 3000);
+  // 아직 적용하지 않은 원본이 다른 입력창의 글을 덮으면 누르지 않는다
+  await evaluate(sw, "chrome.storage.local.get('nai_masters').then((x) => chrome.storage.local.set({ nai_masters: { ...x.nai_masters, prompt: { ...x.nai_masters.prompt, lastApplied: '' } } }))");
+  await sleep(200);
+  await type(0, "1girl, blue hair");
+  await clickInFrame(frame, "document.querySelector('#boxes button:nth-child(2)')");
+  await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로 돌아옴", 3000);
+  await clickInFrame(frame, genButton);
+  await sleep(300);
+  check("한 번도 넣지 않은 원본이 다른 입력창의 글을 덮으면 누르지 않음", (await genPressed()) === genCount && (await boxText(0)).trim() === "1girl, blue hair" && (await genNotice()).includes("직접 고쳤습니다"), { box: await boxText(0), notice: await genNotice() });
+  // 원본을 켠 다른 입력창의 결과가 비면 이전 글로 생성하지 않는다
+  await evaluate(sw, "chrome.storage.local.get('nai_masters').then((x) => chrome.storage.local.set({ nai_masters: { ...x.nai_masters, prompt: { ...x.nai_masters.prompt, text: '' } } }))");
+  await sleep(300);
+  await clickInFrame(frame, genButton);
+  await sleep(300);
+  check("원본을 켠 다른 입력창이 비면 누르지 않음", (await genPressed()) === genCount && (await genNotice()).includes("비어 있어"), await genNotice());
   await type(1, "");
   await closePanel();
   await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");

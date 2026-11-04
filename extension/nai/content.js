@@ -564,11 +564,18 @@
     return { ready: generateReady(button), label, cost: /(\d[\d,]*)\s*Anlas/i.exec(label)?.[1] || "" };
   }
 
-  // 누르는 쪽의 안전장치는 패널에 있다. 여기서는 그 사이 NovelAI 버튼이 바뀌지 않았는지만 다시 본다.
-  function clickGenerate() {
+  // 패널이 계획을 세운 뒤 입력창이나 NovelAI 버튼이 바뀌었으면 누르지 않는다. 글은 빈칸을 빼고 비교한다(문단 편집기의 줄바꿈).
+  function clickGenerate(expected) {
     const button = generateButton();
     if (!button) return { ok: false, reason: "NovelAI 의 생성 버튼을 찾지 못했습니다" };
     if (!generateReady(button)) return { ok: false, reason: "NovelAI 가 지금은 생성할 수 없는 상태입니다" };
+    const squeeze = (text) => text.replace(/\s+/g, "");
+    const list = boxes();
+    for (const { id, text } of expected) {
+      const box = list.find((b) => b.id === id);
+      if (!box) return { ok: false, reason: "입력창이 사라져서 생성하지 않았습니다" };
+      if (squeeze(box.el.innerText) !== squeeze(text)) return { ok: false, reason: `그 사이 ${box.label} 글이 바뀌어서 생성하지 않았습니다` };
+    }
     const { label } = generateState(button);
     button.click();
     return { ok: true, label };
@@ -612,7 +619,7 @@
       const result = await field.apply(message.expected, message.text);
       port.postMessage({ type: "applied", ...result });
     } else if (message.type === "generate") {
-      port.postMessage({ type: "generated", ...clickGenerate() });
+      port.postMessage({ type: "generated", ...clickGenerate(message.expected) });
     }
   }
 

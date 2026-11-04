@@ -1131,10 +1131,14 @@ function applyRules(tokens, pack, opts) {
   const present = new Set(alive.filter((t) => t.kind === "tag").map((t) => t.key));
   const multi = isMultiSubject(present, rules);
 
+  // 곧 빠질 시선은 기준으로 삼지 않는다(straight-on 이 뺄 facing away 때문에 눈 태그까지 빠지지 않게)
+  const blocked = blockedTags(present, pack, opts);
+  const gating = new Set([...present].filter((key) => blocked.get(key)?.[1] !== "remove"));
+
   const hidden = new Map();
   const spared = new Map();   // 그룹 → 그 그룹이 가려도 남기는 태그
   for (const [group, mode, cfg] of ruleGroups(present, pack, opts)) {
-    const active = (cfg.gates || []).filter((g) => gateActive(g, present));
+    const active = (cfg.gates || []).filter((g) => gateActive(g, gating));
     if (!active.length) continue;
     spared.set(group, new Set(active.flatMap((g) => g.keep || [])));
     let regions = new Set(active[0].hide || []);
@@ -1147,7 +1151,7 @@ function applyRules(tokens, pack, opts) {
         if (present.has(tag)) for (const r of revealed) regions.delete(r);
       }
     }
-    const gateTags = new Set(active.flatMap((g) => g.tags).filter((tag) => present.has(tag)));
+    const gateTags = new Set(active.flatMap((g) => g.tags).filter((tag) => gating.has(tag)));
     const gates = sortedCp(gateTags).join(", ");
     for (const region of regions) if (!hidden.has(region)) hidden.set(region, [group, mode, gates]);
   }
@@ -1165,7 +1169,6 @@ function applyRules(tokens, pack, opts) {
     }
   }
 
-  const blocked = blockedTags(present, pack, opts);
   for (const t of alive) {
     if (t.kind === "tag" && blocked.has(t.key)) {
       const [group, mode, gates] = blocked.get(t.key);

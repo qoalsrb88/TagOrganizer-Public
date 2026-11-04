@@ -39,6 +39,8 @@ HANDWRITTEN = [
     "1girl, facing viewer, sideways glance, aqua eyes",
     "2girls, facing away, blue eyes",
     "1girl, facing back, closed eyes, head out of frame",
+    "1girl, straight-on, facing away, blue eyes",
+    "1girl, straight-on, facing away, facing viewer, blue eyes",
     "",
     " , ,\n",
     "smile, 1girl, shoes, upper body, hatsune miku, blue hair, 1.2::long hair ::, outdoors, {{sky}}, from side",

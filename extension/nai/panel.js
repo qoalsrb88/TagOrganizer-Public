@@ -5,7 +5,7 @@ import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/e
 import { Model, gazeToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
-import { boxGroup, boxSettings, masterDrift, masterOverrides, optionsFor, sameLines, sourceText } from "../engine/text.js";
+import { boxGroup, boxSettings, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, sourceText } from "../engine/text.js";
 
 const HOSTNAME = "novelai.net";
 const DRAFT_KEY = "nai_draft";
@@ -350,19 +350,25 @@ function render() {
 
 // ─── 적용 후 생성 ────────────────────────────────────────────────
 
-// 입력창에 넣을 글: 원본을 켠 다른 보이는 입력창과 지금 입력창. 지금 입력창을 마지막에 넣어 대상이 그대로 남게 한다.
+// 생성에 들어갈 입력창: 원본을 켠 다른 보이는 입력창과 지금 입력창(마지막에 넣어 대상이 그대로 남게 한다).
+// Anlas 를 쓰는 동작이라, 원본이 비었거나 직접 고친 글을 덮게 되면 넘어가지 않고 이유를 돌려준다.
 function generatePlan() {
-  const plan = [];
+  const items = [];
+  let problem = "";
+  const edited = (box) => `${box.label} 입력창을 직접 고쳤습니다. 그 입력창을 고른 뒤 원본으로 가져오거나 적용하고 나서 생성하세요.`;
   for (const box of boxes) {
     const master = masterFor(box);
-    if (box.id === result.box.id || !master?.on || !master.text?.trim()) continue;
-    const { text } = organize(inputText(box), pack, currentOptions(box));
-    if (text.trim() && !sameLines(box.text, text)) plan.push({ box, output: text, drift: masterDrift(box.text, master, text) });
+    if (box.id === result.box.id || !master?.on) continue;
+    // 원본이 비어도 칩의 태그는 결과에 들어가므로 원본 글을 먼저 본다(지금 입력창의 빈 원본 안내와 같은 기준)
+    const source = inputText(box);
+    const text = source.trim() ? organize(source, pack, currentOptions(box)).text : "";
+    if (!text.trim()) problem ||= `${box.label} 원본이 비어 있어 생성하지 않았습니다.`;
+    else if (masterWouldOverwrite(box.text, master, text)) problem ||= edited(box);
+    items.push({ box, output: text, apply: !sameLines(box.text, text) });
   }
-  if (!result.unchanged) {
-    plan.push({ box: result.box, output: result.output, drift: masterDrift(result.box.text, masterFor(result.box), result.output) });
-  }
-  return plan;
+  if (masterDrift(result.box.text, masterFor(result.box), result.output)) problem ||= edited(result.box);
+  items.push({ box: result.box, output: result.output, apply: !result.unchanged });
+  return { items, problem };
 }
 
 function generateLocked() {
@@ -388,9 +394,10 @@ function renderGenerate() {
       console.warn("[TagOrganize] 생성 계획을 만들지 못했습니다:", e);
     }
   }
-  const label = busy ? "생성 중…" : plan?.length ? "적용 후 생성" : "생성";
+  const applying = plan?.items.some((item) => item.apply);
+  const label = busy ? "생성 중…" : applying ? "적용 후 생성" : "생성";
   button.textContent = naiGenerate.cost && !busy ? `${label} · ${naiGenerate.cost}` : label;
-  button.title = `${plan?.length ? "입력창에 결과를 넣고 " : ""}NovelAI 의 Generate 를 한 번 누릅니다${naiGenerate.cost ? ` (${naiGenerate.cost} Anlas)` : ""}`;
+  button.title = `${applying ? "입력창에 결과를 넣고 " : ""}NovelAI 의 Generate 를 한 번 누릅니다${naiGenerate.cost ? ` (${naiGenerate.cost} Anlas)` : ""}`;
   button.disabled = busy || Boolean(pendingApply) || !naiGenerate.ready || !plan;
 }
 
@@ -399,9 +406,10 @@ const postApply = (box, output) => new Promise((resolve) => {
   port.postMessage({ type: "apply", id: box.id, expected: box.text, text: output });
 });
 
-const postGenerate = () => new Promise((resolve) => {
+// expected: 누르는 순간 입력창마다 있어야 할 글. 콘텐츠 스크립트가 누르기 직전에 대조한다.
+const postGenerate = (expected) => new Promise((resolve) => {
   pendingGenerate = resolve;
-  port.postMessage({ type: "generate" });
+  port.postMessage({ type: "generate", expected });
 });
 
 async function applyAndGenerate() {
@@ -413,30 +421,30 @@ async function applyAndGenerate() {
     setNotice(e.message, true);
     return;
   }
-  const drifted = plan.find((item) => item.drift);
-  if (drifted) {
-    setNotice(`${drifted.box.label} 입력창을 직접 고쳤습니다. 그 입력창을 고른 뒤 원본으로 가져오거나 적용하고 나서 생성하세요.`, true);
+  if (plan.problem) {
+    setNotice(plan.problem, true);
     return;
   }
+  const writes = plan.items.filter((item) => item.apply);
   const target = activeId;
   generateRun = true;
   render();
   try {
-    for (const { box, output } of plan) {
+    for (const { box, output } of writes) {
       const applied = await postApply(box, output);
       if (!applied.ok) {
         setNotice(applied.reason, true);
         return;
       }
     }
-    if (plan.at(-1) && plan.at(-1).box.id !== target) port.postMessage({ type: "select", id: target });   // 넣은 입력창으로 대상이 옮겨 갔다
-    if (plan.length) await new Promise((resolve) => setTimeout(resolve, GENERATE_SETTLE_MS));
-    const clicked = await postGenerate();
+    if (writes.at(-1) && writes.at(-1).box.id !== target) port.postMessage({ type: "select", id: target });   // 넣은 입력창으로 대상이 옮겨 갔다
+    if (writes.length) await new Promise((resolve) => setTimeout(resolve, GENERATE_SETTLE_MS));
+    const clicked = await postGenerate(plan.items.map(({ box, output }) => ({ id: box.id, text: output })));
     if (clicked.ok) {
       generateLock = { at: performance.now(), label: clicked.label };
       setTimeout(render, GENERATE_LOCK_MIN_MS + 50);
       setTimeout(render, GENERATE_LOCK_MAX_MS + 50);
-      setNotice(plan.length ? "입력창에 넣고 생성을 눌렀습니다." : "생성을 눌렀습니다.");
+      setNotice(writes.length ? "입력창에 넣고 생성을 눌렀습니다." : "생성을 눌렀습니다.");
     } else setNotice(clicked.reason, true);
   } finally {
     generateRun = false;

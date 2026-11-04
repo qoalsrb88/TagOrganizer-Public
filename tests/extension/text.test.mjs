@@ -1,7 +1,7 @@
 // extension/engine/text.js — node --test (tests/test_extension_core.py 가 부른다)
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_SETTINGS, boxGroup, boxSettings, isSortableSelection, keepEdges, masterDrift, masterOverrides, optionsFor, sameLines, selectionProblem, sourceText, summary } from "../../extension/engine/text.js";
+import { DEFAULT_SETTINGS, boxGroup, boxSettings, isSortableSelection, keepEdges, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, selectionProblem, sourceText, summary } from "../../extension/engine/text.js";
 
 test("구분 표기가 없는 조각은 정렬할 것이 없다", () => {
   assert.equal(isSortableSelection("smile"), false);
@@ -155,4 +155,19 @@ test("알림 글에 뺀 태그를 적는다", () => {
   const done = { kept: 3, removed: ["a", "b", "c", "d", "e", "f", "g"], unknown: ["x"], warnings: 1 };
   assert.equal(summary(done), "3개 정렬 · 7개 뺌(a, b, c, d, e, f 외 1개) · DB에 없음 1개 · 문법 경고 1개");
   assert.equal(summary({ kept: 2, removed: [], unknown: [], warnings: 0 }), "2개 정렬");
+});
+
+test("아직 적용하지 않은 원본이 입력창의 다른 글을 덮는지 본다", () => {
+  const output = "1girl,\nsmile";
+  const first = { on: true, text: "1girl, smile", lastApplied: "" };
+  assert.equal(masterWouldOverwrite("1girl, blue hair", first, output), true);
+  assert.equal(masterDrift("1girl, blue hair", first, output), false);        // 지금 입력창이면 미리보기로 보이므로 경고하지 않는다
+  assert.equal(masterWouldOverwrite("", first, output), false);               // 덮일 글이 없다
+  assert.equal(masterWouldOverwrite(" 1girl, smile ", first, output), false); // 원본과 같다
+  assert.equal(masterWouldOverwrite("1girl,\n\nsmile", first, output), false); // 결과와 같다
+  const applied = { ...first, lastApplied: "1girl,\nsmile,\nshoes" };
+  assert.equal(masterWouldOverwrite("1girl,\n\nsmile,\n\nshoes", applied, output), false);   // 마지막에 넣은 글이다
+  assert.equal(masterWouldOverwrite("1girl, red hair", applied, output), true);
+  assert.equal(masterWouldOverwrite("1girl, red hair", { ...first, on: false }, output), false);
+  assert.equal(masterWouldOverwrite("1girl, red hair", undefined, output), false);
 });

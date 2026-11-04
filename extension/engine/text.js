@@ -43,6 +43,12 @@ export function masterDrift(boxText, master, output) {
     && !sameLines(boxText, master.lastApplied) && !sameLines(boxText, output));
 }
 
+// 패널에서 안 보이는 입력창에 쓸 때의 판단: 아직 적용한 적 없는 원본도 입력창의 다른 글을 덮으면 고친 것으로 본다.
+export function masterWouldOverwrite(boxText, master, output) {
+  if (!master?.on || !boxText.trim() || boxText.trim() === (master.text ?? "").trim() || sameLines(boxText, output)) return false;
+  return !master.lastApplied || !sameLines(boxText, master.lastApplied);
+}
+
 // 원본이 켜진 묶음의 칩만 남긴다. 묶음은 원본을 켤 때 적어 둔다(숨은 입력창은 종류를 알 수 없다).
 export function masterOverrides(masters, overrides) {
   const groups = new Set(Object.values(masters).filter((master) => master.on).map((master) => master.group));

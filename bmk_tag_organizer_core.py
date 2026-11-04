@@ -1286,11 +1286,15 @@ def _apply_rules(tokens: List[Token], pack: TagPack, opts: Options) -> None:
     present = {t.key for t in alive if t.kind == "tag"}
     multi = _is_multi_subject(present, rules)
 
+    # 곧 빠질 시선은 기준으로 삼지 않는다(straight-on 이 뺄 facing away 때문에 눈 태그까지 빠지지 않게)
+    blocked = _blocked_tags(present, pack, opts)
+    gating = present - {tag for tag, (_, mode, _) in blocked.items() if mode == "remove"}
+
     # 부위 기반 규칙: 가려진 부위 → (그룹, 모드, 기준 태그)
     hidden: Dict[str, Tuple[str, str, str]] = {}
     spared: Dict[str, Set[str]] = {}        # 그룹 → 그 그룹이 가려도 남기는 태그
     for group, mode, cfg in _rule_groups(present, pack, opts):
-        active = [g for g in cfg.get("gates", ()) if _gate_active(g, present)]
+        active = [g for g in cfg.get("gates", ()) if _gate_active(g, gating)]
         if not active:
             continue
         spared[group] = {tag for g in active for tag in g.get("keep", ())}
@@ -1300,7 +1304,7 @@ def _apply_rules(tokens: List[Token], pack: TagPack, opts: Options) -> None:
             for tag, revealed in (g.get("reveal") or {}).items():
                 if tag in present:
                     regions -= set(revealed)
-        gates = ", ".join(sorted(present & {tag for g in active for tag in g["tags"]}))
+        gates = ", ".join(sorted(gating & {tag for g in active for tag in g["tags"]}))
         for region in regions:
             hidden.setdefault(region, (group, mode, gates))
 
@@ -1316,7 +1320,6 @@ def _apply_rules(tokens: List[Token], pack: TagPack, opts: Options) -> None:
             _act(t, mode, "rule:" + "; ".join(f"{g}({gates})" for g, _, gates in entries))
 
     # 크롭·시점과 함께 그릴 수 없는 태그
-    blocked = _blocked_tags(present, pack, opts)
     for t in alive:
         if t.kind == "tag" and t.key in blocked:
             group, mode, gates = blocked[t.key]

@@ -505,6 +505,15 @@ class GazeTests(unittest.TestCase):
         self.assertEqual(reasons(run("2girls, facing viewer, blue eyes")), {})         # 다른 사람의 눈일 수 있다
         self.assertEqual(reasons(run("1girl, multiple views, facing viewer, blue eyes")), {})
 
+    def test_facing_about_to_be_blocked_does_not_hide_eyes(self):
+        r = run("1girl, straight-on, facing away, blue eyes")
+        self.assertEqual(reasons(r), {"facing away": "rule:view(straight-on)"})
+        self.assertIn("blue eyes", r.text)
+        r = run("1girl, straight-on, facing away, facing viewer, blue eyes")               # 남는 facing 만 기준이 된다
+        self.assertEqual(reasons(r), {"facing away": "rule:view(straight-on)", "blue eyes": "rule:gaze(facing viewer)"})
+        reported = run("1girl, straight-on, facing away, blue eyes", rules={"view": "report"})   # 표시만 하면 facing 이 남는다
+        self.assertEqual(reasons(reported), {"blue eyes": "rule:gaze(facing away)"})
+
     def test_keep_only_spares_tags_from_its_own_group(self):
         r = run("1girl, closed eyes, facing viewer, head out of frame")
         self.assertEqual(reasons(r), {"closed eyes": "rule:framing(head out of frame)"})
