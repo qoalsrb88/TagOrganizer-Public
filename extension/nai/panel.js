@@ -4,8 +4,8 @@
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
 import { Model, gazeToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
-import { listPresets, loadBoxSettings, loadImported, loadPack, loadSettings, putImported, saveBoxSetting } from "../engine/store.js";
-import { boxGroup, boxSettings, optionsFor, sameLines } from "../engine/text.js";
+import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
+import { boxGroup, boxSettings, masterDrift, masterOverrides, optionsFor, sameLines, sourceText } from "../engine/text.js";
 
 const HOSTNAME = "novelai.net";
 const DRAFT_KEY = "nai_draft";
@@ -16,6 +16,7 @@ const UNDO_LIMIT = 100;
 const EDITOR_SIDE_FROM = 620;   // 이 폭부터 청크와 미리보기를 좌우로 놓는다
 const EDITOR_PREVIEW_DELAY = 60;
 const NOTICE_MS = 6000;
+const MASTER_SAVE_DELAY = 250;
 const PORT_NAME = "nai-panel";
 const DIALECT_NAMES = { nai: "NAI", comfyui: "ComfyUI", anima: "Anima" };
 const OVERRIDES = ["framing"];
@@ -33,7 +34,13 @@ let presets = [];
 let boxes = [];
 let activeId = null;
 let result = null;              // 지금 보이는 정렬 결과 {box, output, unchanged}
-const overrides = {};           // 묶음별 크롭·시점·시선 덮어쓰기. 패널을 닫으면 사라진다(버튼 정렬에는 쓰지 않는다)
+const overrides = {};           // 묶음별 크롭·시점·시선. 원본이 켜진 묶음만 저장한다(버튼 정렬에는 쓰지 않는다)
+let masters = {};               // 입력창 id 별 {on, text, lastApplied}
+let masterSaveTimer = 0;
+let mastersDirty = false;
+let dirtyMasters = new Set();   // 저장할 입력창 id. 아직 저장하지 않은 글은 다른 탭의 변경이 와도 지킨다
+let confirmedImport = null;
+let pendingApply = null;        // 응답이 올 때까지 대상과 결과를 보관한다
 
 // 배열 편집: 편집 중인 배열은 입력창 묶음과 상관없이 하나다. 입력창을 옮겨 다니며 같은 배열로 미리 보고 적용한다.
 let editor = null;
@@ -58,6 +65,61 @@ function setNotice(message, warn = false) {
   if (message) noticeTimer = setTimeout(() => setNotice(""), NOTICE_MS);
 }
 
+function flushMasters() {
+  clearTimeout(masterSaveTimer);
+  if (!mastersDirty) return;
+  mastersDirty = false;
+  const changed = Object.fromEntries([...dirtyMasters].map((id) => [id, masters[id]]));
+  dirtyMasters = new Set();
+  saveMasters(changed, overrides).catch((e) => {
+    mastersDirty = true;
+    for (const id of Object.keys(changed)) dirtyMasters.add(id);
+    setNotice(`원본을 저장하지 못했습니다: ${e.message}`, true);
+  });
+}
+
+function storeMasters(id = null, delay = 0) {
+  if (id) dirtyMasters.add(id);
+  mastersDirty = true;
+  clearTimeout(masterSaveTimer);
+  if (delay) masterSaveTimer = setTimeout(flushMasters, delay);
+  else flushMasters();
+}
+
+const masterFor = (box) => box && boxGroup(box.kind) !== "uc" ? masters[box.id] : undefined;
+const inputText = (box) => sourceText(box?.text ?? "", masterFor(box));
+
+function renderMaster(box, output = "") {
+  const master = masterFor(box);
+  $("master").hidden = !box || boxGroup(box.kind) === "uc";
+  $("master_on").checked = Boolean(master?.on);
+  $("master_body").hidden = $("master_import").hidden = !master?.on;
+  const text = master?.text ?? "";
+  // 값을 그대로 두면 입력 중 커서와 선택이 유지된다.
+  if ($("master_text").value !== text) $("master_text").value = text;
+  $("master_warning").hidden = !masterDrift(box?.text ?? "", master, output);
+  if (confirmedImport && (confirmedImport.id !== box?.id || confirmedImport.text !== box.text || confirmedImport.previous !== text)) {
+    confirmedImport = null;
+  }
+}
+
+function importMaster() {
+  const box = activeBox();
+  const master = masterFor(box);
+  if (!master?.on) return;
+  if (master.text !== box.text && !(confirmedImport?.id === box.id && confirmedImport.text === box.text
+    && confirmedImport.previous === master.text && confirmedImport.until > performance.now())) {
+    confirmedImport = { id: box.id, text: box.text, previous: master.text, until: performance.now() + NOTICE_MS };
+    setNotice("원본을 바꾸려면 입력창에서 가져오기를 한 번 더 누르세요.", true);
+    return;
+  }
+  masters[box.id] = { ...master, text: box.text };
+  confirmedImport = null;
+  storeMasters(box.id);
+  render();
+  setNotice("입력창 글을 원본으로 가져왔습니다.");
+}
+
 function renderBoxButtons() {
   const buttons = boxes.map((box) => {
     const button = document.createElement("button");
@@ -75,7 +137,11 @@ const quickChip = (label, pressed, onClick) => {
   chip.type = "button";
   chip.textContent = label;
   chip.setAttribute("aria-pressed", String(pressed));
-  chip.addEventListener("click", onClick);
+  chip.addEventListener("click", () => {
+    onClick();
+    // 켠 원본이 없는 묶음의 칩은 패널을 닫으면 잊는다
+    if (Object.keys(masterOverrides(masters, overrides)).length) storeMasters();
+  });
   return chip;
 };
 
@@ -212,6 +278,7 @@ function render() {
   if (!pack) return;
   $("state").hidden = editing;
   const box = activeBox();
+  renderMaster(box);
   if (!box) {
     $("overrides").hidden = true;
     clearResult("보이는 입력창이 없습니다");
@@ -224,14 +291,16 @@ function render() {
   if ($("preset").selectedIndex < 0) $("preset").selectedIndex = 0;
   $("rules").value = effective.rules;
   $("guess").checked = effective.guess;
-  if (!box.text.trim()) {
-    clearResult(`${box.label} 입력창이 비어 있습니다`);
+  const source = inputText(box);
+  if (!source.trim()) {
+    $("state").hidden = false;
+    clearResult(masterFor(box)?.on ? "원본 프롬프트가 비어 있습니다" : `${box.label} 입력창이 비어 있습니다`);
     return;
   }
   let sorted;
   const started = performance.now();
   try {
-    sorted = organize(box.text, pack, currentOptions(box));
+    sorted = organize(source, pack, currentOptions(box));
   } catch (e) {
     $("state").hidden = false;
     clearResult(e.message, true);
@@ -240,12 +309,13 @@ function render() {
   const ms = performance.now() - started;
   const unchanged = sameLines(box.text, sorted.text);
   result = { box, output: sorted.text, unchanged };
+  renderMaster(box, sorted.text);
   renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted);
   renderChips(sorted.report);
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));
   $("copy").disabled = !sorted.text;
-  $("apply").disabled = unchanged || !sorted.text.trim();
+  $("apply").disabled = Boolean(pendingApply) || unchanged || !sorted.text.trim();
   $("apply").textContent = unchanged ? "정렬됨" : "적용";
   if (!sorted.text.trim()) setNotice(`모두 빠집니다 (${sorted.report.counts.removed}개). 적용할 수 없습니다.`, true);
 }
@@ -412,7 +482,7 @@ function editorHost() {
       const effective = boxSettings(settings, stored, activeBox()?.kind);
       return { rules: effective.rules, guess: effective.guess, ...overrides[boxGroup(activeBox()?.kind)] };
     },
-    inputText: () => activeBox()?.text ?? "",
+    inputText: () => inputText(activeBox()),
     loadPalette: async () => ({
       palette: palette(pack),
       layouts: Object.fromEntries(Object.keys(pack.layouts).map((id) => [id, arrangementFromLayout(pack, id)])),
@@ -496,8 +566,17 @@ port.onMessage.addListener((message) => {
     activeId = message.active;
     render();
   } else if (message.type === "applied") {
-    if (message.ok) setNotice(APPLIED);
-    else setNotice(message.reason, true);
+    if (message.ok) {
+      // 원본을 켜지 않은 입력창의 글은 저장하지 않는다
+      if (pendingApply && masters[pendingApply.id]?.on) {
+        const { id, output } = pendingApply;
+        masters[id] = { ...masters[id], lastApplied: output };
+        storeMasters(id);
+      }
+      setNotice(APPLIED);
+    } else setNotice(message.reason, true);
+    pendingApply = null;
+    render();
   }
 });
 
@@ -509,10 +588,38 @@ $("preset").addEventListener("change", () => {
 $("edit_toggle").addEventListener("click", () => setEditing(!editing));
 $("rules").addEventListener("change", () => changeBoxSetting({ rules: $("rules").value }));
 $("guess").addEventListener("change", () => changeBoxSetting({ guess: $("guess").checked }));
+$("master_on").addEventListener("change", () => {
+  const box = activeBox();
+  if (!box || boxGroup(box.kind) === "uc") return;
+  const master = masterFor(box) || { on: false, text: "", lastApplied: "" };
+  const on = $("master_on").checked;
+  masters[box.id] = { ...master, on, group: boxGroup(box.kind), text: on && !master.text.trim() ? box.text : master.text };
+  confirmedImport = null;
+  storeMasters(box.id);
+  render();
+});
+$("master_text").addEventListener("input", () => {
+  const box = activeBox();
+  const master = masterFor(box);
+  if (!master?.on) return;
+  masters[box.id] = { ...master, text: $("master_text").value };
+  confirmedImport = null;
+  storeMasters(box.id, MASTER_SAVE_DELAY);
+  render();
+});
+$("master_text").addEventListener("change", flushMasters);
+$("master_import").addEventListener("click", importMaster);
+addEventListener("pagehide", flushMasters);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) flushMasters();
+});
 $("show_chips").addEventListener("click", () => showView(true));
 $("show_text").addEventListener("click", () => showView(false));
 $("apply").addEventListener("click", () => {
-  if (result && !result.unchanged) port.postMessage({ type: "apply", id: result.box.id, expected: result.box.text, text: result.output });
+  if (!result || result.unchanged || !result.output.trim() || pendingApply) return;
+  pendingApply = { id: result.box.id, kind: result.box.kind, output: result.output };
+  $("apply").disabled = true;
+  port.postMessage({ type: "apply", id: result.box.id, expected: result.box.text, text: result.output });
 });
 $("copy").addEventListener("click", async () => {
   try {
@@ -524,6 +631,7 @@ $("copy").addEventListener("click", async () => {
 });
 addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
+    flushMasters();
     port.postMessage({ type: "close" });
     return;
   }
@@ -537,7 +645,12 @@ addEventListener("keydown", (event) => {
 });
 
 chrome.storage.onChanged.addListener(async (changes) => {
-  if (!changes.settings && !changes.nai_boxes && !changes.imported_arrangements) return;
+  if (changes.nai_masters) {
+    // 다른 탭이 고친 원본을 받되, 이 패널에서 아직 저장하지 않은 글은 둔다
+    const pending = Object.fromEntries([...dirtyMasters].map((id) => [id, masters[id]]));
+    masters = { ...(changes.nai_masters.newValue || {}), ...pending };
+  }
+  if (!changes.settings && !changes.nai_boxes && !changes.imported_arrangements && !changes.nai_masters) return;
   if (changes.settings) settings = await loadSettings();
   if (changes.nai_boxes) stored = await loadBoxSettings();
   if (changes.imported_arrangements) {
@@ -548,7 +661,8 @@ chrome.storage.onChanged.addListener(async (changes) => {
 });
 
 try {
-  [settings, stored, presets] = await Promise.all([loadSettings(), loadBoxSettings(), listPresets()]);
+  [settings, stored, presets, masters] = await Promise.all([loadSettings(), loadBoxSettings(), listPresets(), loadMasters()]);
+  Object.assign(overrides, await loadMasterOverrides(masters));
   fillPresets();
   pack = await loadPack();
   chipPalette = palette(pack);

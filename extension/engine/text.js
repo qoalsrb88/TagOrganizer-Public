@@ -30,9 +30,24 @@ export function boxSettings(settings, stored, kind) {
 // \n 세 개가 더 붙는다. 결과 글은 \n 하나가 줄바꿈이고 하나 더 붙으면 빈 줄이다.
 export function sameLines(fieldText, output) {
   const newlines = (run) => run.split("\n").length - 1;
-  const field = fieldText.replace(/\s*\n\s*/g, (run) => "\n".repeat(1 + Math.max(0, Math.floor((newlines(run) - 2) / 3)))).trim();
+  const field = fieldText.replace(/\n\n[^\S\n]+(?=\n\n)/g, "\n\n\n").replace(/\s*\n\s*/g, (run) => "\n".repeat(1 + Math.max(0, Math.floor((newlines(run) - 2) / 3)))).trim();
   const result = output.replace(/\s*\n\s*/g, (run) => "\n".repeat(newlines(run))).trim();
   return field === result;
+}
+
+export const sourceText = (boxText, master) => master?.on ? master.text ?? "" : boxText;
+
+// 빈 입력창이나 아직 적용하지 않은 원본은 직접 고친 것으로 보지 않는다. 입력창 글을 원본으로 가져온 뒤에도 사라질 변경이 없다.
+export function masterDrift(boxText, master, output) {
+  return Boolean(master?.on && master.lastApplied && boxText.trim() && boxText.trim() !== (master.text ?? "").trim()
+    && !sameLines(boxText, master.lastApplied) && !sameLines(boxText, output));
+}
+
+// 원본이 켜진 묶음의 칩만 남긴다. 묶음은 원본을 켤 때 적어 둔다(숨은 입력창은 종류를 알 수 없다).
+export function masterOverrides(masters, overrides) {
+  const groups = new Set(Object.values(masters).filter((master) => master.on).map((master) => master.group));
+  return Object.fromEntries(Object.entries(overrides).filter(([group]) => groups.has(group))
+    .map(([group, value]) => [group, { framing: value.framing || "", view: value.view || "", gaze: value.gaze || "" }]));
 }
 
 // 구분 표기 없는 조각 하나는 정렬할 것이 없다(오른쪽 클릭이 단어를 잡는 경우도 있다). 이때는 입력창 전체를 정렬한다.

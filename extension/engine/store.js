@@ -2,11 +2,13 @@
 // 서비스 워커는 쉬면 내려가므로 팩은 쓸 때 읽는다(읽는 데 0.5초 안쪽). 패널도 같은 모듈을 쓴다.
 
 import { TagPack } from "./core.js";
-import { DEFAULT_SETTINGS } from "./text.js";
+import { DEFAULT_SETTINGS, masterOverrides } from "./text.js";
 
 const IMPORTED_KEY = "imported_arrangements";
 const SETTINGS_KEY = "settings";
 const BOXES_KEY = "nai_boxes";
+const MASTERS_KEY = "nai_masters";
+const OVERRIDES_KEY = "nai_overrides";
 
 let packPromise = null;
 let catalogPromise = null;
@@ -53,6 +55,27 @@ export async function loadBoxSettings() {
 export async function saveBoxSetting(group, patch) {
   const stored = await loadBoxSettings();
   await chrome.storage.local.set({ [BOXES_KEY]: { ...stored, [group]: { ...stored[group], ...patch } } });
+}
+
+export async function loadMasters() {
+  const stored = await chrome.storage.local.get(MASTERS_KEY);
+  return stored[MASTERS_KEY] || {};
+}
+
+export async function loadMasterOverrides(masters) {
+  const stored = await chrome.storage.local.get(OVERRIDES_KEY);
+  return masterOverrides(masters, stored[OVERRIDES_KEY] || {});
+}
+
+// 원본과 그 묶음의 칩을 함께 저장한다. 꺼진 묶음의 칩은 남기지 않는다.
+// 다른 탭의 패널이 고친 입력창을 덮지 않도록 바뀐 입력창만 합쳐 쓴다.
+export async function saveMasters(changed, overrides) {
+  const stored = await chrome.storage.local.get([MASTERS_KEY, OVERRIDES_KEY]);
+  const masters = { ...(stored[MASTERS_KEY] || {}), ...changed };
+  await chrome.storage.local.set({
+    [MASTERS_KEY]: masters,
+    [OVERRIDES_KEY]: masterOverrides(masters, { ...(stored[OVERRIDES_KEY] || {}), ...overrides }),
+  });
 }
 
 export async function loadImported() {

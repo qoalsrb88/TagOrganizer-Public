@@ -22,6 +22,16 @@
   <div class="quick"><span>시점</span><div id="view" class="chips multi" role="group" aria-label="시점 덮어쓰기(여러 개)"></div></div>
   <div class="quick"><span>시선</span><div id="gaze" class="chips multi" role="group" aria-label="시선 덮어쓰기(여러 개)"></div></div>
 </div>
+<section id="master" hidden aria-label="원본 프롬프트">
+  <div class="master-head">
+    <label class="check"><input id="master_on" type="checkbox" aria-controls="master_body"> 원본 고정</label>
+    <button id="master_import" type="button" hidden>입력창에서 가져오기</button>
+  </div>
+  <div id="master_body" hidden>
+    <textarea id="master_text" rows="3" aria-label="원본 프롬프트" aria-describedby="master_warning" spellcheck="false"></textarea>
+    <div id="master_warning" role="status" hidden>입력창을 직접 고쳤습니다. 적용하면 그 변경은 사라집니다. 원본에 넣으려면 입력창에서 가져오기를 누르세요.</div>
+  </div>
+</section>
 <div id="state" role="status">팩 읽는 중…</div>
 <nav id="views" class="segments" role="group" aria-label="보기">
   <button id="show_chips" type="button" aria-pressed="true">색 미리보기</button>

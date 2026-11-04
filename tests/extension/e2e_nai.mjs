@@ -284,6 +284,7 @@ try {
   await waitFor(() => inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"), "UC 로 전환", 3000).catch(() => {});
   check("입력창을 누르면 패널 대상이 바뀜", await inFrame(frame, "document.querySelector('#boxes button[aria-pressed=true]')?.textContent === 'UC'"));
   check("UC 에서는 크롭·시점을 숨김", await inFrame(frame, "document.getElementById('overrides').hidden"));
+  check("UC 에서는 원본 칸을 숨김", await inFrame(frame, "document.getElementById('master').hidden"));
   check("UC 는 구도 규칙 끔으로 시작", (await inFrame(frame, "document.getElementById('rules').value")) === "off");
 
   await clickInFrame(frame, "document.querySelectorAll('#boxes button')[0]");
@@ -481,6 +482,145 @@ try {
   const firstLine = async (f) => (await previewText(f)).split("\n")[0];
   const stateOf = (f) => inFrame(f, "document.querySelector('.bmk-to-state').textContent");
 
+  // 원본 고정: 적용으로 빠진 태그도 다음 시점에서 다시 쓴다.
+  const masterPrompt = "1girl, smile, blue eyes, looking back, full body, shoes";
+  const masterText = () => inFrame(frame, "document.getElementById('master_text').value");
+  const viewChip = (tag) => `[...document.querySelectorAll('#view button')].find((b) => b.textContent === ${JSON.stringify(tag)})`;
+  const writeMaster = async (text) => {
+    await clickInFrame(frame, "document.getElementById('master_text')");
+    await key("a", "KeyA", 65, { modifiers: 2, command: "selectAll" });
+    if (text) await send("Input.insertText", { text }, page);
+    else await key("Delete", "Delete", 46, { command: "deleteForward" });
+  };
+  const applyMaster = async () => {
+    const expected = await previewText(frame);
+    await clickInFrame(frame, "document.getElementById('apply')");
+    await waitFor(async () => squeeze(await boxText(0)) === squeeze(expected), "원본 결과 적용");
+    await waitFor(async () => (await stored("nai_masters"))?.prompt?.lastApplied === expected, "적용 결과 저장");
+    return expected;
+  };
+  await type(0, masterPrompt);
+  frame = await openEditor();
+  check("원본을 켜기 전에는 토글만 보임", await inFrame(frame, "!document.getElementById('master').hidden && document.getElementById('master_body').hidden && document.getElementById('master_import').hidden"));
+  await clickInFrame(frame, "document.getElementById('master_on')");
+  check("처음 켜면 입력창으로 원본을 채움", (await masterText()) === masterPrompt);
+  await clickInFrame(frame, viewChip("straight-on"));
+  preview = await applyMaster();
+  check("원본 적용: 결과에서만 시선이 빠짐", !preview.includes("looking back") && (await masterText()) === masterPrompt, preview);
+  check("원본과 달라도 입력창이 결과와 같으면 정렬됨", await inFrame(frame, "document.getElementById('apply').disabled && document.getElementById('apply').textContent === '정렬됨'"));
+  await screenshot("nai_master.png");
+  await clickInFrame(frame, viewChip("from behind"));
+  check("시점을 바꿔도 마지막 적용 글이면 경고 없음", await inFrame(frame, "document.getElementById('master_warning').hidden"));
+  const masterOutput = await applyMaster();
+  check("다른 시점에서 빠졌던 태그가 돌아옴", masterOutput.includes("looking back") && masterOutput.includes("from behind") && (await masterText()) === masterPrompt, masterOutput);
+  await closePanel();
+  frame = await openEditor();
+  check("다시 열어도 원본과 켜짐 유지", (await masterText()) === masterPrompt && await inFrame(frame, "document.getElementById('master_on').checked"));
+  check("다시 열어도 칩과 결과 유지", await inFrame(frame, `${viewChip("from behind")}.getAttribute('aria-pressed') === 'true'`) && (await previewText(frame)) === masterOutput);
+
+  await type(0, "");
+  check("빈 입력창에도 원본으로 적용 가능하고 경고 없음", await inFrame(frame, "!document.getElementById('apply').disabled && document.getElementById('master_warning').hidden") && (await previewText(frame)) === masterOutput);
+  await applyMaster();
+  await type(0, "1girl, red hair");
+  await waitFor(() => inFrame(frame, "!document.getElementById('master_warning').hidden"), "직접 수정 경고");
+  check("직접 수정은 경고하되 적용을 막지 않음", await inFrame(frame, "!document.getElementById('apply').disabled") && (await previewText(frame)) === masterOutput);
+  await clickInFrame(frame, "document.getElementById('master_import')");
+  check("가져오기 첫 클릭은 원본을 지킴", (await masterText()) === masterPrompt && (await inFrame(frame, "document.getElementById('notice').textContent")).includes("한 번 더"));
+  await type(0, "1girl, green hair");
+  await clickInFrame(frame, "document.getElementById('master_import')");
+  check("확인 사이 입력창이 바뀌면 다시 확인", (await masterText()) === masterPrompt);
+  await clickInFrame(frame, "document.getElementById('master_import')");
+  check("가져오기 두 번째 클릭으로 원본 교체", (await masterText()) === "1girl, green hair" && (await previewText(frame)).includes("green hair"));
+  check("가져온 뒤에는 경고 없음", await inFrame(frame, "document.getElementById('master_warning').hidden"));
+  // 다른 탭의 패널이 저장한 입력창은 이 패널의 저장이 덮지 않는다
+  await evaluate(sw, "chrome.storage.local.get('nai_masters').then((x) => chrome.storage.local.set({ nai_masters: { ...x.nai_masters, 'base-prompt': { on: true, group: 'prompt', text: 'other tab', lastApplied: '' } } }))");
+  await sleep(150);
+  await clickInFrame(frame, viewChip("from side"));
+  await sleep(150);
+  check("다른 탭의 원본을 지우지 않음", (await stored("nai_masters"))?.["base-prompt"]?.text === "other tab", await stored("nai_masters"));
+  await evaluate(sw, "chrome.storage.local.get('nai_masters').then(({ nai_masters: { 'base-prompt': _, ...rest } }) => chrome.storage.local.set({ nai_masters: rest }))");
+  await clickInFrame(frame, viewChip("from side"));
+  await sleep(100);
+
+  await clickInFrame(frame, "document.getElementById('edit_toggle')");
+  await waitFor(() => inFrame(frame, "document.querySelectorAll('.bmk-to-tok').length > 0"), "원본 배열 미리보기");
+  const editedMaster = `${masterPrompt}, pink hair`;
+  await writeMaster(editedMaster);
+  await waitFor(async () => (await stored("nai_masters"))?.prompt?.text === editedMaster, "원본 입력 저장");
+  await waitFor(() => inFrame(frame, "[...document.querySelectorAll('.bmk-to-tok')].some((t) => t.textContent === 'pink hair')"), "원본으로 배열 미리보기");
+  check("배열 편집 중에도 원본을 고칠 수 있음", await inFrame(frame, "document.getElementById('views').hidden && document.getElementById('preview').hidden && !document.getElementById('master_body').hidden") && (await boxText(0)).trim() === "1girl, green hair");
+  const masterRect = await panelBox();
+  const masterGrip = await ev(`(() => { const r = ${PANEL}.querySelector('.grip').getBoundingClientRect(); return [r.x + 7, r.y + 7]; })()`);
+  await drag(masterGrip, [masterGrip[0] + 420 - masterRect.width, masterGrip[1]]);
+  check("420px 패널에서 원본 줄이 넘치지 않음", await inFrame(frame, "innerWidth <= 420 && document.documentElement.scrollWidth <= innerWidth && document.getElementById('master_text').getBoundingClientRect().right <= innerWidth"));
+  await writeMaster("");
+  check("빈 원본은 입력창으로 대체하지 않고 안내", await inFrame(frame, "document.getElementById('apply').disabled && !document.getElementById('state').hidden && document.getElementById('state').textContent.includes('원본 프롬프트가 비어')"));
+  await writeMaster(editedMaster);
+  await clickInFrame(frame, "document.getElementById('master_on')");
+  check("끄면 입력창을 쓰고 원본은 남김", (await previewText(frame)).includes("green hair") && (await masterText()) === editedMaster);
+  await clickInFrame(frame, "document.getElementById('master_on')");
+  check("다시 켜면 보관한 원본을 씀", (await masterText()) === editedMaster && (await previewText(frame)).includes("pink hair"));
+  await clickInFrame(frame, "document.getElementById('edit_toggle')");
+  await clickInFrame(frame, "document.getElementById('master_on')");
+  await waitFor(async () => !(await stored("nai_overrides"))?.prompt, "꺼진 묶음의 칩 저장 해제");
+  await closePanel();
+  frame = await openEditor();
+  check("꺼진 원본은 보관하고 칩은 잊음", (await masterText()) === editedMaster && await inFrame(frame, `!document.getElementById('master_on').checked && ${viewChip("자동")}.getAttribute('aria-pressed') === 'true'`));
+  await closePanel();
+  await evaluate(sw, "chrome.storage.local.remove(['nai_masters', 'nai_overrides', 'nai_editing'])");
+
+  // 시점 칩: 여러 개를 고르고, 부딪치면 꺼지고, multiple views 를 켜면 함께 고른다
+  await type(0, "1girl, ass, groin, navel");
+  frame = await openEditor();
+  const viewOn = (tag) => inFrame(frame, `${viewChip(tag)}.getAttribute('aria-pressed') === 'true'`);
+  const pickView = async (tag) => {
+    await clickInFrame(frame, viewChip(tag));
+    await sleep(100);
+  };
+  await pickView("from behind");
+  await pickView("from side");
+  preview = await previewText(frame);
+  check("시점을 여러 개 고름", (await viewOn("from behind")) && (await viewOn("from side")) && preview.includes("from side, from behind"), preview);
+  check("측후면은 앞면 태그를 뺌", preview.includes("ass") && !preview.includes("groin") && !preview.includes("navel"), preview);
+  await pickView("front view");
+  preview = await previewText(frame);
+  check("부딪치는 시점은 꺼짐", (await viewOn("front view")) && !(await viewOn("from behind")) && (await viewOn("from side")), preview);
+  check("끈 까닭과 multiple views 를 알림", (await inFrame(frame, "document.getElementById('notice').textContent")).includes("multiple views"));
+  check("정면은 뒷면 태그를 뺌", !preview.includes("ass") && preview.includes("groin") && preview.includes("navel"), preview);
+  await pickView("multiple views");
+  await pickView("from behind");
+  preview = await previewText(frame);
+  check("multiple views 를 켜면 함께 고름", (await viewOn("front view")) && (await viewOn("from behind")) && preview.includes("multiple views"), preview);
+  check("multiple views 면 시점 규칙을 쓰지 않음", preview.includes("ass") && preview.includes("groin"), preview);
+  await pickView("multiple views");
+  check("multiple views 를 끄면 부딪치는 칩은 앞쪽만 남음", (await viewOn("front view")) && !(await viewOn("from behind")));
+  await pickView("자동");
+  check("시점 자동으로 해제", await viewOn("자동"));
+
+  // 빈 줄: 입력창에 빈 문단으로 들어가고, 빈 줄만 달라도 적용할 수 있다
+  const gapArrangement = { format: "tagorg-arrangement", version: 1, label: "빈 줄 시험", rows: [["who"], ["rest"]],
+    chunks: { who: { members: ["subject/count"], gap_after: true }, rest: { members: ["*"] } } };
+  await evaluate(sw, `chrome.storage.local.set({ imported_arrangements: [{ id: "gap", label: "빈 줄 시험", data: ${JSON.stringify(gapArrangement)} }] })`);
+  await sleep(300);
+  const pickPreset = async (id) => {
+    await inFrame(frame, `(() => { const el = document.getElementById('preset'); el.value = ${JSON.stringify(id)}; el.dispatchEvent(new Event('change')); })()`);
+    await sleep(200);
+  };
+  await type(0, "1girl, smile");
+  await sleep(300);
+  await pickPreset("imported:gap");
+  check("빈 줄이 든 결과는 적용할 수 있음", await inFrame(frame, "!document.getElementById('apply').disabled"), await previewText(frame));
+  check("결과 글에 빈 줄", (await previewText(frame)) === "1girl,\n\nsmile", await previewText(frame));
+  check("색 미리보기에 빈 줄 자리", await inFrame(frame, "(() => { const line = document.querySelector('#chips .line:empty'); return Boolean(line) && line.getBoundingClientRect().height > 0; })()"));
+  await clickInFrame(frame, "document.getElementById('apply')");
+  await waitFor(() => ev(`${VISIBLE}[0].querySelectorAll('p').length === 3`), "빈 문단 적용");
+  check("입력창에 빈 문단이 들어감", await ev(`!${VISIBLE}[0].querySelectorAll('p')[1].textContent.trim()`), await ev(`${VISIBLE}[0].innerHTML`));
+  await waitFor(() => inFrame(frame, "document.getElementById('apply').textContent === '정렬됨'"), "빈 줄 적용 뒤 정렬됨");
+  await pickPreset("layout:default");
+  check("빈 줄이 없는 배열로 바꾸면 다시 적용할 수 있음", await inFrame(frame, "!document.getElementById('apply').disabled"), await boxText(0));
+  await closePanel();
+  await evaluate(sw, "chrome.storage.local.remove(['imported_arrangements', 'nai_boxes', 'nai_editing'])");
+
   await type(0, WORD_PROMPT);
   await sleep(700);
   let edit = await openEditor();
@@ -566,6 +706,23 @@ try {
   await sleep(200);
   check("숨기면 그 태그가 빠짐", !(await previewText(edit)).includes("smile"), await previewText(edit));
   check("빠진 태그는 흐리게 남음", await inFrame(edit, "[...document.querySelectorAll('.bmk-to-tok.rm')].some((t) => t.textContent === 'smile')"));
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+
+  // 우클릭 메뉴: 빈 줄
+  await rightClick(await pagePoint(edit, chunkOfTag("smile")));
+  await clickInFrame(edit, menuEntry("아래에 빈 줄 넣기"));
+  await sleep(200);
+  check("청크 아래에 빈 줄 띠가 보임", await inFrame(edit, "!!document.querySelector('.bmk-to-gap')"));
+  check("빈 줄이 결과에 들어감", (await previewText(edit)).includes("\n\n"), await previewText(edit));
+  check("미리보기 칸에 빈 줄 자리", await inFrame(edit, "(() => { const line = document.querySelector('.bmk-to-preview .bmk-to-line:empty'); return Boolean(line) && line.getBoundingClientRect().height > 0; })()"));
+  await screenshot("nai_editor_gap.png");
+  await rightClick(await pagePoint(edit, "document.querySelector('.bmk-to-gap')"));
+  await clickInFrame(edit, menuEntry("빈 줄 빼기"));
+  await sleep(200);
+  check("띠를 우클릭해 빈 줄을 뺌", await inFrame(edit, "!document.querySelector('.bmk-to-gap')") && !(await previewText(edit)).includes("\n\n"), await previewText(edit));
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(100);
   await key("z", "KeyZ", 90, { modifiers: 2 });
   await sleep(150);
 

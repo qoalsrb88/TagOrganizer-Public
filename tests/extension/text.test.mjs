@@ -1,7 +1,7 @@
 // extension/engine/text.js — node --test (tests/test_extension_core.py 가 부른다)
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_SETTINGS, boxGroup, boxSettings, isSortableSelection, keepEdges, optionsFor, sameLines, selectionProblem, summary } from "../../extension/engine/text.js";
+import { DEFAULT_SETTINGS, boxGroup, boxSettings, isSortableSelection, keepEdges, masterDrift, masterOverrides, optionsFor, sameLines, selectionProblem, sourceText, summary } from "../../extension/engine/text.js";
 
 test("구분 표기가 없는 조각은 정렬할 것이 없다", () => {
   assert.equal(isSortableSelection("smile"), false);
@@ -84,6 +84,71 @@ test("입력창의 빈 문단은 결과의 빈 줄과 같고, 빈 줄이 다르�
   assert.equal(sameLines("a,\n\n\n\n\n\n\n\nb", "a,\n\n\nb"), true);
   assert.equal(sameLines("a,\n\nb", "a,\n\nb"), false);
   assert.equal(sameLines("a,\n\n\n\n\nb", "a,\nb"), false);
+  assert.equal(sameLines("a,\n\n \n\nb", "a,\n\nb"), true);
+  assert.equal(sameLines("a,\n\n \n\nb", "a,\nb"), false);
+});
+
+test("원본이 켜져 있으면 빈 입력창에도 원본을 쓰고, 끄면 입력창을 쓴다", () => {
+  const master = { on: true, text: "1girl, looking back, shoes", lastApplied: "1girl" };
+  assert.equal(sourceText("1girl", master), master.text);
+  assert.equal(sourceText("", master), master.text);
+  assert.equal(sourceText("1girl", { ...master, on: false }), "1girl");
+  assert.equal(sourceText("1girl"), "1girl");
+  assert.equal(sourceText("1girl", { on: true, text: "" }), "");
+  assert.equal(sourceText("1girl", { on: true }), "");
+  assert.equal(master.text, "1girl, looking back, shoes");
+});
+
+test("원본은 입력창 id 별로 따로 고른다", () => {
+  const masters = {
+    prompt: { on: true, text: "1girl" },
+    "base-prompt": { on: true, text: "outdoors" },
+    "character-prompts-0": { on: true, text: "blue eyes" },
+    "character-prompts-1": { on: false, text: "long hair" },
+  };
+  assert.equal(sourceText("smile", masters.prompt), "1girl");
+  assert.equal(sourceText("smile", masters["base-prompt"]), "outdoors");
+  assert.equal(sourceText("smile", masters["character-prompts-0"]), "blue eyes");
+  assert.equal(sourceText("smile", masters["character-prompts-1"]), "smile");
+});
+
+test("직접 고친 입력창은 마지막 적용과 현재 결과 모두 다를 때만 알린다", () => {
+  const master = { on: true, text: "1girl, shoes, smile", lastApplied: "1girl,\nsmile" };
+  const output = "1girl,\nshoes,\nsmile";
+  assert.equal(masterDrift("1girl, blue eyes", master, output), true);
+  assert.equal(masterDrift("1girl,\n\nsmile\n", master, output), false);
+  assert.equal(masterDrift("1girl,\r\n shoes,\n\nsmile", master, output), false);
+  assert.equal(masterDrift(" \n ", master, output), false);
+  assert.equal(masterDrift("1girl, blue eyes", { ...master, on: false }, output), false);
+  assert.equal(masterDrift("1girl, blue eyes", { ...master, lastApplied: "" }, output), false);
+  assert.equal(masterDrift("1girl, blue eyes", { on: true, text: "1girl" }, output), false);
+  assert.equal(masterDrift("1girl, blue eyes", undefined, output), false);
+  // 입력창 글을 원본으로 가져왔으면 적용해도 사라질 변경이 없다
+  assert.equal(masterDrift("1girl, blue eyes", { ...master, text: "1girl, blue eyes" }, output), false);
+});
+
+test("원본이 켜진 묶음의 칩만 남긴다", () => {
+  const overrides = {
+    prompt: { framing: "upper body", view: "from side", gaze: "looking back" },
+    character: { view: "from behind" },
+    uc: { view: "front view" },
+  };
+  const masters = {
+    prompt: { on: false, group: "prompt" },
+    "base-prompt": { on: true, group: "prompt" },
+    "character-prompts-0": { on: false, group: "character" },
+    "character-prompts-1": { on: true, group: "character" },
+  };
+  assert.deepEqual(masterOverrides(masters, overrides), {
+    prompt: overrides.prompt,
+    character: { framing: "", view: "from behind", gaze: "" },
+  });
+  assert.deepEqual(masterOverrides({ ...masters, "base-prompt": { on: false, group: "prompt" } }, overrides), {
+    character: { framing: "", view: "from behind", gaze: "" },
+  });
+  assert.deepEqual(masterOverrides({}, overrides), {});
+  assert.deepEqual(masterOverrides(masters, {}), {});
+  assert.deepEqual(overrides.character, { view: "from behind" });
 });
 
 test("알림 글에 뺀 태그를 적는다", () => {
