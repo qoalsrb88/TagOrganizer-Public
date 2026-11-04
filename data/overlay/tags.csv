@@ -9485,7 +9485,7 @@ dimly_lit_room,danbooru,background/location,effect/lighting,,,,accepted,claude:2
 dimple,danbooru,body/face,,g,face,1,accepted,claude:2026-10-27,0.85,,
 dimple_facial_mark,danbooru,body/face,,g,face,1,accepted,claude:2026-10-27,0.85,facial_mark 선례,
 dimple_piercing,danbooru,clothes/accessory,,g,face,,accepted,claude:2026-10-27,0.9,,
-dimples_of_venus,danbooru,body/lower,,s,back,0,accepted,claude:2026-10-26,0.8,,
+dimples_of_venus,danbooru,body/lower,,s,back_hips,0,reviewed,user:2026-11-04,,허리보단 힙쪽에 가까운 부위로 판단.,
 diner,danbooru,background/location,,,,,accepted,claude:2026-10-27,0.95,,
 ding_(vessel),danbooru,object/prop,,g,,,accepted,claude:2026-10-27,0.85,고대 중국 청동 솥,
 dingir_(fate),danbooru,object/prop,,g,,,accepted,claude:2026-10-27,0.8,위키: 길가메시(캐스터)가 주문에 쓰는 책 모양 석판,
