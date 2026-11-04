@@ -15,11 +15,11 @@ from pathlib import Path
 from typing import Callable, List, Optional
 
 from PySide6.QtCore import QItemSelectionModel, QModelIndex, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFontDatabase, QGuiApplication
+from PySide6.QtGui import QColor, QCursor, QFontDatabase, QGuiApplication
 from PySide6.QtWidgets import (
     QAbstractItemView, QButtonGroup, QCheckBox, QComboBox, QFileDialog, QFormLayout, QFrame, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QMenu, QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSplitter,
-    QTableWidget, QTableWidgetItem, QTabWidget, QTextBrowser, QVBoxLayout, QWidget,
+    QTableWidget, QTableWidgetItem, QTabWidget, QTextBrowser, QToolTip, QVBoxLayout, QWidget,
 )
 
 import bmk_tag_organizer_core as core
@@ -91,6 +91,8 @@ def _combo(items, current=None) -> QComboBox:
 FILTERS = (("all", "전체"), ("unknown", "팩에 없음"), ("guess", "추정"), ("removed", "뺌"), ("flagged", "표시만"),
            ("etc", "보류"), ("syntax", "문법·주석·문장"))
 SYNTAX_KINDS = ("special", "comment", "natural")
+TOKEN_HELP = theme.help_text(("토큰 고르기", "편집 패널에 열어 분류를 고칩니다"),
+                             ("오른쪽 버튼", "커스텀 청크에 넣기 · 확장 DB 에 더하기 · 복사"))
 DIALECT_NAMES = {"nai": "NAI", "comfyui": "ComfyUI", "anima": "Anima"}
 
 
@@ -118,7 +120,7 @@ def _priorities() -> List[tuple]:
 
 
 def dialect_status(dialect: dict) -> str:
-    """report["dialect"] → 상태 줄 조각(HTML). 자동이면 알아낸 문법과 근거, 표기가 섞였으면 경고색."""
+    """report["dialect"] → 상태 글 조각(HTML). 자동이면 알아낸 문법과 근거, 표기가 섞였으면 경고색."""
     if not dialect.get("auto"):
         return ""
     name = DIALECT_NAMES.get(dialect["input"], dialect["input"])
@@ -128,7 +130,7 @@ def dialect_status(dialect: dict) -> str:
              + (f" 외 {counts.get(d, len(v)) - 1}" if counts.get(d, len(v)) > 1 else "")
              for d, v in evidence.items() if v]
     why = " — " + ", ".join(signs) if signs else " — 표기 없음(우선순위 첫 문법)"
-    text = f" · 문법 자동 → <b>{name}</b>{why}"
+    text = f"문법 자동 → <b>{name}</b>{why}"
     if dialect.get("conflict"):
         return theme.span(text + " · 표기가 섞여 우선순위로 정함", "warning")
     return text
@@ -271,9 +273,6 @@ class PreviewPage(QWidget):
             signal.connect(lambda *_: self._timer.start())
         self.exclude.textChanged.connect(self._timer.start)
         layout.addLayout(second)
-        self.status = theme.caption("", "muted")
-        self.status.setWordWrap(True)
-        layout.addWidget(self.status)
 
         self.split = QSplitter(Qt.Vertical)
         self.input = QPlainTextEdit(SAMPLE)
@@ -307,15 +306,6 @@ class PreviewPage(QWidget):
         self.rich.anchorClicked.connect(self._rich_clicked)
         self.rich.highlighted.connect(self._rich_hover)
         rich_layout.addWidget(self.rich, 1)
-        legend_row = QHBoxLayout()
-        self.legend = QLabel()
-        self.legend.setProperty("role", "muted")
-        legend_row.addWidget(self.legend, 1)
-        self.show_removed = QCheckBox("뺀 태그도 보기")
-        self.show_removed.setChecked(True)
-        self.show_removed.toggled.connect(lambda *_: self._render_rich())
-        legend_row.addWidget(self.show_removed)
-        rich_layout.addLayout(legend_row)
         self.output = QPlainTextEdit(readOnly=True)
         self.output.setPlaceholderText("정리된 프롬프트")
         self.removed = QPlainTextEdit(readOnly=True)
@@ -323,10 +313,22 @@ class PreviewPage(QWidget):
         self.result_tabs.addTab(rich_box, "색 미리보기")
         self.result_tabs.addTab(self.output, "텍스트")
         self.result_tabs.addTab(self.removed, "뺀 태그")
+        # 색 미리보기 옵션과 범례는 탭 머리의 빈 자리에(결과 칸의 높이를 쓰지 않게)
+        self.show_removed = QCheckBox("뺀 태그도 보기")
+        self.show_removed.setChecked(True)
+        self.show_removed.toggled.connect(lambda *_: self._render_rich())
+        self.legend_help = theme.HelpButton()
         copy = theme.ghost(QPushButton("결과 복사"))
         copy.setToolTip("정리된 프롬프트(텍스트)를 클립보드에")
         copy.clicked.connect(lambda: QGuiApplication.clipboard().setText(self.output.toPlainText()))
-        self.result_tabs.setCornerWidget(copy)
+        corner = QWidget()
+        corner_layout = QHBoxLayout(corner)
+        corner_layout.setContentsMargins(0, 0, 0, 0)
+        corner_layout.setSpacing(theme.SPACE[1])
+        for w in (self.show_removed, self.legend_help, copy):
+            corner_layout.addWidget(w)
+        self.result_tabs.setCornerWidget(corner)
+        self.result_tabs.currentChanged.connect(self._result_tab_changed)
         self.outputs.addWidget(self.result_tabs)
         self.outputs.setSizes([420, 580])
 
@@ -347,8 +349,13 @@ class PreviewPage(QWidget):
             self.filter_group.addButton(button)
             self.filter_buttons[key] = button
             filters.addWidget(button)
-        filters.addStretch(1)
-        filters.addWidget(theme.caption("오른쪽 버튼: 커스텀 청크에 넣기·복사", "muted"))
+        # 상태는 개수를 보여 주는 칩 옆에: 팩 버전·처리 시간 같은 세부는 ? 안에, 눈여겨볼 것만 글로
+        self.status = theme.caption("", "muted")
+        self.status.setWordWrap(True)
+        self.status.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        filters.addWidget(self.status, 1)
+        self.tokens_help = theme.HelpButton(TOKEN_HELP)
+        filters.addWidget(self.tokens_help)
         tokens_layout.addLayout(filters)
         self.tokens = QTableWidget(0, 6)
         self.tokens.setHorizontalHeaderLabels(["토큰", "분류", "청크", "등급", "사용량", "비고"])
@@ -378,6 +385,12 @@ class PreviewPage(QWidget):
         for signal in (self.show_removed.toggled, self.result_tabs.currentChanged):
             signal.connect(lambda *_: self._save_options())
         self._update_legend()
+        self._result_tab_changed(self.result_tabs.currentIndex())
+
+    def _result_tab_changed(self, index: int) -> None:
+        """뺀 태그 보기와 범례는 색 미리보기에만 쓴다."""
+        for w in (self.show_removed, self.legend_help):
+            w.setVisible(index == 0)
 
     def save_state(self, settings) -> None:
         settings.setValue("preview_split", self.split.saveState())
@@ -506,20 +519,26 @@ class PreviewPage(QWidget):
         self.output.setPlainText(result.text)
         self.removed.setPlainText(result.removed_text)
         c = result.report["counts"]
-        stale = " · <b>분류를 고쳐 다시 만드는 중</b>" if self.pack_rev != self.store.revision else ""
         guessed = f" · 추정 {c['guessed']}" if self.arrange.guess_box.isChecked() else ""
         extra = "".join(f" · {label} {c[key]}" for key, label in (("sentences", "문장"), ("comments", "주석"))
                         if c.get(key))
-        warn = ""
+        detail = (f"<b>팩</b> {html.escape(self.pack.version)} (지금 편집 상태)<br>처리 {ms:.1f}ms · 토큰 {c['total']} · "
+                  f"뺌 {c['removed']} · 표시 {c['flagged']} · 미분류 {c['unclassified']} · "
+                  f"알 수 없음 {c['unknown']}{guessed}{extra}")
+        self.tokens_help.setToolTip(f"{detail}<br><br>{TOKEN_HELP}")
+        notes = [f"미분류 {c['unclassified']}"] if c["unclassified"] else []     # 나머지 개수는 옆의 칩에 있다
+        dialect = dialect_status(result.report["dialect"])
+        if dialect:
+            notes.append(dialect)
+        if self.pack_rev != self.store.revision:
+            notes.append("<b>분류를 고쳐 다시 만드는 중</b>")
         if c.get("warnings"):
             first = result.report["warnings"][0]
             more = f" 외 {c['warnings'] - 1}" if c["warnings"] > 1 else ""
-            warn = "<br>" + theme.span(f"경고: {html.escape(first['tag'])} — "
-                                       f"{html.escape(core.warning_text(first['reason']))}{more}", "warning")
-        self.status.setText(f"팩 {self.pack.version} (지금 편집 상태) · 처리 {ms:.1f}ms · 토큰 {c['total']} · "
-                            f"뺌 {c['removed']} · 표시 {c['flagged']} · 미분류 {c['unclassified']} · "
-                            f"알 수 없음 {c['unknown']}{guessed}{extra}"
-                            f"{dialect_status(result.report['dialect'])}{stale}{warn}")
+            notes.append(theme.span(f"경고: {html.escape(first['tag'])} — "
+                                    f"{html.escape(core.warning_text(first['reason']))}{more}", "warning"))
+        self.status.setText(" · ".join(notes))
+        self.status.setToolTip(detail)
         self._render_rich()
         self.arrange.set_report(result.report)
         self._fill_tokens(result.report["tokens"])
@@ -529,12 +548,15 @@ class PreviewPage(QWidget):
 
     def _update_legend(self) -> None:
         t = theme.tokens()
-        self.legend.setText(
-            f"<span style='color:{t['fg']}'>밝게</span> 남음 · "
-            f"<span style='color:{t['disabled']};text-decoration:line-through'>흐리게</span> 뺌 · "
-            f"<span style='color:{t['danger']}'>빨강</span> 팩에 없음 · <i>기울임</i> 추정 · <b>굵게</b> 덮어씀 · "
-            f"<span style='color:{t['warning']};text-decoration:underline'>밑줄</span> 표시만 · "
-            f"<span style='color:{t['muted']}'><i>// 흐린 기울임</i></span> 주석")
+        self.legend_help.setToolTip(theme.help_text(
+            (f"<span style='color:{t['fg']}'>밝게</span>", "남음"),
+            (f"<span style='color:{t['disabled']};text-decoration:line-through'>흐리게</span>", "뺌"),
+            (f"<span style='color:{t['danger']}'>빨강</span>", "팩에 없음"),
+            ("<i>기울임</i>", "추정"),
+            ("<b>굵게</b>", "덮어씀"),
+            (f"<span style='color:{t['warning']};text-decoration:underline'>밑줄</span>", "표시만"),
+            (f"<span style='color:{t['muted']}'><i>// 흐린 기울임</i></span>", "주석"),
+            ("토큰에 올리기 · 누르기", "분류 보기 · 아래 표에서 찾기"), bold=False))
 
     def _render_rich(self) -> None:
         self._update_legend()
@@ -558,7 +580,7 @@ class PreviewPage(QWidget):
     def _rich_hover(self, url) -> None:
         text = url.toString() if hasattr(url, "toString") else str(url)
         if not text.startswith("tok:") or self.report is None:
-            self._update_legend()
+            QToolTip.hideText()
             return
         row = self.report["tokens"][int(text[4:])]
         parts = [html.escape(row["text"]), html.escape(row["primary"]),
@@ -566,7 +588,7 @@ class PreviewPage(QWidget):
         for key, label in (("removed", "뺌"), ("flagged", "표시"), ("guess", "추정"), ("injected", "덮어씀")):
             if row.get(key):
                 parts.append(f"{label}: {html.escape(str(row[key]))}")
-        self.legend.setText(" · ".join(parts))
+        QToolTip.showText(QCursor.pos(), "<br>".join(parts), self.rich)
 
     def _chunk_labels(self) -> dict:
         if self.report is None:

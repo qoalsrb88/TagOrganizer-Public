@@ -49,6 +49,57 @@ test("빈 줄 띠에 놓으면 그 줄의 끝으로 옮긴다", () => {
   assert.deepEqual(ArrangementEditor.prototype.dropTarget.call(editor, 100, 64), { kind: "newrow", row: 1 });
 });
 
+test("줄을 통째로 옮기면 빈 줄 표시가 따라간다", () => {
+  const m = new Model({ rows: [["a", "b"], ["c"], ["d"]], chunks: {
+    a: { members: ["body/hair"] }, b: { members: ["body/eyes"], gap_after: true }, c: { members: ["clothes"] }, d: { members: ["object"] },
+  } });
+  assert.equal(m.moveRow(0, 0), false);
+  assert.equal(m.moveRow(0, 1), false);
+  assert.equal(m.moveRow(0, 9), false);
+  assert.equal(m.moveRow(-1, 0), false);
+  assert.equal(m.moveRow(0, 2), true);
+  assert.deepEqual(m.rows, [["c"], ["a", "b"], ["d"]]);
+  assert.equal(m.hasGapBefore("d"), true);
+  assert.equal(m.moveRow(2, 0), true);
+  assert.deepEqual(m.rows, [["d"], ["c"], ["a", "b"]]);
+});
+
+test("빈 줄을 줄 사이에 놓고 옮긴다", () => {
+  const m = new Model({ rows: [["a"], ["b"], ["c"]], chunks: {
+    a: { members: ["body/hair"] }, b: { members: ["body/eyes"] }, c: { members: ["clothes"] },
+  } });
+  assert.equal(m.addGapAt(0), false);          // 맨 위에는 앞 청크가 없다
+  assert.equal(m.addGapAt(1), true);
+  assert.equal(m.addGapAt(1), false);          // 겹치지 않는다
+  assert.equal(m.chunks.get("a").gap_after, true);
+  assert.equal(m.moveGap(0, 2), true);
+  assert.equal(m.chunks.get("a").gap_after, undefined);
+  assert.equal(m.chunks.get("b").gap_after, true);
+  assert.equal(m.moveGap(0, 2), false);        // 옮길 빈 줄이 없다
+  assert.equal(m.moveGap(1, 2), false);        // 그 자리에 이미 있다
+  assert.equal(m.addGapBottom(), 3);           // 맨 아래부터 빈자리를 찾는다
+  assert.equal(m.addGapBottom(), 1);
+  assert.equal(m.addGapBottom(), null);
+});
+
+test("줄 단위로 끌 때의 자리는 줄 가운데로 가른다", () => {
+  const box = (top, bottom) => ({ getBoundingClientRect: () => ({ top, bottom }) });
+  const editor = {
+    canvasEl: { querySelectorAll: () => [box(0, 40), box(50, 90)], getBoundingClientRect: () => ({ left: 0, right: 200, top: 0, bottom: 120 }) },
+    lineTarget: ArrangementEditor.prototype.lineTarget,
+    drag: { src: { line: "row", row: 1 } },
+  };
+  const at = (y, x = 100) => ArrangementEditor.prototype.dropTarget.call(editor, x, y);
+  assert.deepEqual(at(10), { kind: "between", row: 0 });
+  assert.deepEqual(at(30), { kind: "between", row: 1 });
+  assert.deepEqual(at(80), { kind: "between", row: 2 });
+  editor.drag.src = { line: "gap", row: 0 };
+  assert.deepEqual(at(10), { kind: "between", row: 1 });    // 빈 줄은 맨 위로 가지 않는다
+  editor.drag.src = { line: "new" };
+  assert.deepEqual(at(80), { kind: "between", row: 2 });
+  assert.equal(at(80, 500), null);                          // 청크 칸 밖에 놓으면 넣지 않는다
+});
+
 test("추정 규칙 글을 읽고 쓴다", () => {
   const text = "holding * => action/holding\n\n# 메모\n* gloves => clothes/handwear | hands, feet | identity | rating=q\n";
   const rules = parseGuessRules(text);

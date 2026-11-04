@@ -334,6 +334,9 @@ def random_ops(data: Dict[str, Any], rng: random.Random, count: int) -> Iterable
                 ["move_chunk_new_row", cid, rng.randint(0, len(model.rows))],
                 ["break_before", cid], ["break_after", cid], ["join_previous", cid],
                 ["toggle_gap_after", cid], ["toggle_gap_before", cid], ["has_gap_before", cid],
+                ["move_row", row, rng.randint(-1, len(model.rows) + 1)],
+                ["add_gap_at", rng.randint(-1, len(model.rows) + 1)], ["add_gap_bottom"],
+                ["move_gap", row, rng.randint(-1, len(model.rows) + 1)],
                 ["toggle_hidden", cid],
                 ["set_label", cid, rng.choice(["", "새 이름", "  여백  "])],
                 ["set_color", cid, rng.choice(["", "#112233"])],
@@ -409,7 +412,8 @@ class ModelParityTest(unittest.TestCase):
                              js["selectors"])
             self.assertEqual(core.uncovered_slots(last, taxonomy), js["uncovered"])
         self.assertGreaterEqual(len(kinds), 15, kinds)
-        self.assertTrue({"toggle_gap_after", "toggle_gap_before", "has_gap_before"} <= kinds)
+        self.assertTrue({"toggle_gap_after", "toggle_gap_before", "has_gap_before", "move_row", "add_gap_at",
+                         "add_gap_bottom", "move_gap"} <= kinds)
 
 
 class TextHelpersTest(unittest.TestCase):

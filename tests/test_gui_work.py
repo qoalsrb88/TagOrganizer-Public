@@ -489,6 +489,61 @@ class WorkWindowTests(unittest.TestCase):
         page.run()
         self.assertNotIn("문법 자동", page.status.text())
 
+    def test_help_moves_out_of_the_layout(self):
+        """설명 글은 화면에 늘어놓지 않고 ? 안에 든다. 팩 버전과 처리 시간은 도움말에, 눈여겨볼 것만 상태 글에."""
+        page = self.win.preview_page
+        self.win.tabs.setCurrentWidget(page)
+        page.ensure_pack()
+        self.wait()
+        page.input.setPlainText("smile, 0.6::artist:nobody ::")
+        page.run()
+        self.assertNotIn(page.pack.version, page.status.text())
+        self.assertNotIn("처리", page.status.text())
+        self.assertIn(page.pack.version, page.tokens_help.toolTip())
+        self.assertIn("커스텀 청크에 넣기", page.tokens_help.toolTip())
+        self.assertIn("팩에 없음", page.legend_help.toolTip())
+        self.assertIn("Backspace", page.arrange.help_btn.toolTip())
+        self.assertIn("빈 줄", page.arrange.help_btn.toolTip())
+        self.assertIs(page.result_tabs.cornerWidget().layout().itemAt(0).widget(), page.show_removed)
+        page.result_tabs.setCurrentIndex(1)
+        self.assertFalse(page.show_removed.isVisibleTo(page))                 # 색 미리보기에만 쓰는 옵션
+        page.result_tabs.setCurrentIndex(0)
+        self.assertTrue(page.show_removed.isVisibleTo(page))
+        editor = self.win.editor
+        editor.set_names([])
+        self.assertEqual(editor.title.text(), "태그를 고르세요")
+        self.assertFalse(editor.info.isVisibleTo(editor))
+        self.assertIn("여러 개", editor.help_btn.toolTip())
+        with mock.patch("gui.theme.QToolTip.showText") as show:
+            editor.help_btn.click()
+        self.assertEqual(show.call_args[0][1], editor.help_btn.toolTip())
+
+    def test_uncovered_warning_is_a_corner_button(self):
+        panel = self.win.preview_page.arrange
+        self.assertFalse(panel.warn_btn.isVisibleTo(panel.board))
+        try:
+            panel._apply(lambda: panel.model.load({"rows": [["a"]], "chunks": {"a": {"members": ["body/hair"]}}}))
+            self.assertTrue(panel.warn_btn.isVisibleTo(panel.board))
+            self.assertIn("어느 청크에도 없는 분류", panel.warn_btn.toolTip())
+            panel.warn_btn.click()
+            self.assertFalse(panel.warn_btn.isVisibleTo(panel.board))
+        finally:
+            panel.saved = panel.model.dumps()                                 # 닫을 때 저장을 묻지 않게
+
+    def test_token_hover_shows_tooltip(self):
+        page = self.win.preview_page
+        self.win.tabs.setCurrentWidget(page)
+        page.ensure_pack()
+        self.wait()
+        page.input.setPlainText("smile")
+        page.run()
+        with mock.patch("gui.work.QToolTip.showText") as show:
+            page._rich_hover("tok:0")
+        self.assertIn("smile", show.call_args[0][1])
+        with mock.patch("gui.work.QToolTip.hideText") as hide:
+            page._rich_hover("")
+        hide.assert_called_once()
+
     def test_rich_html_gap_follows_shown_rows(self):
         from fixtures import core, pack
         from gui.work import rich_html

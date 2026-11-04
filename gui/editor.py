@@ -27,6 +27,12 @@ from .store import MAX_EDIT, SITE_TYPE_LABELS, TYPE_LABELS, ConflictError, Resul
 
 RATINGS = ("", "g", "s", "q", "e")
 RATING_TEXT = {"": "없음", **theme.RATING_NAMES}
+EDITOR_HELP = theme.help_text(
+    ("태그 고르기", "왼쪽 목록이나 미리보기 표에서 고르면 여기서 분류를 고칩니다"),
+    ("여러 개", "Ctrl·Shift 로 고르면 건드린 칸만 모두에 같은 값으로 씁니다. '(여러 값)' 칸은 그대로 둡니다"),
+    ("부위", "여러 개일 때 켠 것을 더하고 끈 것을 뺍니다. 일부에만 있는 부위(■)는 태그마다 그대로입니다"),
+    ("Ctrl+S · Ctrl+Enter", "저장 · 저장 후 다음"),
+)
 
 
 def _same(key: str, new: str, old: str) -> bool:
@@ -102,6 +108,8 @@ class EditorPanel(QWidget):
         head.addWidget(self.title, 1)
         head.addWidget(self.wiki_btn, 0, Qt.AlignTop)
         head.addWidget(self.posts_btn, 0, Qt.AlignTop)
+        self.help_btn = theme.HelpButton(EDITOR_HELP)
+        head.addWidget(self.help_btn, 0, Qt.AlignVCenter)
         self.info = theme.caption("", "muted")
         self.info.setWordWrap(True)
         self.info.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -216,11 +224,11 @@ class EditorPanel(QWidget):
         self.refs.addTab(self.evidence, "Danbooru 증거")
         similar = QVBoxLayout()
         similar.setSpacing(theme.SPACE[0])
-        similar.addWidget(theme.caption("더블클릭하면 그 분류를 폼에 가져옵니다", "muted"))
         self.similar_list = QListWidget()
         self.similar_list.itemDoubleClicked.connect(self._take_precedent)
         similar.addWidget(self.similar_list, 1)
         self.refs.addTab(_wrap(similar), "같은 계열 선례")
+        self.refs.setTabToolTip(1, "더블클릭하면 그 분류를 폼에 가져옵니다")
         self.refs.setMinimumHeight(150)
         outer.addWidget(self.refs, 1)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -311,6 +319,11 @@ class EditorPanel(QWidget):
                 edit.setText(snap[key])
 
     def _show_header(self) -> None:
+        self._fill_header()
+        for label in (self.info, self.state):       # 할 말이 없으면 자리를 차지하지 않는다
+            label.setVisible(bool(label.text()))
+
+    def _fill_header(self) -> None:
         enabled = bool(self.names) and len(self.names) <= MAX_EDIT
         for w in (self.main_combo, self.sub_combo, self.secondary_edit, self.note_edit, self.identity_box,
                   *self.region_boxes.values(), *self.rating_group.buttons(), self.reset_btn):
@@ -320,16 +333,14 @@ class EditorPanel(QWidget):
         self.posts_btn.setVisible(single)
         if not self.names:
             self.title.setText("태그를 고르세요")
-            self.info.setText("왼쪽 목록에서 고르면 여기서 분류를 고칩니다. Ctrl·Shift 로 여러 개를 고르면 한꺼번에 고칩니다.")
+            self.info.setText("")
             self.state.setText("")
             return
         if not single:
             shown = ", ".join(self.names[:8]) + (" …" if len(self.names) > 8 else "")
             self.title.setText(f"{len(self.names):,}개 선택")
             self.info.setText(shown)
-            self.state.setText("건드린 칸만 모두에 같은 값으로 씁니다. '(여러 값)' 칸은 그대로 둡니다. 부위는 켠 것을 "
-                               "더하고 끈 것을 빼며, 일부에만 있는 부위(■)는 태그마다 그대로입니다."
-                               if enabled else f"한 번에 {MAX_EDIT}개까지 고칠 수 있습니다.")
+            self.state.setText("" if enabled else f"한 번에 {MAX_EDIT}개까지 고칠 수 있습니다.")
             return
         name = self.names[0]
         e = self.store.by_name[name]

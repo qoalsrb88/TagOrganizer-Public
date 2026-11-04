@@ -726,6 +726,52 @@ try {
   await key("z", "KeyZ", 90, { modifiers: 2 });
   await sleep(150);
 
+  // 줄째 옮기기와 구석 +
+  const rowOrder = () => inFrame(edit, "[...document.querySelectorAll('.bmk-to-row')].map((r) => r.querySelector('.bmk-to-chunk').dataset.cid)");
+  const gapRows = () => inFrame(edit, "[...document.querySelectorAll('.bmk-to-row')].flatMap((r, i) => (r.querySelector('.bmk-to-gap') ? [i] : []))");
+  const rowGutter = (n) => `document.querySelectorAll('.bmk-to-row')[${n}].querySelector('.bmk-to-gutter')`;
+  const gapTool = "document.querySelector('.bmk-to-tool[data-act=gap]')";
+  const aboveRow = async (n) => {
+    const at = await inFrame(edit, `(() => { const r = document.querySelectorAll('.bmk-to-row')[${n}].getBoundingClientRect(); return [r.x + 12, r.y - 2]; })()`);
+    const off = await frameOffset();
+    return [off[0] + at[0], off[1] + at[1]];
+  };
+  const order0 = await rowOrder();
+  await dragTo(await pagePoint(edit, rowGutter(0)), await aboveRow(2));
+  const order1 = await rowOrder();
+  check("줄 번호를 끌면 줄째 옮겨짐", order1[0] === order0[1] && order1[1] === order0[0] && order1.length === order0.length, order1);
+  check("줄을 놓으면 끌기 표시가 사라짐", await inFrame(edit, "!document.querySelector('.bmk-to-ghost') && !document.querySelector('.bmk-to-row.dragging')"));
+  await screenshot("nai_editor_row_moved.png");
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+  check("줄 옮기기도 되돌려짐", JSON.stringify(await rowOrder()) === JSON.stringify(order0));
+  await dragTo(await pagePoint(edit, gapTool), await aboveRow(2));
+  await sleep(200);
+  check("구석 + 를 끌어 놓으면 그 줄 사이에 빈 줄", JSON.stringify(await gapRows()) === "[1]", await gapRows());
+  check("끌어 넣은 빈 줄이 결과에 들어감", (await previewText(edit)).includes("\n\n"), await previewText(edit));
+  await screenshot("nai_editor_gap_dragged.png");
+  await dragTo(await pagePoint(edit, "document.querySelector('.bmk-to-gap')"), await aboveRow(1));
+  await sleep(200);
+  check("빈 줄 띠를 끌면 다른 줄 사이로 옮겨짐", JSON.stringify(await gapRows()) === "[0]", await gapRows());
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(100);
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+  check("빈 줄 끌기도 되돌려짐", JSON.stringify(await gapRows()) === "[]", await gapRows());
+  const rowsNow = (await rowOrder()).length;
+  await clickInFrame(edit, gapTool);
+  await sleep(200);
+  check("구석 + 를 누르면 맨 아래에 빈 줄", JSON.stringify(await gapRows()) === JSON.stringify([rowsNow - 1]), await gapRows());
+  await key("z", "KeyZ", 90, { modifiers: 2 });
+  await sleep(150);
+  await clickInFrame(edit, "document.querySelector('.bmk-to-tool[data-act=help]')");
+  await sleep(100);
+  check("? 를 누르면 도움말", await inFrame(edit, "document.querySelector('.bmk-to-help')?.textContent.includes('줄 번호')"));
+  await screenshot("nai_editor_help.png");
+  await clickInFrame(edit, "document.querySelector('.bmk-to-status')");
+  await sleep(100);
+  check("밖을 누르면 도움말이 닫힘", await inFrame(edit, "!document.querySelector('.bmk-to-help')"));
+
   // 펼치기와 멤버 빼내기
   const clothes = chunkOfTag("white shirt");
   const clothesAt = await pagePoint(edit, clothes);

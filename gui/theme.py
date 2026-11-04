@@ -6,7 +6,8 @@ BMK AI Studio 의 `bmk_studio/appearance.py`(MIT, 같은 저자)를 바탕으로
 - 등급 색 rating_g·s·q·e: Danbooru 관례(초록·노랑·주황·빨강)를 표 글자로 읽히는 중간 밝기로. 등급은 전체 이름으로 보인다
   (general·sensitive·questionable·explicit — rating_name).
 - QTableView(태그 표), 체크 가능한 칩(등급 버튼), 일부만 체크(─) 표시, 카드(편집 미리보기), 바뀐 칸 표시.
-- 아이콘: search · refresh · build · sync · download · dash.
+- 아이콘: search · refresh · build · sync · download · dash · gap-add · expand · collapse · warning.
+- 도움말: 화면에 설명 글을 늘어놓는 대신 둥근 ? (HelpButton). 올리거나 누르면 툴팁으로 보인다.
 """
 
 from __future__ import annotations
@@ -15,10 +16,10 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Optional
 
-from PySide6.QtCore import QByteArray, QSize, Qt
+from PySide6.QtCore import QByteArray, QRect, QSize, Qt
 from PySide6.QtGui import QColor, QGuiApplication, QIcon, QPainter, QPalette, QPixmap
 from PySide6.QtSvg import QSvgRenderer
-from PySide6.QtWidgets import QApplication, QComboBox, QLabel, QPushButton
+from PySide6.QtWidgets import QApplication, QComboBox, QLabel, QPushButton, QToolTip
 
 PATHS = {
     # Studio 와 같은 것
@@ -40,6 +41,10 @@ PATHS = {
     'sync': '<path d="M4 12h12M12 6l6 6-6 6M20 4v16"/>',
     'download': '<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',
     'dash': '<path d="M6 12h12"/>',
+    'gap-add': '<path d="M12 3v10M7 8h10M3 19h4M10 19h4M17 19h4"/>',
+    'expand': '<path d="m7 9 5-5 5 5M7 15l5 5 5-5"/>',
+    'collapse': '<path d="m7 4 5 5 5-5M7 20l5-5 5 5"/>',
+    'warning': '<path d="M12 3 2 20h20zM12 10v5M12 17.5v.5"/>',
 }
 
 # 간격 단계(px). 배치는 이 값에서 고른다
@@ -149,7 +154,7 @@ def icon(name: str, icon_color: Optional[str] = None) -> QIcon:
 def decorate(button, name: str):
     """버튼에 아이콘을 단다. 테마를 바꾸면 apply 가 같은 이름으로 다시 그린다."""
     button.setProperty('iconName', name)
-    icon_color = tokens()['on_accent'] if button.property('primary') else tokens()['muted']
+    icon_color = tokens()['on_accent'] if button.property('primary') else tokens()[button.property('iconRole') or 'muted']
     button.setIcon(icon(name, icon_color))
     button.setIconSize(QSize(16, 16))
     return button
@@ -165,6 +170,41 @@ def ghost(button):
     """덜 중요한 동작: 테두리·배경 없이, 올리면 드러남."""
     button.setProperty('ghost', True)
     return button
+
+
+def tool(button, name: str, tip: str = ''):
+    """글자 없는 작은 아이콘 버튼(청크 화면 구석의 도구 띠). 테두리 없이, 올리면 드러난다."""
+    button.setProperty('tool', True)
+    button.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+    button.setToolTip(tip)
+    button.setAccessibleName(tip.split(' — ')[0])
+    return decorate(ghost(button), name)
+
+
+class HelpButton(QPushButton):
+    """둥근 ? — 올리거나 누르면 setToolTip 의 글이 보인다. 화면에 늘 띄울 필요가 없는 설명을 여기로 옮긴다."""
+
+    SHOW_MS = 20000         # 누른 뒤 읽을 시간(기본 툴팁은 금방 사라진다)
+
+    def __init__(self, text: str = '', parent=None) -> None:
+        super().__init__('?', parent)
+        self.setProperty('help', True)
+        self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        self.setToolTip(text)
+        self.setAccessibleName('도움말')
+        self.clicked.connect(self._show)
+
+    def _show(self) -> None:
+        QToolTip.showText(self.mapToGlobal(self.rect().bottomLeft()), self.toolTip(), self, QRect(), self.SHOW_MS)
+
+
+def help_text(*rows, bold: bool = True) -> str:
+    """도움말 툴팁 글: (이름, 설명) 줄을 표로 맞춘다. 글은 이미 html escape 한 것."""
+    def name(text: str) -> str:
+        return f'<b>{text}</b>' if bold else text
+    cells = ''.join(f"<tr><td style='padding:1px 10px 1px 0'>{name(k)}</td><td style='padding:1px 0'>{v}</td></tr>"
+                    for k, v in rows)
+    return f'<table>{cells}</table>'
 
 
 def caption(text: str, role: str = 'muted') -> QLabel:
@@ -241,6 +281,10 @@ def stylesheet(t: Dict[str, str]) -> str:
     QPushButton[ghost="true"]:hover {{ background:{surface2}; color:{fg}; }}
     QPushButton[ghost="true"]:pressed {{ background:{selected}; }}
     QPushButton[ghost="true"]:disabled {{ background:transparent; color:{disabled}; }}
+    QPushButton[tool="true"] {{ padding:0; min-width:24px; max-width:24px; min-height:24px; max-height:24px; }}
+    QPushButton[help="true"] {{ background:transparent; color:{muted}; border:1px solid {border}; border-radius:9px; padding:0; min-width:16px; max-width:16px; min-height:16px; max-height:16px; font-size:11px; font-weight:600; }}
+    QPushButton[help="true"]:hover {{ color:{accent}; border-color:{accent}; }}
+    QPushButton[help="true"]:focus {{ border-color:{accent}; }}
     QPushButton[chip="true"] {{ background:{surface}; color:{fg}; border:1px solid {border}; border-radius:12px; padding:2px 12px; min-height:18px; min-width:20px; }}
     QPushButton[chip="true"]:hover {{ border-color:{accent}; }}
     QPushButton[chip="true"]:checked {{ background:{accent}; color:{on_accent}; border-color:{accent}; }}

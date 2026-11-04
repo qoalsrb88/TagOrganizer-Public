@@ -3,9 +3,11 @@
 - 한 줄 = 출력 한 줄. 줄 안의 청크는 ', ' 로 이어진다. 왼쪽 숫자가 줄 번호.
 - 청크를 펼치면(▸ 누르기·더블클릭·Space) 안의 서브(멤버)가 보인다. 서브를 끌어 순서를 바꾸면(= 청크 안 태그 순서),
   다른 청크에 놓으면 옮겨지고, 청크 밖(줄 사이·다른 청크 옆)에 놓으면 새 청크가 된다.
+- 줄 번호나 줄의 빈 자리를 끌면 줄째 위아래로 옮긴다. 점선 빈 줄 띠를 끌면 빈 줄이 다른 줄 사이로 옮겨 가고,
+  구석의 + (GapButton)를 끌어다 놓으면 그 줄 사이에 빈 줄이 생긴다.
 - 키보드: ←→ 고르기(펼친 청크는 → 로 서브에 들어감), ↑↓ 위·아래 줄, Ctrl+←→ 옮기기, Ctrl+↑↓ 다른 줄로,
   Enter 앞에서 줄바꿈(서브면 새 청크로 분리), Shift+Enter 뒤에서 줄바꿈, Backspace 앞 줄과 합치기,
-  Space 펼치기·접기, Delete 숨기기(그 청크의 태그를 뺌), F2 이름, Ctrl+Z·Ctrl+Y 되돌리기·다시.
+  Alt+↑↓ 줄째 옮기기, Space 펼치기·접기, Delete 숨기기(그 청크의 태그를 뺌), F2 이름, Ctrl+Z·Ctrl+Y 되돌리기·다시.
 - 색은 분류 체계(taxonomy) 색을 옅게 칠한다. 화면 색은 테마 토큰만 쓴다.
 모델은 gui/arrangement.py 의 Model. 바꾸면 changed(바꾸기 전 JSON) 를 보낸다 — 패널이 되돌리기 기록과 미리보기를 맡는다.
 """
@@ -13,12 +15,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Mapping, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Set, Tuple, Union
 
-from PySide6.QtCore import QEvent, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QPointF, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QKeySequence, QPainter, QPainterPath, QPen, QPolygonF
 from PySide6.QtWidgets import (
-    QApplication, QColorDialog, QInputDialog, QMenu, QScrollArea, QSizePolicy, QToolTip, QWidget,
+    QApplication, QColorDialog, QInputDialog, QMenu, QPushButton, QScrollArea, QSizePolicy, QToolTip, QWidget,
 )
 
 import bmk_tag_organizer_core as core
@@ -52,6 +54,13 @@ class _Box:
     arrow: Optional[QRectF] = None
 
 
+@dataclass
+class _Grab:
+    """줄 단위로 끄는 것. kind: row 줄째, gap 빈 줄 띠, new 구석 + 에서 꺼낸 새 빈 줄."""
+    kind: str
+    row: int = -1
+
+
 class ChunkCanvas(QWidget):
     changed = Signal(str)               # 바꾸기 전 모델 JSON
     selection_changed = Signal(str)     # 고른 청크 id(없으면 "")
@@ -70,9 +79,10 @@ class ChunkCanvas(QWidget):
         self._boxes: List[_Box] = []
         self._bands: List[Tuple[float, float]] = []
         self._gap_bands: Dict[int, QRectF] = {}
-        self._press: Optional[Tuple[QPointF, Optional[_Box]]] = None
-        self._drag: Optional[_Box] = None
+        self._press: Optional[Tuple[QPointF, Union[_Box, _Grab, None]]] = None
+        self._drag: Union[_Box, _Grab, None] = None
         self._drop: Optional[tuple] = None
+        self._hover_row: Optional[int] = None           # 끌 수 있다는 표시(점 여섯 개)를 그릴 줄
         self._mouse = QPointF()
         self._width = -1
         self.setFocusPolicy(Qt.StrongFocus)
@@ -97,6 +107,9 @@ class ChunkCanvas(QWidget):
             self.expanded &= set(self.model.chunks)
             if self.sel and (self.sel[0] not in self.model.chunks or self.sel[1] >= len(self.model.members(self.sel[0]))):
                 self.sel = (self.sel[0], -1) if self.sel[0] in self.model.chunks else None
+            grabbed = self._drag if self._drag is not None else self._press[1] if self._press else None
+            if isinstance(grabbed, _Grab) and grabbed.row >= len(self.model.rows):
+                self._press = self._drag = self._drop = None    # 끄는 사이 되돌리기로 그 줄이 사라졌다
         self._relayout()
         self.update()
 
@@ -228,6 +241,21 @@ class ChunkCanvas(QWidget):
                 return b
         return next((b for b in self._boxes if b.mi < 0 and b.rect.contains(pos)), None)
 
+    def _grab_at(self, pos: QPointF) -> Optional[_Grab]:
+        """청크 밖에서 잡은 것: 빈 줄 띠면 그 빈 줄, 줄 번호나 줄의 빈 자리면 그 줄."""
+        for ri, (top, bottom) in enumerate(self._bands):
+            if top <= pos.y() <= bottom:
+                gap = self._gap_bands.get(ri)
+                return _Grab("gap", ri) if gap is not None and gap.contains(pos) else _Grab("row", ri)
+        return None
+
+    def _boundary(self, pos: QPointF) -> int:
+        """pos 에 가장 가까운 줄 사이(rows[n] 앞, 줄 수면 맨 아래)."""
+        for ri, (top, bottom) in enumerate(self._bands):
+            if pos.y() < (top + bottom) / 2:
+                return ri
+        return len(self._bands)
+
     @staticmethod
     def _line_pos(boxes: List[_Box], pos: QPointF, index: Callable[[_Box], int], count: int) -> int:
         """한 줄 안 끼울 자리: pos 가 있는(가장 가까운) 시각 줄에서 가운데가 pos 보다 오른쪽인 첫 상자 앞."""
@@ -257,6 +285,9 @@ class ChunkCanvas(QWidget):
         drag = self._drag
         if drag is None:
             return None
+        if isinstance(drag, _Grab):
+            to = self._boundary(pos)
+            return ("between", to if drag.kind == "row" else max(to, 1))    # 맨 위에는 빈 줄을 둘 수 없다
         if drag.mi >= 0:
             over = next((b for b in self._boxes if b.mi < 0 and b.rect.contains(pos)), None)
             if over is not None:
@@ -276,7 +307,15 @@ class ChunkCanvas(QWidget):
             self.changed.emit(before)
         return result
 
-    def _apply_drop(self, drag: _Box, drop: tuple) -> None:
+    def _apply_drop(self, drag: Union[_Box, _Grab], drop: tuple) -> None:
+        if isinstance(drag, _Grab):
+            if drag.kind == "row":
+                self._edit(self.model.move_row, drag.row, drop[1])
+            elif drag.kind == "gap":
+                self._edit(self.model.move_gap, drag.row, drop[1])
+            else:
+                self._edit(self.model.add_gap_at, drop[1])
+            return
         if drag.mi < 0:
             if drop[0] == "row":
                 self._edit(self.model.move_chunk, drag.cid, drop[1], drop[2])
@@ -293,6 +332,45 @@ class ChunkCanvas(QWidget):
             return
         new = self._edit(self.model.detach_member, drag.cid, drag.mi, drop[1], drop[2] if drop[0] == "row" else None)
         self.select(new)
+
+    # ---- 구석 + 에서 꺼내는 빈 줄 ----
+
+    def add_gap_here(self) -> None:
+        """+ 를 눌렀을 때: 고른 청크 아래, 고른 것이 없으면 아직 빈 줄이 없는 맨 아래 자리."""
+        if self.model is None or not self.model.rows:
+            return
+        if self.sel is None:
+            row = self._edit(self.model.add_gap_bottom)
+            rect = self._gap_bands.get(row - 1) if row else None
+            area = self._scroll_area()
+            if rect is not None and area is not None:      # 새 높이가 스크롤에 반영된 뒤에
+                QTimer.singleShot(0, lambda: area.ensureVisible(int(rect.center().x()), int(rect.center().y()), 0, 24))
+        elif not self.model.chunks[self.sel[0]].get("gap_after"):
+            self._edit(self.model.toggle_gap_after, self.sel[0])
+
+    def begin_new_gap(self) -> None:
+        self.setFocus(Qt.MouseFocusReason)              # Esc 로 취소할 수 있게
+        self._press = None
+        self._drag = _Grab("new")
+
+    def drag_new_gap(self, global_pos: QPointF) -> None:
+        if not isinstance(self._drag, _Grab):           # Esc 로 취소했다
+            return
+        self._mouse = self.mapFromGlobal(global_pos)
+        area = self._scroll_area()
+        view = area.viewport() if area is not None else self
+        inside = view.rect().contains(view.mapFromGlobal(global_pos).toPoint())
+        self._drop = self._target(self._mouse) if inside else None     # 화면 밖에 놓으면 넣지 않는다
+        if inside:
+            self._autoscroll()
+        self.update()
+
+    def finish_drag(self) -> None:
+        drag, drop = self._drag, self._drop
+        self._press = self._drag = self._drop = None
+        if drag is not None and drop is not None:
+            self._apply_drop(drag, drop)
+        self.update()
 
     def toggle_expanded(self, cid: str) -> None:
         if cid in self.expanded:
@@ -328,19 +406,41 @@ class ChunkCanvas(QWidget):
         p.setFont(self._small())
         p.setPen(QColor(t["muted"]))
         for ri, (top, _bottom) in enumerate(self._bands):
-            p.drawText(QRectF(0, top, GUTTER - 8, H), Qt.AlignRight | Qt.AlignVCenter, str(ri + 1))
-        for rect in self._gap_bands.values():
+            cell = QRectF(0, top, GUTTER - 8, H)
+            if ri == self._hover_row and self._drag is None:
+                self._paint_grip(p, cell, t)
+            else:
+                p.drawText(cell, Qt.AlignRight | Qt.AlignVCenter, str(ri + 1))
+        drag = self._drag
+        for ri, rect in self._gap_bands.items():
+            p.setOpacity(0.35 if isinstance(drag, _Grab) and drag.row == ri else 1.0)
             p.setPen(QPen(QColor(t["muted"]), 1, Qt.DashLine))
             p.drawLine(rect.topLeft(), rect.topRight())
             p.drawText(rect, Qt.AlignCenter, "빈 줄")
+        p.setOpacity(1.0)
         for b in self._boxes:
-            faded = self._drag is not None and self._drag.cid == b.cid and self._drag.mi in (-1, b.mi)
+            if isinstance(drag, _Grab):
+                faded = drag.kind == "row" and drag.row == b.row
+            else:
+                faded = drag is not None and drag.cid == b.cid and drag.mi in (-1, b.mi)
             if b.mi < 0:
                 self._paint_chunk(p, b, t, faded)
             else:
                 self._paint_member(p, b, t, faded)
         self._paint_drop(p, t)
         self._paint_ghost(p, t)
+
+    @staticmethod
+    def _paint_grip(p: QPainter, cell: QRectF, t: Dict[str, str]) -> None:
+        """줄을 끌 수 있다는 표시: 줄 번호 자리에 점 여섯 개."""
+        p.save()
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(t["muted"]))
+        center = cell.center()
+        for dx in (-3, 3):
+            for dy in (-5, 0, 5):
+                p.drawEllipse(QPointF(center.x() + dx, center.y() + dy), 1.4, 1.4)
+        p.restore()
 
     def _fill(self, color: QColor, strong: bool = False) -> QColor:
         c = QColor(color)
@@ -431,7 +531,7 @@ class ChunkCanvas(QWidget):
                 r = boxes[-1].rect
                 x = r.right() + GAP / 2
             p.drawLine(QPointF(x, r.top() - 2), QPointF(x, r.top() + H + 2))
-        elif d[0] == "newrow":
+        elif d[0] in ("newrow", "between"):
             if d[1] < len(self._bands):
                 y = self._bands[d[1]][0] - ROW_GAP / 2
             else:
@@ -458,7 +558,14 @@ class ChunkCanvas(QWidget):
         drag = self._drag
         if drag is None:
             return
-        if drag.mi < 0:
+        if isinstance(drag, _Grab):
+            if drag.kind == "row":
+                labels = [self.chunk_label(c) for c in self.model.rows[drag.row]]
+                text = f"{drag.row + 1}번 줄 — " + " · ".join(labels[:3]) + (" …" if len(labels) > 3 else "")
+                color = self._color(self.model.chunks[self.model.rows[drag.row][0]])
+            else:
+                text, color = "빈 줄", QColor(t["muted"])
+        elif drag.mi < 0:
             text, color = self.chunk_label(drag.cid), self._color(self.model.chunks[drag.cid])
         else:
             member = self.model.members(drag.cid)[drag.mi]
@@ -489,7 +596,7 @@ class ChunkCanvas(QWidget):
                 self.toggle_expanded(box.cid)
                 self.select(box.cid)
                 return
-            self._press = (pos, box)
+            self._press = (pos, box if box is not None else self._grab_at(pos))
         if box is not None:
             self.select(box.cid, box.mi)
         elif event.button() == Qt.LeftButton:
@@ -498,20 +605,39 @@ class ChunkCanvas(QWidget):
     def mouseMoveEvent(self, event) -> None:
         self._mouse = event.position()
         if self._press and self._drag is None and event.buttons() & Qt.LeftButton:
-            start, box = self._press
-            if box is not None and (self._mouse - start).manhattanLength() >= QApplication.startDragDistance():
-                self._drag = box
+            start, grabbed = self._press
+            if grabbed is not None and (self._mouse - start).manhattanLength() >= QApplication.startDragDistance():
+                self._drag = grabbed
         if self._drag is not None:
             self._drop = self._target(self._mouse)
             self._autoscroll()
+            self.setCursor(Qt.ClosedHandCursor)
             self.update()
+        else:
+            self._hover(self._mouse)
 
     def mouseReleaseEvent(self, event) -> None:
-        drag, drop = self._drag, self._drop
-        self._press = self._drag = self._drop = None
-        if drag is not None and drop is not None:
-            self._apply_drop(drag, drop)
-        self.update()
+        self.finish_drag()
+        self._hover(event.position())
+
+    def leaveEvent(self, event) -> None:
+        if self._hover_row is not None:
+            self._hover_row = None
+            self.update()
+        super().leaveEvent(event)
+
+    def _hover(self, pos: QPointF) -> None:
+        """마우스 아래의 끌 수 있는 것을 커서와 줄 번호 자리의 점으로 알린다."""
+        box = self._hit(pos)
+        grab = None if box is not None else self._grab_at(pos)
+        row = grab.row if grab is not None and grab.kind == "row" else None
+        if row != self._hover_row:
+            self._hover_row = row
+            self.update()
+        if box is not None and box.arrow is not None and box.arrow.width() and box.arrow.contains(pos):
+            self.setCursor(Qt.PointingHandCursor)
+        else:
+            self.setCursor(Qt.OpenHandCursor if box is not None or grab is not None else Qt.ArrowCursor)
 
     def mouseDoubleClickEvent(self, event) -> None:
         box = self._hit(event.position())
@@ -588,7 +714,11 @@ class ChunkCanvas(QWidget):
                 self._step(cid, mi, d)
         elif key in (Qt.Key_Up, Qt.Key_Down):
             d = -1 if key == Qt.Key_Up else 1
-            if ctrl:
+            if event.modifiers() & Qt.AltModifier:
+                row = self.model.where(cid)[0]
+                self._edit(self.model.move_row, row, row - 1 if d < 0 else row + 2)
+                self.select(cid, mi)
+            elif ctrl:
                 self._edit(self.model.shift_row, cid, d)
                 self.select(cid)
             else:
@@ -704,9 +834,16 @@ class ChunkCanvas(QWidget):
         return menu
 
     def _tooltip(self, event) -> None:
-        box = self._hit(QPointF(event.pos()))
+        pos = QPointF(event.pos())
+        box = self._hit(pos)
         if box is None:
-            QToolTip.hideText()
+            grab = self._grab_at(pos)
+            if grab is not None and grab.kind == "gap":
+                QToolTip.showText(event.globalPos(), "끌어서 다른 줄 사이로 옮기기 · 오른쪽 버튼으로 빼기", self)
+            elif grab is not None:
+                QToolTip.showText(event.globalPos(), f"{grab.row + 1}번 줄 — 끌어서 위아래로 옮기기 (Alt+↑↓)", self)
+            else:
+                QToolTip.hideText()
             return
         if box.mi >= 0:
             member = self.model.members(box.cid)[box.mi]
@@ -727,3 +864,38 @@ class ChunkCanvas(QWidget):
                 lines.append(f"이 프롬프트: 남음 {count[0]} · 뺌 {count[1]}" + (f"\n{count[2]}" if count[2] else ""))
             text = "\n".join(lines)
         QToolTip.showText(event.globalPos(), text, self)
+
+
+class GapButton(QPushButton):
+    """구석의 + : 누르면 빈 줄을 넣고, 끌어서 줄 사이에 놓으면 거기에 빈 줄을 넣는다."""
+
+    def __init__(self, canvas: ChunkCanvas, parent=None) -> None:
+        super().__init__(parent)
+        self.canvas = canvas
+        self._start: Optional[QPointF] = None
+        self._dragging = False
+        self.clicked.connect(canvas.add_gap_here)
+
+    def mousePressEvent(self, event) -> None:
+        if event.button() == Qt.LeftButton:
+            self._start = event.position()
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event) -> None:
+        if self._start is None:
+            return super().mouseMoveEvent(event)
+        if not self._dragging and (event.position() - self._start).manhattanLength() >= QApplication.startDragDistance():
+            self._dragging = True
+            self.setDown(False)                         # 놓아도 clicked 가 나가지 않게
+            self.canvas.begin_new_gap()
+        if self._dragging:
+            self.canvas.drag_new_gap(event.globalPosition())
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event) -> None:
+        dragging = self._dragging
+        self._start, self._dragging = None, False
+        if dragging:
+            self.canvas.finish_drag()
+        super().mouseReleaseEvent(event)

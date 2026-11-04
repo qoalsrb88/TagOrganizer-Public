@@ -36,9 +36,23 @@ from .arrangement import (
     SHARE_ID, Model, config_pack, list_entries, parse_text, read_file, share_id, slug, split_items, tolerate,
     write_file,
 )
-from .chunks import ChunkCanvas
+from .chunks import ChunkCanvas, GapButton
 
 UNDO_LIMIT = 100
+
+CANVAS_HELP = theme.help_text(
+    ("청크 끌기", "순서 바꾸기. 줄 사이·맨 아래에 놓으면 새 줄"),
+    ("줄 번호·빈 자리 끌기", "줄째 위아래로 옮기기 (Alt+↑↓)"),
+    ("빈 줄", "구석 + 를 줄 사이로 끌어다 놓기. 점선 띠는 끌어서 옮기고, 오른쪽 버튼으로 빼기"),
+    ("Enter · Shift+Enter", "앞·뒤에서 줄바꿈"),
+    ("Backspace", "앞 줄과 합치기"),
+    ("Ctrl+방향키", "고른 청크 옮기기"),
+    ("Space · 더블클릭", "서브 펼치기·접기"),
+    ("Delete", "숨기기(그 청크의 태그를 뺌)"),
+    ("F2", "이름 바꾸기"),
+    ("Ctrl+Z · Ctrl+Y", "되돌리기·다시"),
+    ("오른쪽 버튼", "메뉴"),
+)
 
 
 class FlowLayout(QLayout):
@@ -85,18 +99,29 @@ class FlowLayout(QLayout):
         return size
 
     def _place(self, rect, apply: bool) -> int:
-        x, y, line_h = rect.x(), rect.y(), 0
+        lines: List[List[Tuple[Any, QSize]]] = [[]]
+        x = rect.x()
         for item in self._items:
             if item.isEmpty():          # 숨긴 칩은 자리를 차지하지 않는다
                 continue
             hint = item.sizeHint()
-            if x > rect.x() and x + hint.width() > rect.right():
-                x, y, line_h = rect.x(), y + line_h + self.spacing(), 0
-            if apply:
-                item.setGeometry(QRect(QPoint(x, y), hint))
+            if lines[-1] and x + hint.width() > rect.right():
+                lines.append([])
+                x = rect.x()
+            lines[-1].append((item, hint))
             x += hint.width() + self.spacing()
-            line_h = max(line_h, hint.height())
-        return y + line_h - rect.y()
+        y = rect.y()
+        for n, line in enumerate(lines):
+            if n:
+                y += self.spacing()
+            height = max((hint.height() for _, hint in line), default=0)
+            if apply:
+                x = rect.x()
+                for item, hint in line:         # 높이가 다른 것(글자·버튼·입력칸)도 줄 가운데에 맞춘다
+                    item.setGeometry(QRect(QPoint(x, y + (height - hint.height()) // 2), hint))
+                    x += hint.width() + self.spacing()
+            y += height
+        return y - rect.y()
 
 
 def _chip(text: str, data: str, tip: str = "") -> QPushButton:
@@ -352,7 +377,8 @@ class ArrangementPanel(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(theme.SPACE[0])
 
-        top = QHBoxLayout()
+        # 배열 고르기·저장과 옵션을 한 줄에(좁으면 접힌다). 설명은 툴팁과 청크 화면 구석의 ? 로
+        top = FlowLayout(spacing=theme.SPACE[1])
         top.addWidget(theme.caption("배열", "field"))
         self.combo = QComboBox()
         self.combo.setMinimumWidth(180)
@@ -379,12 +405,25 @@ class ArrangementPanel(QWidget):
         self.undo_btn = theme.decorate(theme.ghost(QPushButton("되돌리기")), "undo")
         self.undo_btn.setToolTip("배열 편집 되돌리기(청크 화면에서 Ctrl+Z, 다시는 Ctrl+Y)")
         self.undo_btn.clicked.connect(self.undo)
-        for w in (self.save_btn, save_as, share, self.undo_btn):
-            top.addWidget(w)
-        top.addStretch(1)
+        self.sub_order_box = QCheckBox("서브 순서")
+        self.sub_order_box.setToolTip("켜면 청크 안 태그를 펼친 서브 순서로 놓습니다. 끄면 입력(또는 고른 순서 옵션) 순서")
+        self.sub_order_box.toggled.connect(self._sub_order)
+        self.guess_box = QCheckBox("추정")
+        self.guess_box.setToolTip("holding * · * eyes 같은 패턴과 끝말(뒤쪽 단어가 팩의 태그인지)로 팩에 없는 토큰을 "
+                                  "분류에 임시로 넣습니다(출력 글자는 그대로, 기울임으로 표시)")
+        self.guess_box.toggled.connect(self._guess_toggled)
+        rules_btn = theme.ghost(QPushButton("추정 규칙…"))
+        rules_btn.clicked.connect(self.edit_guess_rules)
+        custom_btn = QPushButton("+ 커스텀 청크")
+        custom_btn.setToolTip("내가 쓰는 태그(팩에 없어도 됨)를 모아 원하는 자리에 놓는 청크")
+        custom_btn.clicked.connect(lambda: self.new_custom())
         self.state = theme.caption("", "muted")
-        top.addWidget(self.state)
-        layout.addLayout(top)
+        for w in (self.save_btn, save_as, share, self.undo_btn, self.sub_order_box, self.guess_box, rules_btn, custom_btn,
+                  self.state):
+            top.addWidget(w)
+        holder = QWidget()
+        holder.setLayout(top)
+        layout.addWidget(holder)
 
         rules = self.config["rules"]
         hides = {}
@@ -425,31 +464,9 @@ class ArrangementPanel(QWidget):
             + ("눈을 감거나 가렸을 때" if tag.startswith("facing") else "눈이 보일 때") + ") — 여러 개 고를 수 있음"
             for tag in self.palette["quick"].get("gaze") or ()})
 
-        opts = QHBoxLayout()
-        self.sub_order_box = QCheckBox("청크 안은 서브 순서대로")
-        self.sub_order_box.setToolTip("켜면 청크 안 태그를 펼친 서브 순서로 놓습니다. 끄면 입력(또는 고른 순서 옵션) 순서")
-        self.sub_order_box.toggled.connect(self._sub_order)
-        self.guess_box = QCheckBox("팩에 없는 토큰 추정")
-        self.guess_box.setToolTip("holding * · * eyes 같은 패턴과 끝말(뒤쪽 단어가 팩의 태그인지)로 팩에 없는 토큰을 "
-                                  "분류에 임시로 넣습니다(출력 글자는 그대로, 기울임으로 표시)")
-        self.guess_box.toggled.connect(self._guess_toggled)
-        rules_btn = theme.ghost(QPushButton("추정 규칙…"))
-        rules_btn.clicked.connect(self.edit_guess_rules)
-        custom_btn = QPushButton("+ 커스텀 청크")
-        custom_btn.setToolTip("내가 쓰는 태그(팩에 없어도 됨)를 모아 원하는 자리에 놓는 청크")
-        custom_btn.clicked.connect(lambda: self.new_custom())
-        expand = theme.ghost(QPushButton("모두 펼치기"))
-        expand.clicked.connect(lambda: self.canvas.set_all_expanded(True))
-        collapse = theme.ghost(QPushButton("모두 접기"))
-        collapse.clicked.connect(lambda: self.canvas.set_all_expanded(False))
-        for w in (self.sub_order_box, self.guess_box, rules_btn, custom_btn, expand, collapse):
-            opts.addWidget(w)
-        opts.addStretch(1)
-        layout.addLayout(opts)
-
         # 청크 화면은 따로(self.board): 미리보기 탭이 색 미리보기 옆에 놓는다
         self.board = QWidget()
-        board = QVBoxLayout(self.board)
+        board = QHBoxLayout(self.board)
         board.setContentsMargins(0, 0, 0, 0)
         board.setSpacing(theme.SPACE[0])
         self.canvas = ChunkCanvas()
@@ -463,14 +480,27 @@ class ArrangementPanel(QWidget):
         scroll.setMinimumHeight(90)
         scroll.setProperty("canvas", True)
         board.addWidget(scroll, 1)
-        hint = theme.caption("끌어서 옮기기 · 줄 사이에 놓으면 새 줄 · Enter 줄바꿈 · Backspace 앞 줄과 합치기 · "
-                             "Space 펼치기 · Delete 숨기기 · 오른쪽 버튼 메뉴", "muted")
-        hint.setWordWrap(True)
-        board.addWidget(hint)
-        self.warning = QLabel(wordWrap=True)
-        self.warning.linkActivated.connect(lambda _: self._add_uncovered())
-        board.addWidget(self.warning)
-        self.warning.hide()
+        # 구석의 도구 띠: 높이를 쓰지 않고 청크 화면 옆에 붙는다
+        tools = QVBoxLayout()
+        tools.setSpacing(2)
+        self.gap_btn = theme.tool(GapButton(self.canvas), "gap-add",
+                                  "빈 줄 — 끌어서 줄 사이에 놓습니다. 누르면 고른 청크 아래에 넣습니다")
+        expand = theme.tool(QPushButton(), "expand", "모두 펼치기")
+        expand.clicked.connect(lambda: self.canvas.set_all_expanded(True))
+        collapse = theme.tool(QPushButton(), "collapse", "모두 접기")
+        collapse.clicked.connect(lambda: self.canvas.set_all_expanded(False))
+        self.help_btn = theme.HelpButton(CANVAS_HELP)
+        self.warn_btn = QPushButton()
+        self.warn_btn.setProperty("iconRole", "warning")
+        theme.tool(self.warn_btn, "warning", "어느 청크에도 없는 분류")
+        self.warn_btn.clicked.connect(self._add_uncovered)
+        self.warn_btn.hide()
+        for w in (self.gap_btn, expand, collapse):
+            tools.addWidget(w)
+        tools.addWidget(self.help_btn, 0, Qt.AlignHCenter)
+        tools.addWidget(self.warn_btn)
+        tools.addStretch(1)
+        board.addLayout(tools)
         self.canvas.set_model(self.model, self.config["taxonomy"])
 
     def _build_multi(self, layout, group: str, title: str, tips: Mapping[str, str]) -> None:
@@ -666,24 +696,25 @@ class ArrangementPanel(QWidget):
 
     def _update_state(self) -> None:
         self.undo_btn.setEnabled(bool(self.undo_stack))
+        tip = ""
         if self.source.startswith("layout:"):
-            text = "레이아웃에서 시작 — 바꾸면 저장할 때 이름을 묻습니다" if not self.dirty() else "수정됨(저장 안 함)"
+            text = "레이아웃에서 시작" if not self.dirty() else "수정됨(저장 안 함)"
+            tip = "바꾸면 저장할 때 이름을 묻습니다"
         elif not self.source:
             text = "가져옴(저장 안 함)"
         elif self.is_shared(self.source):
-            text = ("수정됨 — 저장하면 내 배열로(공유본은 그대로)" if self.dirty()
-                    else f"공유 프리셋: {Path(self.source).name}")
+            text = "수정됨(저장 안 함)" if self.dirty() else f"공유 프리셋: {Path(self.source).name}"
+            tip = "저장하면 내 배열로 저장하고 공유본은 그대로 둡니다"
         else:
             text = "수정됨(저장 안 함)" if self.dirty() else f"저장됨: {Path(self.source).name}"
         self.state.setText(text)
+        self.state.setToolTip(tip)
         missing = core.uncovered_slots(self.model.to_json(), self.config["taxonomy"])
         if missing:
             shown = ", ".join(missing[:8]) + (" …" if len(missing) > 8 else "")
-            self.warning.setText(theme.span(f"어느 청크에도 없는 분류: {html.escape(shown)} — 맨 끝 '나머지' 줄로 갑니다. ",
-                                            "warning") + "<a href='add'>새 청크로 넣기</a>")
-            self.warning.show()
-        else:
-            self.warning.hide()
+            self.warn_btn.setToolTip(f"<b>어느 청크에도 없는 분류</b>: {html.escape(shown)}<br>맨 끝 '나머지' 줄로 갑니다. "
+                                     "누르면 새 청크로 넣습니다")
+        self.warn_btn.setVisible(bool(missing))
 
     def _add_uncovered(self) -> None:
         missing = core.uncovered_slots(self.model.to_json(), self.config["taxonomy"])

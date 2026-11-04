@@ -209,7 +209,8 @@ class ModelTests(unittest.TestCase):
 
 try:
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-    from PySide6.QtCore import QPoint, QPointF, Qt
+    from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication, QDialog, QInputDialog, QMessageBox
     HAVE_QT = True
@@ -295,6 +296,114 @@ class CanvasTests(unittest.TestCase):
         band = self.canvas._gap_bands[0]
         self.assertGreater(band.top(), max(b.rect.bottom() for b in self.canvas._boxes if b.row == 0))
         self.assertEqual(self.canvas._row_target(band.center()), ("row", 0, 2))
+
+    def row_y(self, row):
+        return int(self.canvas._bands[row][0]) + 10
+
+    def test_drag_row_by_gutter_and_blank_space(self):
+        order = [list(r) for r in self.model.rows]
+        self.drag(QPoint(10, self.row_y(0)), QPoint(10, self.row_y(2) + 2))     # 줄 번호를 2번 줄 앞으로
+        self.assertEqual(self.model.rows[:2], [order[1], order[0]])
+        self.assertEqual(self.model.rows[2:], order[2:])
+        self.assertEqual(len(self.changes), 1)
+        self.drag(QPoint(650, self.row_y(1)), QPoint(650, self.row_y(0)))       # 줄의 빈 자리로 끌어도 같다
+        self.assertEqual(self.model.rows, order)
+        self.drag(QPoint(10, self.row_y(0)), QPoint(10, self.row_y(0) + 4))     # 제자리면 바뀌지 않는다
+        self.assertEqual(self.model.rows, order)
+        self.assertEqual(len(self.changes), 2)
+
+    def test_row_drag_keeps_gap_with_its_row_and_escape_cancels(self):
+        self.context_menu(self.center("count"), "아래에 빈 줄 넣기")
+        order = [list(r) for r in self.model.rows]
+        self.drag(QPoint(10, self.row_y(0)), QPoint(10, self.row_y(2) + 2))
+        self.assertEqual(self.model.rows[1], order[0])
+        self.assertIn(1, self.canvas._gap_bands)
+        QTest.mousePress(self.canvas, Qt.LeftButton, Qt.NoModifier, QPoint(10, self.row_y(0)))
+        QTest.mouseMove(self.canvas, QPoint(10, self.row_y(2)))
+        self.key(Qt.Key_Escape)
+        QTest.mouseRelease(self.canvas, Qt.LeftButton, Qt.NoModifier, QPoint(10, self.row_y(2)))
+        self.assertEqual(self.model.rows[1], order[0])
+
+    def test_undo_during_row_drag_cancels_when_row_is_gone(self):
+        last = len(self.model.rows) - 1
+        QTest.mousePress(self.canvas, Qt.LeftButton, Qt.NoModifier, QPoint(10, self.row_y(last)))
+        QTest.mouseMove(self.canvas, QPoint(10, self.row_y(0)))
+        self.model.load({"rows": [["count"]], "chunks": {"count": {"members": ["subject/count"]}}})
+        self.canvas.refresh()
+        self.canvas.grab()                                                    # 그려도 잘못된 줄을 찾지 않는다
+        QTest.mouseRelease(self.canvas, Qt.LeftButton, Qt.NoModifier, QPoint(10, self.row_y(0)))
+        self.assertEqual(self.model.rows, [["count"]])
+        self.assertEqual(self.changes, [])
+
+    def test_drag_gap_band_to_other_boundary(self):
+        self.context_menu(self.center("count"), "아래에 빈 줄 넣기")
+        last_of = lambda row: self.model.chunks[self.model.rows[row][-1]]
+        band = self.canvas._gap_bands[0].center().toPoint()
+        self.drag(band, QPoint(100, int(self.canvas._bands[1][0]) + 30))        # 1번 줄 가운데 아래 = 2번 줄 앞
+        self.assertNotIn("gap_after", last_of(0))
+        self.assertTrue(last_of(1)["gap_after"])
+        band = self.canvas._gap_bands[1].center().toPoint()
+        self.drag(band, QPoint(100, 2))                                         # 맨 위로는 못 가서 첫 줄 아래로
+        self.assertTrue(last_of(0)["gap_after"])
+        self.assertEqual(self.canvas._gap_bands.keys(), {0})
+
+    def test_gap_button_click_uses_selection_or_bottom(self):
+        from gui.chunks import GapButton
+        button = GapButton(self.canvas)
+        button.resize(24, 24)
+        button.show()
+        self.canvas.select("")
+        QTest.mouseClick(button, Qt.LeftButton)
+        self.assertEqual(self.canvas._gap_bands.keys(), {len(self.model.rows) - 1})     # 고른 것이 없으면 맨 아래
+        self.canvas.select("count")
+        QTest.mouseClick(button, Qt.LeftButton)
+        self.assertTrue(self.model.chunks["count"]["gap_after"])
+        before = len(self.changes)
+        QTest.mouseClick(button, Qt.LeftButton)                                         # 이미 있으면 그대로
+        self.assertEqual(len(self.changes), before)
+        button.close()
+
+    def test_gap_button_drag_drops_between_rows_and_cancels_outside(self):
+        from gui.chunks import GapButton
+        button = GapButton(self.canvas)
+        button.setGeometry(0, 0, 24, 24)
+        button.show()
+
+        def move(global_point):
+            local = button.mapFromGlobal(global_point)
+            QApplication.sendEvent(button, QMouseEvent(QEvent.MouseMove, QPointF(local), QPointF(global_point), Qt.NoButton,
+                                                       Qt.LeftButton, Qt.NoModifier))
+
+        target = self.canvas.mapToGlobal(QPoint(120, int(self.canvas._bands[1][0]) - 2))
+        QTest.mousePress(button, Qt.LeftButton, Qt.NoModifier, QPoint(12, 12))
+        move(target)
+        self.assertEqual(self.canvas._drop, ("between", 1))
+        clicks = []
+        button.clicked.connect(lambda: clicks.append(1))
+        QTest.mouseRelease(button, Qt.LeftButton, Qt.NoModifier, button.mapFromGlobal(target))
+        self.assertEqual(self.canvas._gap_bands.keys(), {0})
+        self.assertEqual(clicks, [])                                                    # 끌면 clicked 가 나가지 않는다
+
+        before = self.model.dumps()
+        outside = self.canvas.mapToGlobal(QPoint(5000, 5000))
+        QTest.mousePress(button, Qt.LeftButton, Qt.NoModifier, QPoint(12, 12))
+        move(outside)
+        self.assertIsNone(self.canvas._drop)
+        QTest.mouseRelease(button, Qt.LeftButton, Qt.NoModifier, button.mapFromGlobal(outside))
+        self.assertEqual(self.model.dumps(), before)
+        button.close()
+
+    def test_alt_arrows_move_whole_row(self):
+        order = [list(r) for r in self.model.rows]
+        self.canvas.setFocus()
+        self.canvas.select(order[0][0])
+        self.key(Qt.Key_Up, Qt.AltModifier)                                   # 맨 위에서는 그대로
+        self.assertEqual(self.model.rows, order)
+        self.key(Qt.Key_Down, Qt.AltModifier)
+        self.assertEqual(self.model.rows[:2], [order[1], order[0]])
+        self.assertEqual(self.canvas.sel, (order[0][0], -1))
+        self.key(Qt.Key_Up, Qt.AltModifier)
+        self.assertEqual(self.model.rows, order)
 
     def test_keyboard_edits(self):
         self.canvas.setFocus()

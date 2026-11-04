@@ -130,6 +130,14 @@ class Model:
         self._tidy()
         return True
 
+    def move_row(self, row: int, to: int) -> bool:
+        """rows[row] 를 통째로 rows[to] 앞으로(옮기기 전 기준, to == 줄 수면 맨 끝). 빈 줄 표시는 청크를 따라간다."""
+        if not 0 <= row < len(self.rows) or not 0 <= to <= len(self.rows) or to in (row, row + 1):
+            return False
+        moved = self.rows.pop(row)
+        self.rows.insert(to - 1 if row < to else to, moved)
+        return True
+
     def break_before(self, cid: str) -> bool:
         r, p = self.where(cid)
         if p == 0:
@@ -162,6 +170,33 @@ class Model:
         flat = self.flat()
         i = flat.index(cid)
         return bool(i and self.chunks[flat[i - 1]].get("gap_after"))
+
+    def add_gap_at(self, row: int) -> bool:
+        """rows[row] 위에 빈 줄을 놓는다(row == 줄 수면 맨 아래). 맨 위는 앞 청크가 없어 둘 수 없다."""
+        if not 1 <= row <= len(self.rows):
+            return False
+        spec = self.chunks[self.rows[row - 1][-1]]
+        if spec.get("gap_after"):
+            return False
+        spec["gap_after"] = True
+        return True
+
+    def add_gap_bottom(self) -> Optional[int]:
+        """아직 빈 줄이 없는 가장 아래 자리에 빈 줄을 놓고 그 자리를 돌려준다(둘 곳이 없으면 None)."""
+        for row in range(len(self.rows), 0, -1):
+            if self.add_gap_at(row):
+                return row
+        return None
+
+    def move_gap(self, row: int, to: int) -> bool:
+        """rows[row] 아래의 빈 줄을 rows[to] 위로. 거기에 이미 빈 줄이 있으면 그대로 둔다."""
+        if not 0 <= row < len(self.rows):
+            return False
+        spec = self.chunks[self.rows[row][-1]]
+        if not spec.get("gap_after") or not self.add_gap_at(to):
+            return False
+        spec.pop("gap_after")
+        return True
 
     def join_previous(self, cid: str) -> bool:
         """cid 의 줄을 앞 줄 끝에 붙인다(줄 맨 앞에서 Backspace)."""
