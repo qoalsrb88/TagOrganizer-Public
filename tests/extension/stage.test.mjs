@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { dialZone, nearestFrame, stageCovers, viewWithZone } from "../../extension/editor/stage.js";
+import { dialZone, stageCovers, viewWithZone } from "../../extension/editor/stage.js";
 
 const quick = JSON.parse(readFileSync(new URL("../../data/rules.json", import.meta.url), "utf-8")).quick;
 const palette = { quick: { framing: quick.framing, view: quick.view }, view_conflicts: quick.view_conflicts, view_lift: quick.view_lift,
@@ -17,16 +17,6 @@ test("그림이 맡는 태그는 퀵 목록 순서", () => {
   assert.deepEqual(covers.framing, quick.framing);
   assert.deepEqual(covers.view, ["front view", "three quarter view", "from side", "from behind", "from above", "from below"]);
   assert.deepEqual(stageCovers({ quick: palette.quick }), { framing: [], view: [] });
-});
-
-test("틀의 위·아래에 가장 가까운 크롭", () => {
-  const frames = quick.framing_frame;
-  assert.equal(nearestFrame(frames, 0, 1), "full body");
-  assert.equal(nearestFrame(frames, 0.5, 1), "lower body");
-  assert.equal(nearestFrame(frames, 0, 0.56), "upper body");
-  assert.equal(nearestFrame(frames, 0, 0.7), "cowboy shot");
-  assert.equal(nearestFrame(frames, 0.15, 1), "head out of frame");
-  assert.equal(nearestFrame(frames, 0, 0.1), "close-up");
 });
 
 test("다이얼 구간: 방향은 좌우가 같고 높이의 가운데는 수평", () => {

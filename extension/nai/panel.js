@@ -337,7 +337,8 @@ function renderOverrides(box, gazeBlocked = [], lifted = false, poseBlocked = []
   $("stage_toggle").setAttribute("aria-pressed", String(stageOn));
   $("stage").hidden = !stage || !stageOn;
   if (stage && stageOn) {
-    stage.update({ framing: overrides[group]?.framing || "", view: splitItems(overrides[group]?.view), present, lifted });
+    const picked = (name) => splitItems(overrides[group]?.[name]);
+    stage.update({ framing: overrides[group]?.framing || "", view: picked("view"), pose: picked("pose"), gaze: picked("gaze"), present, lifted });
   }
   renderBlockable("gaze", gazeToggle, group, gazeBlocked);
   renderBlockable("pose", poseToggle, group, poseBlocked);

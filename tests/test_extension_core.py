@@ -439,7 +439,8 @@ class TextHelpersTest(unittest.TestCase):
         result = subprocess.run(["node", "--test", str(ROOT / "tests" / "extension" / "text.test.mjs"),
                                  str(ROOT / "tests" / "extension" / "model.test.mjs"),
                                  str(ROOT / "tests" / "extension" / "glyphs.test.mjs"),
-                                 str(ROOT / "tests" / "extension" / "stage.test.mjs")],
+                                 str(ROOT / "tests" / "extension" / "stage.test.mjs"),
+                                 str(ROOT / "tests" / "extension" / "figure.test.mjs")],
                                 capture_output=True, encoding="utf-8", timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
