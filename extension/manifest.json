@@ -3,7 +3,7 @@
   "name": "BMK Tag Organizer",
   "version": "0.2.0",
   "description": "입력창에서 선택한 프롬프트를 분류 팩과 배열 프리셋에 맞춰 정렬합니다. 모든 처리는 이 브라우저 안에서 합니다.",
-  "minimum_chrome_version": "116",
+  "minimum_chrome_version": "123",
   "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
   "background": { "service_worker": "background.js", "type": "module" },
   "action": { "default_title": "BMK Tag Organizer", "default_popup": "panel/panel.html" },

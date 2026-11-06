@@ -9,8 +9,11 @@
   "자동"은 프롬프트 그대로. 프롬프트에 있는 태그는 테두리로 표시한다.
 - 시점: 여러 개를 고른다(organize 의 view). 부딪치는 시점은 켜는 순간 꺼지고, multiple views 를 켜면 함께 고를 수 있다.
 - 시선: 여러 개를 고른다(organize 의 gaze). 함께 쓸 수 없는 태그는 켜는 순간 꺼지고, 지금 크롭·시점과 맞지 않는 태그는
-  숨긴다(report 의 gaze_blocked). 숨겨도 선택은 남아 시점을 되돌리면 다시 든다.
+  숨긴다(report 의 gaze_blocked). 숨겨도 선택은 남아 시점을 되돌리면 다시 든다. 칩은 방향(열) × looking·facing(행)
+  격자에 그림으로 놓는다(palette 의 gaze_grid).
 - 포즈: 시선과 같게 고른다(organize 의 pose, report 의 pose_blocked). 장소·구속 태그는 프롬프트에 그대로 남는다.
+  칩은 자세 묶음(palette 의 pose_groups)으로 모은다. 격자·묶음이 없는 옛 팩에서는 칩을 한 줄로 늘어놓는다.
+- 퀵 칩의 그림은 확장과 같은 데이터(glyphs)로 그린다.
 - 팩에 없는 토큰 추정(guess)은 켜고 끄는 미리보기 옵션이고, 추정 규칙(내 패턴)은 배열에 저장된다.
 되돌리기(Ctrl+Z, 청크 화면에서)는 이 패널의 기록이다 — 분류 편집의 되돌리기와 따로 간다.
 """
@@ -26,13 +29,13 @@ from PySide6.QtCore import QPoint, QRect, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QGuiApplication, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QButtonGroup, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout,
-    QHBoxLayout, QInputDialog, QLabel, QLayout, QLineEdit, QMenu, QMessageBox, QPlainTextEdit, QPushButton,
-    QScrollArea, QVBoxLayout, QWidget, QWidgetItem,
+    QGridLayout, QHBoxLayout, QInputDialog, QLabel, QLayout, QLineEdit, QMenu, QMessageBox, QPlainTextEdit,
+    QPushButton, QScrollArea, QVBoxLayout, QWidget, QWidgetItem,
 )
 
 import bmk_tag_organizer_core as core
 
-from . import theme
+from . import glyphs, theme
 from .arrangement import (
     SHARE_ID, Model, config_pack, list_entries, parse_text, read_file, share_id, slug, split_items, tolerate,
     write_file,
@@ -40,6 +43,7 @@ from .arrangement import (
 from .chunks import ChunkCanvas, GapButton
 
 UNDO_LIMIT = 100
+GAZE_ROWS = (("looking", "looking: 눈이 보일 때"), ("facing", "facing: 눈을 감거나 가렸을 때"))
 
 CANVAS_HELP = theme.help_text(
     ("청크 끌기", "순서 바꾸기. 줄 사이·맨 아래에 놓으면 새 줄"),
@@ -125,7 +129,8 @@ class FlowLayout(QLayout):
         return y - rect.y()
 
 
-def _chip(text: str, data: str, tip: str = "") -> QPushButton:
+def _chip(text: str, data: str, tip: str = "", group: str = "", cell: bool = False) -> QPushButton:
+    """체크 칩. group 의 그림이 있으면 붙인다. cell 이면 그림만 둔 시선 격자 칸(그림이 없으면 보통 칩)."""
     button = QPushButton(text)
     button.setProperty("chip", True)
     button.setCheckable(True)
@@ -133,7 +138,41 @@ def _chip(text: str, data: str, tip: str = "") -> QPushButton:
     button.setFocusPolicy(Qt.TabFocus)
     if tip:
         button.setToolTip(tip)
+    if group and data and glyphs.spec(group, data) is not None:
+        button.setProperty("glyph", True)
+        button.setProperty("glyphGroup", group)
+        button.setProperty("glyphSize", 18 if group == "pose" or cell else 16)
+        if cell:
+            button.setProperty("cell", True)
+            button.setText("")
+            button.setAccessibleName(data)
+        _paint_glyph(button)
     return button
+
+
+def _chip_text(button: QPushButton, on: bool) -> str:
+    tag = button.property("tag")
+    if not tag:
+        return "자동"
+    if button.property("glyph"):
+        return "" if button.property("cell") else tag
+    return ("✓ " if on else "") + tag           # 그림이 없는 칩만 눌림을 ✓ 로도 보인다(그림 칩은 채운 바탕으로 충분)
+
+
+def _paint_glyph(button: QPushButton) -> None:
+    """칩 그림을 칩 글자색으로 그린다: 보통 fg, 프롬프트에 있으면 accent, 눌리면 on_accent. 테마·표시가 바뀌면 다시."""
+    group, tag = button.property("glyphGroup") or "", button.property("tag") or ""
+    shape = glyphs.spec(group, tag)
+    if shape is None:
+        return
+    t = theme.tokens()
+    height = int(button.property("glyphSize") or 16)
+    gap = 0 if button.property("cell") else 2               # 글자가 있는 칩은 그림과 글자 사이를 조금 띄운다
+    off = t["accent"] if button.property("present") else t["fg"]
+    button.setIcon(glyphs.icon(shape, {(QIcon.Normal, QIcon.Off): off, (QIcon.Normal, QIcon.On): t["on_accent"],
+                                       (QIcon.Disabled, QIcon.Off): t["disabled"],
+                                       (QIcon.Disabled, QIcon.On): t["muted"]}, height, gap))
+    button.setIconSize(QSize(*glyphs.size(shape, height, gap)))
 
 
 def _swatch(color: str) -> QIcon:
@@ -361,6 +400,9 @@ class ArrangementPanel(QWidget):
         self.undo_stack: List[str] = []
         self.redo_stack: List[str] = []
         self._chips: Dict[str, QButtonGroup] = {}
+        self._blocked: Dict[str, set] = {}                     # report 의 gaze_blocked·pose_blocked
+        self._picked: Optional[QLabel] = None                   # 시선 격자 옆의 고른 태그 이름
+        self._pose_heads: List[Tuple[QWidget, List[str]]] = []  # 포즈 묶음 머리(이름표 + 첫 칩)와 묶음의 태그
         self._set_config(config)
         self.model = Model(core.arrangement_from_layout(self.vpack, "default"))
         self.saved = self.model.dumps()
@@ -447,7 +489,7 @@ class ArrangementPanel(QWidget):
                 tip = f"프롬프트의 {title} 태그를 '{tag}' 로 바꿉니다"
                 if tag in hides:
                     tip += f" — 가리는 부위: {hides[tag]}"
-                chip = _chip(tag, tag, tip)
+                chip = _chip(tag, tag, tip, group)
                 buttons.addButton(chip)
                 flow.addWidget(chip)
             buttons.buttonClicked.connect(lambda b, g=group: self._quick(g, b.property("tag")))
@@ -509,28 +551,117 @@ class ArrangementPanel(QWidget):
         self.canvas.set_model(self.model, self.config["taxonomy"])
 
     def _build_multi(self, layout, group: str, title: str, tips: Mapping[str, str]) -> None:
-        """시점·시선·포즈 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다."""
+        """시점·시선·포즈 칩: 여러 개를 고른다. 자동은 고른 것이 없을 때만 켜져 있다.
+        시선은 격자(gaze_grid), 포즈는 묶음(pose_groups)으로 놓고, 팩에 그 목록이 없으면 한 줄로 늘어놓는다."""
         if not tips:
             return
-        flow = FlowLayout(spacing=theme.SPACE[0])
         label = theme.caption(title, "field")
         label.setMinimumWidth(28)
-        flow.addWidget(label)
         buttons = QButtonGroup(self)
         buttons.setExclusive(False)
         auto = _chip("자동", "", "프롬프트 그대로")
         auto.setChecked(True)
         buttons.addButton(auto)
-        flow.addWidget(auto)
-        for tag, tip in tips.items():
-            chip = _chip(tag, tag, tip)
-            buttons.addButton(chip)
-            flow.addWidget(chip)
+        grid = self.palette.get("gaze_grid") if group == "gaze" else None
+        groups = self.palette.get("pose_groups") if group == "pose" else None
+        if grid:
+            holder = self._gaze_grid(label, auto, buttons, tips, grid)
+        elif groups:
+            holder = self._pose_groups(label, auto, buttons, tips, groups)
+        else:
+            flow = FlowLayout(spacing=theme.SPACE[0])
+            flow.addWidget(label)
+            flow.addWidget(auto)
+            for tag, tip in tips.items():
+                flow.addWidget(self._add_chip(buttons, group, tag, tip))
+            holder = QWidget()
+            holder.setLayout(flow)
         buttons.buttonClicked.connect(lambda b, g=group: self._multi_clicked(g, b.property("tag")))
         self._chips[group] = buttons
+        layout.addWidget(holder)
+
+    @staticmethod
+    def _add_chip(buttons: QButtonGroup, group: str, tag: str, tip: str, cell: bool = False) -> QPushButton:
+        chip = _chip(tag, tag, tip, group, cell)
+        buttons.addButton(chip)
+        return chip
+
+    def _gaze_grid(self, label: QLabel, auto: QPushButton, buttons: QButtonGroup, tips: Mapping[str, str],
+                   grid: Sequence[Mapping[str, str]]) -> QWidget:
+        """시선 격자: 열은 방향, 행은 looking(눈이 보임)·facing(눈을 감거나 가림). 자동은 왼쪽 위 모서리에 둔다.
+        칸에는 그림만 있으니 고른 태그 이름을 격자 옆에 글로 보인다. 막힌 칸은 숨겨도 자리를 지키고,
+        격자에 없는 퀵 태그는 그 뒤에 보통 칩으로 둔다."""
+        table = QGridLayout()
+        table.setContentsMargins(0, 0, 0, 0)
+        table.setHorizontalSpacing(theme.SPACE[0])
+        table.setVerticalSpacing(2)
+        table.addWidget(label, 0, 0)
+        table.addWidget(auto, 0, 1)
+        placed = set()
+        for c, col in enumerate(grid, 2):
+            table.addWidget(theme.caption(col.get("label", ""), "small"), 0, c, Qt.AlignHCenter | Qt.AlignBottom)
+        for r, (row, title) in enumerate(GAZE_ROWS, 1):
+            head = theme.caption(row, "small")
+            head.setToolTip(title)
+            table.addWidget(head, r, 1)
+            for c, col in enumerate(grid, 2):
+                tag = col.get(row)
+                if not tag or tag not in tips or tag in placed:
+                    continue
+                placed.add(tag)
+                tip = f"{tag} ({col.get('label', '')}) — {tips[tag]}"
+                cell = self._add_chip(buttons, "gaze", tag, tip, cell=True)
+                policy = cell.sizePolicy()
+                policy.setRetainSizeWhenHidden(True)        # 막힌 칸은 비워도 자리를 지킨다
+                cell.setSizePolicy(policy)
+                table.addWidget(cell, r, c, Qt.AlignCenter)
+        self._picked = theme.caption("", "muted")
+        rest = FlowLayout(spacing=theme.SPACE[0])
+        rest.addWidget(self._picked)
+        for tag, tip in tips.items():
+            if tag not in placed:
+                rest.addWidget(self._add_chip(buttons, "gaze", tag, tip))
+        rest_holder = QWidget()
+        rest_holder.setLayout(rest)
+        holder = QWidget()
+        row_layout = QHBoxLayout(holder)
+        row_layout.setContentsMargins(0, 0, 0, 0)
+        row_layout.setSpacing(theme.SPACE[1])
+        row_layout.addLayout(table)
+        row_layout.addWidget(rest_holder, 1, Qt.AlignVCenter)
+        return holder
+
+    def _pose_groups(self, label: QLabel, auto: QPushButton, buttons: QButtonGroup, tips: Mapping[str, str],
+                     groups: Sequence[Mapping[str, Any]]) -> QWidget:
+        """포즈 묶음: 자세별로 칩을 모은다. 묶음 이름표는 첫 칩과 붙여 줄 끝에 혼자 남지 않게 한다.
+        묶음 안이 모두 막히면 묶음째 숨기고(set_report), 묶음에 없는 퀵 태그는 뒤에 둔다."""
+        flow = FlowLayout(spacing=theme.SPACE[0])
+        flow.addWidget(label)
+        flow.addWidget(auto)
+        placed = set()
+        for spec in groups:
+            tags = list(dict.fromkeys(t for t in spec.get("tags", ()) if t in tips and t not in placed))
+            if not tags:
+                continue
+            placed.update(tags)
+            first, *chips = [self._add_chip(buttons, "pose", tag, tips[tag]) for tag in tags]
+            head = QWidget()
+            head_layout = QHBoxLayout(head)
+            head_layout.setContentsMargins(0, 0, 0, 0)
+            head_layout.setSpacing(theme.SPACE[0])
+            name = theme.caption(spec.get("label", ""), "group")
+            head_layout.addWidget(name)
+            head_layout.addWidget(first)
+            flow.addWidget(head)
+            for chip in chips:
+                flow.addWidget(chip)
+            self._pose_heads.append((head, tags))
+        for tag, tip in tips.items():
+            if tag not in placed:
+                flow.addWidget(self._add_chip(buttons, "pose", tag, tip))
         holder = QWidget()
         holder.setLayout(flow)
-        layout.addWidget(holder)
+        return holder
 
     # ---- 바깥에서 ----
 
@@ -556,17 +687,33 @@ class ArrangementPanel(QWidget):
                 if b.property("present") != mark:
                     b.setProperty("present", mark)
                     theme.repolish(b)
+                    _paint_glyph(b)
         self._view_lifted = bool(report.get("view_lifted"))
         for group in ("gaze", "pose"):
             if group not in self._chips:
                 continue
-            blocked = set(report.get(f"{group}_blocked", ()))
+            blocked = self._blocked[group] = set(report.get(f"{group}_blocked", ()))
             active = set(split_items(getattr(self, group))) - blocked
             for b in self._chips[group].buttons():
                 tag = b.property("tag")
                 b.setVisible(tag not in blocked)
                 if not tag:
                     b.setChecked(not active)            # 고른 것이 모두 막히면 프롬프트 그대로다
+        blocked = self._blocked.get("pose", set())
+        for head, tags in self._pose_heads:
+            head.setVisible(any(tag not in blocked for tag in tags))
+        self._update_picked()
+
+    def restyle(self) -> None:
+        """테마를 바꾼 뒤: 칩 그림은 스타일시트가 칠하지 않아 새 색으로 다시 그린다."""
+        for buttons in self._chips.values():
+            for b in buttons.buttons():
+                _paint_glyph(b)
+
+    def _update_picked(self) -> None:
+        if self._picked is not None:
+            blocked = self._blocked.get("gaze", set())
+            self._picked.setText(", ".join(t for t in split_items(self.gaze) if t not in blocked))
 
     def custom_chunks(self) -> List[Tuple[str, str]]:
         return [(cid, self.canvas.chunk_label(cid)) for cid in self.model.custom_ids()]
@@ -613,8 +760,10 @@ class ArrangementPanel(QWidget):
             tag = b.property("tag")
             on = tag in tags if tag else not tags
             b.setChecked(on)
-            b.setText(("✓ " if on else "") + tag if tag else "자동")
+            b.setText(_chip_text(b, on))
         self._quick(group, ", ".join(tags))
+        if group == "gaze":
+            self._update_picked()
 
     def _sub_order(self, on: bool) -> None:
         if on != self.model.sub_order:

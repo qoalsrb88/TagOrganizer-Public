@@ -64,12 +64,23 @@ class SyncTests(unittest.TestCase):
         self.assertIn("kneeling", info["quick"]["pose"])
         self.assertEqual(info["files"][sync.PACK_REL], sync.sha256_bytes(self.pack.read_bytes()))
         self.assertEqual(list(self.target.rglob("*.sync-tmp")), [])
-        self.assertEqual(set(sync.EDITOR_FILES), {"editor.js", "model.js", "glyphs.js"})
+        self.assertEqual(set(sync.EDITOR_FILES), {"editor.js", "model.js", "glyphs.js", "glyphs.json"})
         for source in sync.EDITOR_FILES:
             rel = f"{sync.EDITOR_REL}/{source}"
             expected = (ROOT / sync.EDITOR_SRC / source).read_bytes().replace(b"\r\n", b"\n")
             self.assertEqual((self.target / rel).read_bytes(), expected)
             self.assertEqual(info["files"][rel], sync.sha256_bytes(expected))
+
+    @unittest.skipUnless(shutil.which("node"), "Node 가 없음")
+    def test_synced_glyphs_module_loads_its_data(self):
+        """노드 팩에 복사한 glyphs.js 가 옆에 함께 복사한 glyphs.json 을 읽는다(빠지면 어댑터 전체가 로드되지 않는다)."""
+        self.run_sync()
+        url = (self.target / sync.EDITOR_REL / "glyphs.js").as_uri()
+        script = f'const m = await import({json.dumps(url)}); console.log(JSON.stringify(m.glyphSpec("pose", "standing").box));'
+        result = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "[28,28]")
 
     def test_second_sync_is_noop(self):
         self.run_sync()
@@ -191,7 +202,7 @@ class SyncTests(unittest.TestCase):
         self.assertFalse((self.target / sync.CORE_REL).exists())          # 충돌이 있으면 다른 파일도 쓰지 않는다
 
     def test_missing_editor_is_rejected_before_writing(self):
-        for name in ("model.js", "glyphs.js"):
+        for name in ("model.js", "glyphs.js", "glyphs.json"):
             with self.subTest(name=name):
                 repo = self.editor_copy()
                 (repo / sync.EDITOR_SRC / name).unlink()
@@ -291,7 +302,7 @@ class EditorModuleTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "Node 가 없음")
     def test_import_does_nothing(self):
         """ComfyUI 가 js/ 아래 .js 를 전부 import 하므로 두 모듈은 import 만으로 아무 일도 하지 않아야 한다."""
-        urls = [(ROOT / sync.EDITOR_SRC / name).as_uri() for name in sync.EDITOR_FILES]
+        urls = [(ROOT / sync.EDITOR_SRC / name).as_uri() for name in sync.EDITOR_FILES if name.endswith(".js")]
         script = """
 for (const name of ["setInterval", "setTimeout", "fetch", "addEventListener"]) {
   globalThis[name] = () => { throw new Error(`import 중에 ${name} 호출`); };

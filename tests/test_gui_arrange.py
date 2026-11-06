@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 import tempfile
@@ -465,6 +466,205 @@ class CanvasTests(unittest.TestCase):
 
 
 @unittest.skipUnless(HAVE_QT, "PySide6 없음")
+class QuickChipLayoutTests(unittest.TestCase):
+    """퀵 칩 배치: 시선은 방향 × looking·facing 격자, 포즈는 자세 묶음, 두 목록이 없는 옛 팩은 한 줄. 그림은 확장과 같은 데이터."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QApplication.instance() or QApplication([])
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.config = tagdb.load_config()
+        self.quick = self.config["rules"]["quick"]
+
+    def make(self, config=None):
+        from gui.arrange_panel import ArrangementPanel
+        panel = ArrangementPanel(config or self.config, Path(self._tmp.name, "arrangements"))
+        self.addCleanup(panel.deleteLater)
+        return panel
+
+    def edited(self, **quick):
+        config = copy.deepcopy(self.config)
+        for key, value in quick.items():
+            if value is None:
+                del config["rules"]["quick"][key]
+            else:
+                config["rules"]["quick"][key] = value
+        return config
+
+    @staticmethod
+    def chips(panel, group):
+        return {b.property("tag"): b for b in panel._chips[group].buttons()}
+
+    @staticmethod
+    def grid(panel):
+        from PySide6.QtWidgets import QGridLayout
+        grids = QuickChipLayoutTests.chips(panel, "gaze")[""].parentWidget().findChildren(QGridLayout)
+        return grids[0] if grids else None
+
+    @staticmethod
+    def widgets(layout):
+        return [layout.itemAt(i).widget() for i in range(layout.count())]
+
+    def test_gaze_grid_places_direction_columns_and_two_rows(self):
+        panel = self.make()
+        grid, chips = self.grid(panel), self.chips(panel, "gaze")
+        self.assertEqual(len(chips), len(self.quick["gaze"]) + 1)              # 퀵 태그가 모두 격자에 든다
+        self.assertEqual(grid.getItemPosition(grid.indexOf(chips[""]))[:2], (0, 1))   # 자동은 모서리
+        self.assertEqual([grid.itemAtPosition(r, 1).widget().text() for r in (1, 2)], ["looking", "facing"])
+        for c, col in enumerate(panel.palette["gaze_grid"], 2):
+            self.assertEqual(grid.itemAtPosition(0, c).widget().text(), col["label"])
+            for r, row in ((1, "looking"), (2, "facing")):
+                item = grid.itemAtPosition(r, c)
+                if col.get(row):
+                    self.assertIs(item.widget(), chips[col[row]], col)
+                else:
+                    self.assertIsNone(item, col)                               # 빈 칸
+        cell = chips["sideways glance"]
+        self.assertEqual(cell.text(), "")
+        self.assertFalse(cell.icon().isNull())
+        self.assertEqual(cell.accessibleName(), "sideways glance")
+        self.assertIn("sideways glance (곁눈)", cell.toolTip())
+
+    def test_gaze_grid_keeps_place_of_blocked_cells_and_names_picked(self):
+        panel = self.make()
+        chips = self.chips(panel, "gaze")
+        panel.set_quick("gaze", "looking at viewer, looking to the side")
+        self.assertEqual(panel._picked.text(), "looking at viewer, looking to the side")
+        self.assertEqual(chips["looking to the side"].text(), "")               # 그림 칸에는 ✓ 도 붙이지 않는다
+        panel.resize(1200, 400)
+        panel.show()
+        self.addCleanup(panel.hide)
+        QTest.qWait(10)
+        after = chips["sideways glance"].geometry()                              # '옆' 열의 오른쪽 칸
+        panel.set_report({"tokens": [], "gaze_blocked": ["looking to the side", "facing to the side"]})
+        panel.layout().activate()
+        QTest.qWait(10)
+        self.assertTrue(chips["looking to the side"].isHidden())
+        self.assertTrue(chips["looking to the side"].isChecked())                # 숨겨도 선택은 남는다
+        self.assertEqual(chips["sideways glance"].geometry(), after)            # 막힌 칸은 비워도 자리를 지킨다
+        self.assertEqual(panel._picked.text(), "looking at viewer")
+        self.assertFalse(chips[""].isChecked())
+
+    def test_gaze_tags_outside_grid_follow_as_chips(self):
+        grid = [col for col in self.quick["gaze_grid"] if col.get("looking") != "looking afar"]
+        panel = self.make(self.edited(gaze_grid=grid))
+        chip = self.chips(panel, "gaze")["looking afar"]
+        self.assertFalse(chip.property("cell"))
+        self.assertEqual(chip.text(), "looking afar")
+        self.assertFalse(chip.icon().isNull())
+        self.assertEqual(self.widgets(panel._picked.parentWidget().layout()), [panel._picked, chip])
+        self.assertEqual(self.grid(panel).indexOf(chip), -1)
+
+    def test_pose_groups_keep_label_with_first_chip_and_hide_empty_groups(self):
+        panel = self.make()
+        chips, groups = self.chips(panel, "pose"), panel.palette["pose_groups"]
+        heads = panel._pose_heads
+        self.assertEqual([tags for _, tags in heads], [g["tags"] for g in groups])
+        flow = self.widgets(chips[""].parentWidget().layout())
+        expected = [chips[""]]
+        for (head, tags), spec in zip(heads, groups):
+            self.assertEqual(head.layout().itemAt(0).widget().text(), spec["label"])
+            self.assertIs(head.layout().itemAt(1).widget(), chips[tags[0]])     # 이름표와 첫 칩이 붙어 다닌다
+            expected += [head, *(chips[tag] for tag in tags[1:])]
+        self.assertEqual(flow[1:], expected)
+        self.assertEqual(chips["standing"].text(), "standing")
+        self.assertFalse(chips["standing"].icon().isNull())
+        chips["standing"].click()
+        self.assertEqual(chips["standing"].text(), "standing")                  # 그림 칩은 채운 바탕으로 눌림을 보인다
+        first, second = heads[0], heads[1]
+        panel.set_report({"tokens": [], "pose_blocked": [*first[1], second[1][0]]})
+        self.assertTrue(first[0].isHidden())                                     # 묶음이 모두 막히면 이름표째 숨김
+        self.assertFalse(second[0].isHidden())                                   # 첫 칩만 막히면 이름표는 남김
+        self.assertTrue(chips[second[1][0]].isHidden())
+        self.assertFalse(chips[second[1][1]].isHidden())
+        self.assertTrue(chips[""].isChecked())                                   # 고른 것이 모두 막히면 자동
+        panel.set_report({"tokens": [], "pose_blocked": []})
+        self.assertFalse(first[0].isHidden())
+        self.assertFalse(chips[""].isChecked())
+
+    def test_pose_tags_outside_groups_follow(self):
+        groups = self.quick["pose_groups"][:-1]
+        panel = self.make(self.edited(pose_groups=groups))
+        chips = self.chips(panel, "pose")
+        left = self.quick["pose_groups"][-1]["tags"]
+        flow = self.widgets(chips[""].parentWidget().layout())
+        self.assertEqual(flow[-len(left):], [chips[tag] for tag in left])
+        self.assertEqual(len(panel._pose_heads), len(groups))
+
+    def test_old_pack_lays_chips_in_one_line(self):
+        from gui.arrange_panel import FlowLayout
+        panel = self.make(self.edited(gaze_grid=None, pose_groups=None))
+        self.assertEqual((panel.palette["gaze_grid"], panel.palette["pose_groups"]), ([], []))
+        self.assertIsNone(self.grid(panel))
+        self.assertIsNone(panel._picked)
+        self.assertEqual(panel._pose_heads, [])
+        for group in ("gaze", "pose"):
+            chips = self.chips(panel, group)
+            layout = chips[""].parentWidget().layout()
+            self.assertIsInstance(layout, FlowLayout)
+            self.assertEqual([w.property("tag") for w in self.widgets(layout)[1:]], ["", *self.quick[group]])
+        panel.set_quick("gaze", "looking back")
+        self.assertEqual(self.chips(panel, "gaze")["looking back"].text(), "looking back")
+        panel.set_report({"tokens": [], "gaze_blocked": ["looking back"], "pose_blocked": []})
+        self.assertTrue(self.chips(panel, "gaze")[""].isChecked())
+
+    def test_without_glyph_data_chips_fall_back_to_text(self):
+        with mock.patch("gui.glyphs._data", return_value={}):
+            panel = self.make()
+            chips = self.chips(panel, "gaze")
+            self.assertTrue(chips["looking back"].icon().isNull())
+            self.assertEqual(chips["looking back"].text(), "looking back")       # 격자 칸도 이름으로
+            self.assertGreaterEqual(self.grid(panel).indexOf(chips["looking back"]), 0)
+            panel.set_quick("gaze", "looking back")
+            self.assertEqual(chips["looking back"].text(), "✓ looking back")
+
+    def test_glyph_colors_follow_chip_text(self):
+        from PySide6.QtCore import QSize
+        from PySide6.QtGui import QIcon
+        from gui import theme
+
+        def color(button, state=QIcon.Off):
+            img = button.icon().pixmap(QSize(18, 18), QIcon.Normal, state).toImage()
+            return next(img.pixelColor(x, y).name() for y in range(img.height()) for x in range(img.width())
+                        if img.pixelColor(x, y).alpha() == 255)
+
+        panel = self.make()
+        cell = self.chips(panel, "gaze")["looking down"]
+        light = theme.THEMES["light"]
+        self.assertEqual(color(cell), light["fg"])
+        self.assertEqual(color(cell, QIcon.On), light["on_accent"])
+        panel.set_report({"tokens": [{"kind": "tag", "key": "looking down", "text": "looking down"}]})
+        self.assertEqual(color(cell), light["accent"])                           # 프롬프트에 있으면 글자처럼 강조색
+        with mock.patch("gui.theme.tokens", return_value=theme.THEMES["dark"]):
+            panel.restyle()
+        self.assertEqual(color(cell), theme.THEMES["dark"]["accent"])
+
+    def test_glyphs_read_the_extension_data(self):
+        from gui import glyphs
+        self.assertEqual(glyphs.PATH, Path(__file__).resolve().parent.parent / "extension" / "editor" / "glyphs.json")
+        data = json.loads(glyphs.PATH.read_text(encoding="utf-8"))
+        for group in glyphs.GROUPS:
+            for tag in self.quick[group]:
+                self.assertEqual(glyphs.spec(group, tag), data[group][tag], f"{group}: {tag}")
+        self.assertIsNone(glyphs.spec("pose", "flying"))
+        self.assertIsNone(glyphs.spec("note", "looking back"))
+
+    def test_crop_glyph_is_solid_only_inside_frame(self):
+        from gui import glyphs
+
+        def alpha(tag, x, y):                                                    # 그림 좌표(16 × 20)
+            img = glyphs.pixmap(glyphs.spec("framing", tag), "#000000", 20).toImage()
+            return img.pixelColor(int(x * img.width() / 16), int(y * img.height() / 20)).alpha()
+
+        self.assertGreater(alpha("full body", 8, 3.2), 240)                     # 틀 안의 머리는 진하게
+        self.assertLess(alpha("lower body", 8, 3.2), 120)                       # 틀 밖은 흐리게
+        self.assertGreater(alpha("lower body", 7.3, 13.5), alpha("upper body", 7.3, 13.5) + 60)
+
+
+@unittest.skipUnless(HAVE_QT, "PySide6 없음")
 class PreviewArrangeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -558,14 +758,14 @@ class PreviewArrangeTests(unittest.TestCase):
         chips["looking at viewer"].click()
         self.assertEqual(self.panel.gaze, "looking at viewer, looking back")
         self.assertFalse(chips[""].isChecked())
-        self.assertTrue(chips["looking back"].text().startswith("✓"))
+        self.assertEqual(self.panel._picked.text(), "looking at viewer, looking back")   # 격자 칸은 그림만 둔다
         self.page.run()
         self.assertIn("looking down  # override:gaze", self.page.removed.toPlainText())
         self.assertIn("looking back", self.page.output.toPlainText())
         chips["facing away"].click()
         self.assertEqual(self.panel.gaze, "facing away")
         self.assertFalse(chips["looking back"].isChecked())
-        self.assertEqual(chips["looking back"].text(), "looking back")
+        self.assertEqual(self.panel._picked.text(), "facing away")
         chips["facing away"].click()
         self.assertEqual(self.panel.gaze, "")
         self.assertTrue(chips[""].isChecked())

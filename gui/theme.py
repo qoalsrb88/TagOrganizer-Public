@@ -5,7 +5,8 @@ BMK AI Studio 의 `bmk_studio/appearance.py`(MIT, 같은 저자)를 바탕으로
 - 의미 색: danger(저장할 수 없음) · warning(참고) · notice_*(밖에서 바뀜 알림 띠). 화면에 색을 직접 쓰지 않고 이것만 쓴다.
 - 등급 색 rating_g·s·q·e: Danbooru 관례(초록·노랑·주황·빨강)를 표 글자로 읽히는 중간 밝기로. 등급은 전체 이름으로 보인다
   (general·sensitive·questionable·explicit — rating_name).
-- QTableView(태그 표), 체크 가능한 칩(등급 버튼), 일부만 체크(─) 표시, 카드(편집 미리보기), 바뀐 칸 표시.
+- QTableView(태그 표), 체크 가능한 칩(등급 버튼·퀵 칩, 그림 칩과 시선 격자 칸), 일부만 체크(─) 표시,
+  카드(편집 미리보기), 바뀐 칸 표시.
 - 아이콘: search · refresh · build · sync · download · dash · gap-add · expand · collapse · warning.
 - 도움말: 화면에 설명 글을 늘어놓는 대신 둥근 ? (HelpButton). 올리거나 누르면 툴팁으로 보인다.
 """
@@ -49,6 +50,8 @@ PATHS = {
 
 # 간격 단계(px). 배치는 이 값에서 고른다
 SPACE = (4, 8, 12, 16)
+# 시선 격자 칸(그림만 둔 칩)의 크기(px)
+GLYPH_CELL = (30, 24)
 
 THEMES = {
     'light': dict(bg='#f2f3f5', surface='#ffffff', surface2='#e9ebef', fg='#1b1f26', muted='#6b7480', border='#d5d9e0',
@@ -250,6 +253,8 @@ def stylesheet(t: Dict[str, str]) -> str:
     QLabel[role="field"] {{ color:{muted}; }}
     QLabel[role="field"][dirty="true"] {{ color:{accent}; font-weight:600; }}
     QLabel[role="muted"] {{ color:{muted}; }}
+    QLabel[role="small"] {{ color:{muted}; font-size:11px; }}
+    QLabel[role="group"] {{ color:{muted}; font-size:11px; border-left:1px solid {border}; margin-left:4px; padding-left:6px; }}
     QFrame[role="divider"] {{ background:{border}; border:0; min-height:1px; max-height:1px; }}
     QFrame[role="card"] {{ background:{surface}; border:1px solid {border}; border-radius:6px; }}
     QFrame#banner {{ background:{t['notice_bg']}; border:0; border-bottom:1px solid {t['notice_border']}; }}
@@ -291,6 +296,8 @@ def stylesheet(t: Dict[str, str]) -> str:
     QPushButton[chip="true"]:disabled {{ background:{bg}; color:{disabled}; border-color:{border}; }}
     QPushButton[chip="true"]:checked:disabled {{ background:{surface2}; color:{muted}; }}
     QPushButton[chip="true"][present="true"]:!checked {{ border:1px solid {accent}; color:{accent}; }}
+    QPushButton[chip="true"][glyph="true"] {{ padding:2px 10px 2px 6px; }}
+    QPushButton[chip="true"][cell="true"] {{ padding:0; border-radius:6px; min-width:{GLYPH_CELL[0]}px; max-width:{GLYPH_CELL[0]}px; min-height:{GLYPH_CELL[1]}px; max-height:{GLYPH_CELL[1]}px; }}
     QPushButton[chip="true"][rating="g"]:!checked:enabled {{ color:{rating_g}; }}
     QPushButton[chip="true"][rating="s"]:!checked:enabled {{ color:{rating_s}; }}
     QPushButton[chip="true"][rating="q"]:!checked:enabled {{ color:{rating_q}; }}

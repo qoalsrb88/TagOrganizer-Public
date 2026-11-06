@@ -286,6 +286,7 @@ class MainWindow(QMainWindow):
         self.editor._update_preview()
         self.editor.evidence.render()
         self.preview_page.arrange.canvas.update()
+        self.preview_page.arrange.restyle()
         self.preview_page.run()
         self.work_page.refresh_versions(force=True)
         self.check_page.mark_stale()
