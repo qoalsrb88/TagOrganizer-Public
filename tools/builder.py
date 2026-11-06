@@ -316,6 +316,29 @@ def build_pack(
         for tag in placed[group]:
             if tag not in quick.get(group, ()):
                 warnings.append(f"rules.quick.{where} '{tag}' 는 {group} 퀵 목록에 없습니다")
+    # 그림 조작이 맡는 태그: 크롭 틀은 0~1 안의 위<아래, 다이얼 구간은 축 범위 안에서 겹치지 않고 at 을 품는다
+    for tag, span in (quick.get("framing_frame") or {}).items():
+        if tag not in quick.get("framing", ()):
+            warnings.append(f"rules.quick.framing_frame '{tag}' 는 framing 퀵 목록에 없습니다")
+        if not (len(span) == 2 and 0 <= span[0] < span[1] <= 1):
+            warnings.append(f"rules.quick.framing_frame '{tag}' 의 범위 {span} 가 0~1 안의 [위, 아래] 가 아닙니다")
+    def number(value) -> bool:
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+    for axis, (low, high) in (("direction", (0, 180)), ("height", (-90, 90))):
+        end_before = None
+        zones = (quick.get("view_dial") or {}).get(axis, ())
+        for zone in sorted(zones, key=lambda z: z.get("from") if number(z.get("from")) else low):
+            tag = zone.get("tag")
+            if tag not in quick.get("view", ()):
+                warnings.append(f"rules.quick.view_dial.{axis} '{tag}' 는 view 퀵 목록에 없습니다")
+            start, end, at = zone.get("from"), zone.get("to"), zone.get("at")
+            if not all(number(v) for v in (start, end, at)) or not low <= start <= at <= end <= high or start == end:
+                warnings.append(f"rules.quick.view_dial.{axis} '{tag}' 의 구간이 {low}~{high} 안의 from ≤ at ≤ to 가 아닙니다")
+                continue
+            if end_before is not None and end_before > start:
+                warnings.append(f"rules.quick.view_dial.{axis} '{tag}' 가 앞 구간과 겹칩니다")
+            end_before = end
     pose_scope = (quick.get("pose_scope") or {}).get("tags", ())
     _check_rule_tags("rules.quick.pose_scope", pose_scope, rows, aliases, warnings)
     for tag in pose_scope:

@@ -16,13 +16,17 @@
   </label>
   <label class="check"><input id="guess" type="checkbox"> 추정</label>
   <label class="check" id="master" title="입력창별 풀버전 프롬프트를 원본 탭에 두고, 빼낸 결과만 입력창에 넣습니다"><input id="master_on" type="checkbox"> 원본 고정</label>
+  <button id="stage_toggle" type="button" aria-pressed="false" aria-controls="stage" title="크롭과 시점의 방향·높이를 그림으로 고릅니다. 켜면 그림이 맡는 칩은 숨깁니다">그림</button>
   <button id="edit_toggle" type="button" aria-pressed="false">배열 편집</button>
 </header>
 <div id="overrides">
-  <div class="quick"><span>크롭</span><div id="framing" class="chips" role="group" aria-label="크롭 덮어쓰기"></div></div>
-  <div class="quick"><span>시점</span><div id="view" class="chips multi" role="group" aria-label="시점 덮어쓰기(여러 개)"></div></div>
-  <div class="quick"><span>시선</span><div id="gaze" class="chips multi" role="group" aria-label="시선 덮어쓰기(여러 개)"></div></div>
-  <div class="quick"><span>포즈</span><div id="pose" class="chips multi" role="group" aria-label="포즈 덮어쓰기(여러 개)"></div></div>
+  <div id="stage" hidden></div>
+  <div id="quick_rows">
+    <div class="quick"><span>크롭</span><div id="framing" class="chips" role="group" aria-label="크롭 덮어쓰기"></div></div>
+    <div class="quick"><span>시점</span><div id="view" class="chips multi" role="group" aria-label="시점 덮어쓰기(여러 개)"></div></div>
+    <div class="quick"><span>시선</span><div id="gaze" class="chips multi" role="group" aria-label="시선 덮어쓰기(여러 개)"></div></div>
+    <div class="quick"><span>포즈</span><div id="pose" class="chips multi" role="group" aria-label="포즈 덮어쓰기(여러 개)"></div></div>
+  </div>
 </div>
 <div id="state" role="status">팩 읽는 중…</div>
 <div id="master_warning" role="status" hidden>입력창을 직접 고쳤습니다. 적용하면 그 변경은 사라집니다. 원본에 넣으려면 원본 탭의 입력창에서 가져오기를 누르세요.</div>

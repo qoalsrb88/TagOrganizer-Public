@@ -771,9 +771,40 @@ class ChipLayoutTests(unittest.TestCase):
 
     def test_old_packs_have_empty_layouts(self):
         data, _ = build()
-        del data["rules"]["quick"]["gaze_grid"], data["rules"]["quick"]["pose_groups"]
+        for key in ("gaze_grid", "pose_groups", "framing_frame", "view_dial"):
+            del data["rules"]["quick"][key]
         pal = core.palette(core.TagPack(data))
-        self.assertEqual((pal["gaze_grid"], pal["pose_groups"]), ([], []))
+        self.assertEqual((pal["gaze_grid"], pal["pose_groups"], pal["framing_frame"]), ([], [], {}))
+        self.assertEqual(pal["view_dial"], {"direction": [], "height": []})
+
+    def test_stage_covers_every_crop_and_the_camera_axes(self):
+        quick = tagdb.load_config()["rules"]["quick"]
+        self.assertEqual(sorted(quick["framing_frame"]), sorted(quick["framing"]))
+        dial = quick["view_dial"]
+        self.assertEqual([z["tag"] for z in dial["direction"]], ["front view", "three quarter view", "from side", "from behind"])
+        self.assertEqual([z["tag"] for z in dial["height"]], ["from below", "from above"])
+        self.assertEqual((dial["direction"][0]["from"], dial["direction"][-1]["to"]), (0, 180))
+        for a, b in zip(dial["direction"], dial["direction"][1:]):
+            self.assertEqual(a["to"], b["from"], (a, b))
+        # 정면 쪽 방향과 뒤는 부딪친다(다이얼에서 한쪽을 고르면 다른 쪽이 꺼짐)
+        self.assertIn("from behind", quick["view_conflicts"]["three quarter view"])
+        pal = core.palette(pack())
+        self.assertEqual(pal["framing_frame"]["lower body"], [0.48, 1])
+        self.assertEqual(pal["view_dial"]["height"][1], {"tag": "from above", "from": 20, "to": 90, "at": 50})
+
+    def test_builder_warns_about_bad_stage_data(self):
+        config = tagdb.load_config()
+        quick = config["rules"]["quick"]
+        quick["framing_frame"] = {**quick["framing_frame"], "portrait": [0.5, 0.2], "close up": [0, 0.2]}
+        quick["view_dial"] = {"direction": quick["view_dial"]["direction"] + [{"tag": "pov", "from": 170, "to": 200, "at": 180}],
+                              "height": quick["view_dial"]["height"] + [{"tag": "dutch angle", "from": 60, "to": 80, "at": 70}]}
+        _, warnings = build(config=config)
+        self.assertIn("rules.quick.framing_frame 'portrait' 의 범위 [0.5, 0.2] 가 0~1 안의 [위, 아래] 가 아닙니다", warnings)
+        self.assertIn("rules.quick.framing_frame 'close up' 는 framing 퀵 목록에 없습니다", warnings)
+        self.assertIn("rules.quick.view_dial.direction 'pov' 의 구간이 0~180 안의 from ≤ at ≤ to 가 아닙니다", warnings)
+        self.assertIn("rules.quick.view_dial.height 'dutch angle' 가 앞 구간과 겹칩니다", warnings)
+        _, clean = build()
+        self.assertFalse([w for w in clean if "framing_frame" in w or "view_dial" in w], clean)
 
 
 class GuessTests(unittest.TestCase):

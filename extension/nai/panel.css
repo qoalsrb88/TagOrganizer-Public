@@ -66,8 +66,11 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
   color: var(--accent-fg);
 }
 
-#overrides { padding: 6px 10px; border-bottom: 1px solid var(--line); }
-#overrides[hidden] { display: none; }
+/* 그림(#stage)과 칩 줄은 폭이 되면 나란히, 모자라면 그림이 위로 */
+#overrides { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 14px; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+#overrides[hidden], #stage[hidden], .quick[hidden], #stage_toggle[hidden] { display: none; }
+#quick_rows { flex: 1 1 320px; min-width: 0; }
+#stage_toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .quick { display: flex; gap: 8px; align-items: baseline; }
 .quick + .quick { margin-top: 4px; }
 .quick > span { flex: 0 0 auto; color: var(--muted); }
@@ -89,7 +92,38 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .gaze-grid .col-head, .gaze-grid .row-head { color: var(--muted); font-size: 11px; white-space: nowrap; }
 .gaze-grid .col-head { text-align: center; overflow: visible; display: flex; justify-content: center; }
 .gaze-grid .row-head { padding-right: 4px; cursor: help; }
-#overrides { container-type: inline-size; }
+#quick_rows { container-type: inline-size; }
+
+/* 크롭 틀·방향·높이 그림(editor/stage.js). 점선은 프롬프트에 든 지금 값, 채움은 덮어쓰기 */
+.qs { display: flex; gap: 12px; }
+.qs-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.qs-head { display: flex; align-items: center; gap: 4px; min-height: 20px; color: var(--muted); font-size: 11px; }
+.qs .qs-auto { padding: 0 8px; border-radius: 10px; font-size: 12px; }
+.qs .qs-auto[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.qs-dial-row { display: flex; gap: 4px; }
+.qs-svg { display: block; overflow: visible; touch-action: none; cursor: grab; border-radius: 4px; }
+.qs-crop-svg { cursor: ns-resize; }
+.qs-svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.qs-read { max-width: 136px; color: var(--muted); font-size: 11px; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.qs-crop .qs-read { max-width: 72px; }
+.qs-read.on { color: var(--accent); }
+.qs .hidden { display: none; }
+.qs-figure { fill: none; stroke: var(--muted); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; opacity: .55; }
+.qs-dim { fill: var(--bg); opacity: .72; }
+.qs-frame { fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.qs-frame.on { stroke: var(--accent); stroke-dasharray: none; }
+.qs-ghost { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 2; }
+.qs-handle { fill: var(--muted); }
+.qs-handle.on { fill: var(--accent); }
+.qs-track { fill: none; stroke: var(--line); stroke-width: 1; }
+.qs-zone { fill: transparent; stroke: var(--line-strong); stroke-width: .8; }
+.qs-zone:hover { fill: color-mix(in srgb, var(--accent) 14%, transparent); }
+.qs-zone.on { fill: color-mix(in srgb, var(--accent) 50%, transparent); stroke: var(--accent); }
+.qs-zone.det { fill: color-mix(in srgb, var(--muted) 18%, transparent); stroke: var(--muted); stroke-dasharray: 3 2; }
+.qs-zone.prompt { stroke: var(--muted); stroke-dasharray: 2 2; }
+.qs-subject { fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.qs-cam { fill: var(--bg); stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 2 2; }
+.qs-cam.on { fill: var(--accent); stroke: var(--accent); stroke-dasharray: none; }
 @container (max-width: 420px) { .gaze-grid .col-head { font-size: 10px; letter-spacing: -.5px; } }
 /* 좁으면 포즈 묶음 이름표가 한 줄을 더 쓰게 하므로 글은 숨기고 경계선만 둔다(이름은 마우스를 올리면 보인다) */
 @container (max-width: 719px) { .chip-group .group-label { padding-left: 3px; font-size: 0; } }

@@ -1663,6 +1663,8 @@ export function palette(pack) {
     gaze_grid: (quick.gaze_grid ?? []).map((col) =>
       Object.fromEntries(["label", "looking", "facing"].filter((key) => col[key]).map((key) => [key, col[key]]))),
     pose_groups: (quick.pose_groups ?? []).map((group) => ({ label: group.label ?? "", tags: [...(group.tags ?? [])] })),
+    framing_frame: Object.fromEntries(Object.entries(quick.framing_frame ?? {}).map(([tag, span]) => [tag, [...span]])),
+    view_dial: Object.fromEntries(["direction", "height"].map((axis) => [axis, (quick.view_dial?.[axis] ?? []).map((zone) => ({ ...zone }))])),
     layouts: Object.fromEntries(Object.entries(pack.layouts).map(([lid, lay]) => [lid, lay.label ?? lid])) };
 }
 

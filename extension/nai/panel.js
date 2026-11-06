@@ -4,6 +4,7 @@
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
 import { glyph } from "../editor/glyphs.js";
 import { Model, gazeToggle, poseToggle, splitItems, viewToggle } from "../editor/model.js";
+import { QuickStage, stageCovers } from "../editor/stage.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
 import { boxGroup, boxSettings, fieldText, masterDrift, masterOverrides, masterWouldOverwrite, optionsFor, sameLines, sourceText, tidyMasters } from "../engine/text.js";
@@ -12,6 +13,7 @@ const HOSTNAME = "novelai.net";
 const DRAFT_KEY = "nai_draft";
 const EDITING_KEY = "nai_editing";
 const SPLIT_KEY = "nai_editor_split";
+const STAGE_KEY = "nai_stage";
 const IMPORTED_PREFIX = "imported:";
 const UNDO_LIMIT = 100;
 const EDITOR_SIDE_FROM = 620;   // 이 폭부터 청크와 미리보기를 좌우로 놓는다
@@ -39,6 +41,9 @@ let boxes = [];
 let activeId = null;
 let result = null;              // 지금 보이는 정렬 결과 {box, output, unchanged}
 const overrides = {};           // 묶음별 크롭·시점·시선·포즈. 원본이 켜진 묶음만 저장한다(버튼 정렬에는 쓰지 않는다)
+let stage = null;               // 크롭 틀·방향·높이 그림(QuickStage). 켜면 그림이 맡는 칩을 숨긴다
+let stageOn = false;
+let staged = { framing: new Set(), view: new Set() };   // 그림이 맡는 태그
 let masters = {};               // 입력창 id 별 {on, text, lastApplied}
 let masterSaveTimer = 0;
 let mastersDirty = false;
@@ -182,6 +187,11 @@ function renderBoxButtons() {
   $("boxes").replaceChildren(...buttons);
 }
 
+// 켠 원본이 없는 묶음의 칩은 패널을 닫으면 잊는다
+function persistOverrides() {
+  if (Object.keys(masterOverrides(masters, overrides)).length) storeMasters();
+}
+
 function quickButton(className, tag, pressed, onClick) {
   const button = document.createElement("button");
   button.type = "button";
@@ -190,10 +200,25 @@ function quickButton(className, tag, pressed, onClick) {
   button.setAttribute("aria-pressed", String(pressed));
   button.addEventListener("click", () => {
     onClick();
-    // 켠 원본이 없는 묶음의 칩은 패널을 닫으면 잊는다
-    if (Object.keys(masterOverrides(masters, overrides)).length) storeMasters();
+    persistOverrides();
   });
   return button;
+}
+
+// 그림에서 바꾼 값. 칩과 같은 자리(지금 입력창 묶음의 덮어쓰기)에 쓴다
+function setOverride(name, value) {
+  const box = activeBox();
+  if (!box) return;
+  const group = boxGroup(box.kind);
+  overrides[group] = { ...overrides[group], [name]: value };
+  render();
+  persistOverrides();
+}
+
+function setStage(on) {
+  stageOn = on;
+  chrome.storage.local.set({ [STAGE_KEY]: on }).catch(() => {});
+  render();
 }
 
 // 퀵 칩. 태그 칩에는 그림을 붙이고(group 의 그림이 있으면), 자동 칩은 tag 가 비어 있다.
@@ -298,19 +323,31 @@ function renderView(group, lifted) {
     if (dropped.length) setNotice(`${dropped.join(", ")}: ${tag} 와 함께 쓸 수 없어 껐습니다. ${chipPalette.view_lift.join(", ")} 를 켜면 함께 고를 수 있습니다.`);
     set(next);
   };
-  const chips = quick.view.map((tag) => quickChip(tag, selected.includes(tag), () => toggle(tag), "view", tag));
+  // 그림을 켜면 다이얼이 맡는 시점(방향·높이)은 칩에서 뺀다
+  const chips = quick.view.filter((tag) => !(stageOn && staged.view.has(tag)))
+    .map((tag) => quickChip(tag, selected.includes(tag), () => toggle(tag), "view", tag));
   $("view").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
 }
 
-function renderOverrides(box, gazeBlocked = [], lifted = false, poseBlocked = []) {
+// present: 프롬프트에 원래 든 태그(넣은 태그 제외). 그림이 점선으로 보이는 '지금 값'이다
+function renderOverrides(box, gazeBlocked = [], lifted = false, poseBlocked = [], present = new Set()) {
   const group = boxGroup(box.kind);
   $("overrides").hidden = group === "uc";
+  $("stage_toggle").hidden = !stage || group === "uc";
+  $("stage_toggle").setAttribute("aria-pressed", String(stageOn));
+  $("stage").hidden = !stage || !stageOn;
+  if (stage && stageOn) {
+    stage.update({ framing: overrides[group]?.framing || "", view: splitItems(overrides[group]?.view), present, lifted });
+  }
   renderBlockable("gaze", gazeToggle, group, gazeBlocked);
   renderBlockable("pose", poseToggle, group, poseBlocked);
   renderView(group, lifted);
   for (const name of OVERRIDES) {
     const current = overrides[group]?.[name] || "";
-    const chips = [["", "자동"], ...quick[name].map((tag) => [tag, tag])].map(([value, label]) =>
+    // 그림을 켜면 틀이 맡는 크롭 칩은 숨기고(자동은 그림에 있다), 남는 칩이 없으면 줄째 숨긴다
+    const tags = quick[name].filter((tag) => !(stageOn && staged[name]?.has(tag)));
+    $(name).parentElement.hidden = stageOn && Boolean(stage) && !tags.length;
+    const chips = [["", "자동"], ...tags.map((tag) => [tag, tag])].map(([value, label]) =>
       quickChip(label, value === current, () => {
         overrides[group] = { ...overrides[group], [name]: value };
         render();
@@ -437,7 +474,8 @@ function render() {
   const unchanged = sameLines(box.text, sorted.text);
   result = { box, output: sorted.text, unchanged };
   renderMaster(box, sorted.text);
-  renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted, sorted.report.pose_blocked);
+  const present = new Set(sorted.report.tokens.filter((t) => t.kind === "tag" && t.key && !t.injected).map((t) => t.key));
+  renderOverrides(box, sorted.report.gaze_blocked, sorted.report.view_lifted, sorted.report.pose_blocked, present);
   renderChips(sorted.report);
   $("text").value = sorted.text;
   setState(stateLine(sorted.report, ms));
@@ -830,6 +868,7 @@ $("preset").addEventListener("change", () => {
   else changeBoxSetting({ preset: id });
 });
 $("edit_toggle").addEventListener("click", () => setEditing(!editing));
+$("stage_toggle").addEventListener("click", () => setStage(!stageOn));
 $("rules").addEventListener("change", () => changeBoxSetting({ rules: $("rules").value }));
 $("guess").addEventListener("change", () => changeBoxSetting({ guess: $("guess").checked }));
 $("master_on").addEventListener("change", () => {
@@ -916,7 +955,16 @@ try {
   pack = await loadPack();
   chipPalette = palette(pack);
   ({ quick } = chipPalette);
-  const saved = await chrome.storage.local.get([DRAFT_KEY, EDITING_KEY]);
+  const covers = stageCovers(chipPalette);
+  staged = { framing: new Set(covers.framing), view: new Set(covers.view) };
+  // 옛 팩처럼 그림이 맡는 태그가 없으면 그림 단추를 두지 않는다
+  if (covers.framing.length || covers.view.length) {
+    stage = new QuickStage({ palette: chipPalette, onFraming: (tag) => setOverride("framing", tag),
+      onView: (tags) => setOverride("view", tags.join(", ")) });
+    $("stage").replaceChildren(stage.root);
+  }
+  const saved = await chrome.storage.local.get([DRAFT_KEY, EDITING_KEY, STAGE_KEY]);
+  stageOn = Boolean(saved[STAGE_KEY]);
   draft = saved[DRAFT_KEY] || null;     // 저장하지 않고 닫은 변경을 잇는다
   render();
   if (saved[EDITING_KEY]) await setEditing(true);

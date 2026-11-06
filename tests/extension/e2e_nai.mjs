@@ -360,6 +360,58 @@ try {
   await sleep(100);
   check("포즈 자동으로 해제", !(await previewText(frame)).includes("standing"));
 
+  // 그림: 크롭 틀·방향·높이. 켜면 그림이 맡는 칩은 숨고, 그림에서 고른 값이 칩과 같은 덮어쓰기로 들어간다
+  const stageBox = async (selector) => {
+    const r = await inFrame(frame, `(() => { const r = document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect(); return [r.x, r.y]; })()`);
+    const offset = await frameOffset();
+    return [offset[0] + r[0], offset[1] + r[1]];
+  };
+  const mouseDrag = async (from, to, modifiers = 0) => {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: from[0], y: from[1], modifiers }, page);
+    await send("Input.dispatchMouseEvent", { type: "mousePressed", x: from[0], y: from[1], button: "left", clickCount: 1, buttons: 1, modifiers }, page);
+    for (const t of [0.25, 0.5, 0.75, 1]) {
+      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: from[0] + (to[0] - from[0]) * t, y: from[1] + (to[1] - from[1]) * t, button: "left", buttons: 1, modifiers }, page);
+      await sleep(30);
+    }
+    await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: to[0], y: to[1], button: "left", clickCount: 1, modifiers }, page);
+    await sleep(150);
+  };
+  check("그림 단추가 있고 처음엔 꺼져 있음", await inFrame(frame, "!document.getElementById('stage_toggle').hidden && document.getElementById('stage').hidden && document.getElementById('stage_toggle').getAttribute('aria-pressed') === 'false'"));
+  await clickInFrame(frame, "document.getElementById('stage_toggle')");
+  await sleep(150);
+  check("그림을 켜면 크롭 줄이 숨고 시점은 다이얼 밖 칩만", await inFrame(frame, "!document.getElementById('stage').hidden && document.getElementById('framing').parentElement.hidden && JSON.stringify([...document.querySelectorAll('#view button')].map((b) => b.dataset.tag)) === JSON.stringify(['', 'straight-on', 'profile', 'pov', 'dutch angle', 'multiple views'])"),
+    await inFrame(frame, "[...document.querySelectorAll('#view button')].map((b) => b.dataset.tag)"));
+  check("그림 켬을 기억", (await stored("nai_stage")) === true);
+  check("자동이면 프롬프트의 크롭을 점선으로", await inFrame(frame, "document.querySelector('.qs-crop .qs-read').textContent === 'upper body' && !document.querySelector('.qs-frame').classList.contains('on')"));
+  await inFrame(frame, "document.querySelector('.qs-crop-svg').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))");
+  await sleep(150);
+  preview = await previewText(frame);
+  check("크롭 틀을 키로 옮기면 덮어쓰기", preview.includes("cowboy shot") && !preview.includes("upper body"), preview);
+  check("고른 크롭은 틀이 채워짐", await inFrame(frame, "document.querySelector('.qs-frame').classList.contains('on') && document.querySelector('.qs-crop .qs-read').textContent === 'cowboy shot'"));
+  const dial = await stageBox(".qs-dir-svg");
+  await mouseDrag([dial[0] + 42 + 20, dial[1] + 42 + 20], [dial[0] + 42, dial[1] + 42 - 34]);
+  preview = await previewText(frame);
+  check("방향 다이얼을 뒤로 끌면 from behind", preview.includes("from behind"), preview);
+  const heightDial = await stageBox(".qs-height-svg");
+  const above = [heightDial[0] + 8 + 20, heightDial[1] + 42 - 20];
+  await mouseDrag(above, above);
+  preview = await previewText(frame);
+  check("높이 다이얼 위쪽을 누르면 from above, 방향은 남음", preview.includes("from above") && preview.includes("from behind"), preview);
+  await mouseDrag([dial[0] + 42 + 21, dial[1] + 42], [dial[0] + 42 + 21, dial[1] + 42], 2);
+  check("Ctrl 을 누르고 누르면 방향을 더함", await inFrame(frame, "document.querySelector('.qs-dials .qs-read').textContent === 'from side + from behind'"),
+    await inFrame(frame, "document.querySelector('.qs-dials .qs-read').textContent"));
+  await clickInFrame(frame, "document.querySelector('.qs-auto')");
+  await sleep(100);
+  check("그림의 자동으로 크롭 해제", (await previewText(frame)).includes("upper body"));
+  await clickInFrame(frame, "document.querySelector('#view button[data-tag=\"\"]')");
+  await sleep(100);
+  preview = await previewText(frame);
+  check("시점 자동 칩으로 다이얼 값도 해제", !preview.includes("from behind") && !preview.includes("from above"), preview);
+  await clickInFrame(frame, "document.getElementById('stage_toggle')");
+  await sleep(150);
+  check("그림을 끄면 칩이 돌아옴", await inFrame(frame, "document.getElementById('stage').hidden && !document.getElementById('framing').parentElement.hidden && document.querySelectorAll('#view button').length === 12"));
+  check("그림 끔을 기억", (await stored("nai_stage")) === false);
+
   // 구도 규칙·추정·프리셋: 입력창 묶음별로 저장
   await inFrame(frame, "(() => { const el = document.getElementById('rules'); el.value = 'off'; el.dispatchEvent(new Event('change')); })()");
   await sleep(150);
