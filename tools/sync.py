@@ -1,12 +1,14 @@
 """노드 팩 동기화 — 코어, 런타임 팩, 청크 편집기 모듈을 ComfyUI_BMK_Nodes 폴더에 복사한다.
 
-쓰는 파일은 아래 일곱 개뿐이고, 대상 폴더에서 아무것도 지우지 않는다.
+쓰는 파일은 아래 아홉 개뿐이고, 대상 폴더에서 아무것도 지우지 않는다.
     bmk_tag_organizer_core.py   → <노드 팩>/bmk_tag_organizer_core.py   (줄바꿈 LF 로 통일)
     build/tagpack.json.gz       → <노드 팩>/tag_organizer_data/tagpack.json.gz   (gzip 이 아니면 압축)
     extension/editor/editor.js  → <노드 팩>/js/tag_organizer/editor.js   (줄바꿈 LF 로 통일)
     extension/editor/model.js   → <노드 팩>/js/tag_organizer/model.js    (줄바꿈 LF 로 통일)
     extension/editor/glyphs.js  → <노드 팩>/js/tag_organizer/glyphs.js   (줄바꿈 LF 로 통일, 퀵 칩 그림)
     extension/editor/glyphs.json → <노드 팩>/js/tag_organizer/glyphs.json (줄바꿈 LF 로 통일, glyphs.js 가 import 하는 그림 데이터)
+    extension/editor/stage.js   → <노드 팩>/js/tag_organizer/stage.js    (줄바꿈 LF 로 통일, 퀵 세팅 그림: 크롭 틀·방향/높이 다이얼)
+    extension/editor/figure.js  → <노드 팩>/js/tag_organizer/figure.js   (줄바꿈 LF 로 통일, stage.js 가 import 하는 인형 계산)
     (생성)                       → <노드 팩>/tag_organizer_data/pack_info.json
 
 ComfyUI 는 js/ 아래의 .js 를 전부 확장으로 import 하므로, 편집기 모듈은 import 만으로 아무 일도 하지 않아야 한다.
@@ -44,7 +46,8 @@ INFO_FORMAT = "tagorg-pack-info"
 PACKAGE_MARKER = "ComfyUI_BMK_Nodes"
 EDITOR_SRC = "extension/editor"             # 정본 저장소 안의 위치
 EDITOR_REL = "js/tag_organizer"             # 노드 팩 안의 위치
-EDITOR_FILES = ("editor.js", "model.js", "glyphs.js", "glyphs.json")    # glyphs.js 는 옆의 glyphs.json 을 import 한다
+# 상대 import 가 이 목록 안에서 풀려야 한다: glyphs.js → glyphs.json, stage.js → figure.js·model.js
+EDITOR_FILES = ("editor.js", "model.js", "glyphs.js", "glyphs.json", "stage.js", "figure.js")
 TEXT_FILES = frozenset({CORE_REL, *(f"{EDITOR_REL}/{name}" for name in EDITOR_FILES)})   # 줄바꿈을 LF 로 맞춰 쓰고 비교하는 파일
 REPO_ROOT = Path(__file__).resolve().parent.parent
 _SHA256 = re.compile(r"[0-9a-f]{64}")

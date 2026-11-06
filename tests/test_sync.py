@@ -6,6 +6,7 @@ import contextlib
 import gzip
 import io
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -64,7 +65,7 @@ class SyncTests(unittest.TestCase):
         self.assertIn("kneeling", info["quick"]["pose"])
         self.assertEqual(info["files"][sync.PACK_REL], sync.sha256_bytes(self.pack.read_bytes()))
         self.assertEqual(list(self.target.rglob("*.sync-tmp")), [])
-        self.assertEqual(set(sync.EDITOR_FILES), {"editor.js", "model.js", "glyphs.js", "glyphs.json"})
+        self.assertEqual(set(sync.EDITOR_FILES), {"editor.js", "model.js", "glyphs.js", "glyphs.json", "stage.js", "figure.js"})
         for source in sync.EDITOR_FILES:
             rel = f"{sync.EDITOR_REL}/{source}"
             expected = (ROOT / sync.EDITOR_SRC / source).read_bytes().replace(b"\r\n", b"\n")
@@ -81,6 +82,20 @@ class SyncTests(unittest.TestCase):
                                 encoding="utf-8", errors="replace", timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "[28,28]")
+
+    @unittest.skipUnless(shutil.which("node"), "Node 가 없음")
+    def test_synced_stage_module_loads_its_imports(self):
+        """노드 팩에 복사한 stage.js 가 옆의 figure.js·model.js 를 읽는다."""
+        self.run_sync()
+        url = (self.target / sync.EDITOR_REL / "stage.js").as_uri()
+        palette = {"quick": {"framing": ["upper body", "portrait"], "view": ["from above", "pov"]},
+                   "framing_frame": {"upper body": [0, 0.5]},
+                   "view_dial": {"height": [{"tag": "from above", "from": 20, "to": 90, "at": 45}]}}
+        script = f"const m = await import({json.dumps(url)}); console.log(JSON.stringify(m.stageCovers({json.dumps(palette)})));"
+        result = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {"framing": ["upper body"], "view": ["from above"]})
 
     def test_second_sync_is_noop(self):
         self.run_sync()
@@ -202,7 +217,7 @@ class SyncTests(unittest.TestCase):
         self.assertFalse((self.target / sync.CORE_REL).exists())          # 충돌이 있으면 다른 파일도 쓰지 않는다
 
     def test_missing_editor_is_rejected_before_writing(self):
-        for name in ("model.js", "glyphs.js", "glyphs.json"):
+        for name in ("model.js", "glyphs.js", "glyphs.json", "stage.js", "figure.js"):
             with self.subTest(name=name):
                 repo = self.editor_copy()
                 (repo / sync.EDITOR_SRC / name).unlink()
@@ -211,17 +226,19 @@ class SyncTests(unittest.TestCase):
                 self.assertEqual(sorted(p.name for p in self.target.iterdir()), ["__init__.py"])
                 shutil.rmtree(repo)
 
-    def test_glyphs_added_to_older_sync_is_created(self):
-        """그림 모듈이 없던 노드 팩에 다시 동기화하면 glyphs.js 만 새로 생기고 나머지는 그대로다."""
+    def test_modules_added_to_older_sync_are_created(self):
+        """새 모듈이 없던 노드 팩에 다시 동기화하면 그 모듈만 새로 생기고 나머지는 그대로다."""
         self.run_sync()
-        glyphs_rel = f"{sync.EDITOR_REL}/glyphs.js"
-        (self.target / glyphs_rel).unlink()
+        added = [f"{sync.EDITOR_REL}/{name}" for name in ("glyphs.js", "stage.js", "figure.js")]
         info_path = self.target / sync.INFO_REL
         info = json.loads(info_path.read_text(encoding="utf-8"))
-        del info["files"][glyphs_rel]
+        for rel in added:
+            (self.target / rel).unlink()
+            del info["files"][rel]
         info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         states = self.run_sync()
-        self.assertEqual(states[glyphs_rel], "create")
+        for rel in added:
+            self.assertEqual(states[rel], "create")
         self.assertEqual(states[self.editor_rel], "unchanged")
         self.assertEqual(states[sync.CORE_REL], "unchanged")
         self.assertEqual(states[sync.INFO_REL], "update")
@@ -299,6 +316,17 @@ class SyncTests(unittest.TestCase):
 
 
 class EditorModuleTests(unittest.TestCase):
+    def test_relative_imports_are_synced(self):
+        """편집기 모듈이 상대 경로로 import 하는 파일은 모두 함께 복사한다(빠지면 노드 어댑터 전체가 로드되지 않는다)."""
+        pattern = re.compile(r"""\bfrom\s+["']\./([^"']+)["']""")
+        for name in sync.EDITOR_FILES:
+            if not name.endswith(".js"):
+                continue
+            text = (ROOT / sync.EDITOR_SRC / name).read_text(encoding="utf-8")
+            for target in pattern.findall(text):
+                with self.subTest(module=name, imports=target):
+                    self.assertIn(target, sync.EDITOR_FILES)
+
     @unittest.skipUnless(shutil.which("node"), "Node 가 없음")
     def test_import_does_nothing(self):
         """ComfyUI 가 js/ 아래 .js 를 전부 import 하므로 두 모듈은 import 만으로 아무 일도 하지 않아야 한다."""
