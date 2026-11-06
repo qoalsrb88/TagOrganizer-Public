@@ -304,15 +304,20 @@ try {
   await sleep(100);
   check("자동으로 돌리면 덮어쓰기 해제", (await previewText(frame)).includes("upper body"));
 
-  // 시선 덮어쓰기: 여러 개, 함께 못 쓰는 태그는 꺼지고, 시점이 막는 태그는 사라진다
-  const gazeChip = (text) => `[...document.querySelectorAll('#gaze button')].find((b) => b.textContent === '${text}')`;
+  check("크롭·시점 칩에 그림", await inFrame(frame, "['framing', 'view'].every((id) => [...document.querySelectorAll(`#${id} .chip:not(.auto)`)].every((b) => b.querySelector('svg.glyph')))"));
+
+  // 시선 덮어쓰기: 여러 개, 함께 못 쓰는 태그는 꺼지고, 시점이 막는 태그는 사라진다. 칩은 방향 × looking·facing 격자
+  const tagButton = (id, text) => `[...document.querySelectorAll('#${id} button')].find((b) => b.dataset.tag === '${text}' || b.textContent === '${text}')`;
+  const gazeChip = (text) => tagButton("gaze", text);
   const pressed = (text) => inFrame(frame, `${gazeChip(text)}?.getAttribute('aria-pressed') === 'true'`);
+  check("시선 격자는 9 방향 × 2 행, 칸마다 그림", await inFrame(frame, "document.querySelectorAll('#gaze .gaze-grid .col-head').length === 9 && document.querySelectorAll('#gaze .gaze-grid .cell svg.glyph').length === 15 && document.querySelectorAll('#gaze .gaze-grid .empty').length === 3"));
   await clickInFrame(frame, gazeChip("looking back"));
   await sleep(100);
   await clickInFrame(frame, gazeChip("looking at viewer"));
   await sleep(100);
   preview = await previewText(frame);
   check("시선을 여러 개 고름", preview.includes("looking back") && preview.includes("looking at viewer"), preview);
+  check("격자 옆에 고른 시선 이름", await inFrame(frame, "document.querySelector('#gaze .picked')?.textContent === 'looking at viewer, looking back'"));
   await clickInFrame(frame, gazeChip("facing away"));
   await sleep(100);
   check("함께 못 쓰는 시선은 꺼짐", (await pressed("facing away")) && !(await pressed("looking back")));
@@ -331,8 +336,9 @@ try {
   check("시선 자동으로 해제", !(await previewText(frame)).includes("looking back"));
 
   // 포즈 덮어쓰기: 여러 개, 몸이 동시에 못 하는 자세는 꺼지고, 얼굴 크롭에서는 사라진다
-  const poseChip = (text) => `[...document.querySelectorAll('#pose button')].find((b) => b.textContent === '${text}')`;
+  const poseChip = (text) => tagButton("pose", text);
   const posePressed = (text) => inFrame(frame, `${poseChip(text)}?.getAttribute('aria-pressed') === 'true'`);
+  check("포즈 칩은 자세 묶음 5개, 칩마다 그림", await inFrame(frame, "document.querySelectorAll('#pose .chip-group').length === 5 && [...document.querySelectorAll('#pose .chip-group .chip')].length === 17 && [...document.querySelectorAll('#pose .chip:not(.auto)')].every((b) => b.querySelector('svg.glyph'))"));
   await clickInFrame(frame, poseChip("lying"));
   await sleep(100);
   await clickInFrame(frame, poseChip("on back"));
@@ -344,7 +350,7 @@ try {
   check("함께 못 하는 포즈는 꺼짐", (await posePressed("standing")) && !(await posePressed("lying")) && !(await posePressed("on back")));
   await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === 'portrait')");
   await sleep(100);
-  check("얼굴 크롭이면 포즈 칩이 사라짐", await inFrame(frame, `!${poseChip("standing")}`));
+  check("얼굴 크롭이면 포즈 칩이 사라짐", await inFrame(frame, `!${poseChip("standing")} && !document.querySelector('#pose .chip-group')`));
   check("고른 포즈가 모두 막히면 자동으로 보임", await posePressed("자동"));
   check("막힌 포즈는 프롬프트에 넣지 않음", !(await previewText(frame)).includes("standing"));
   await clickInFrame(frame, "[...document.querySelectorAll('#framing button')].find((b) => b.textContent === '자동')");
@@ -531,7 +537,8 @@ try {
   check("처음 켜면 입력창으로 원본을 채움", (await masterText()) === masterPrompt);
   check("켜면 원본 탭이 생기고 칸은 탭 안에 있음", await inFrame(frame, "!document.getElementById('show_master').hidden && document.getElementById('master_body').hidden && !document.getElementById('chips').hidden"));
   await clickInFrame(frame, "document.getElementById('show_master')");
-  check("원본 탭은 미리보기 자리를 쓰고 가져오기가 보임", await inFrame(frame, "!document.getElementById('master_body').hidden && document.getElementById('chips').hidden && !document.getElementById('master_import').hidden && document.getElementById('master_text').getBoundingClientRect().height > 100"));
+  check("원본 탭은 미리보기 자리를 쓰고 가져오기가 보임", await inFrame(frame, "!document.getElementById('master_body').hidden && document.getElementById('chips').hidden && !document.getElementById('master_import').hidden && document.getElementById('master_text').getBoundingClientRect().height > 100"),
+    await inFrame(frame, "JSON.stringify({ win: innerHeight, w: innerWidth, ...Object.fromEntries(['overrides', 'preview', 'master_text', 'master_import', 'views', 'state'].map((id) => [id, Math.round(document.getElementById(id).getBoundingClientRect().height)])), header: Math.round(document.querySelector('header').getBoundingClientRect().height), footer: Math.round(document.querySelector('footer').getBoundingClientRect().height) })"));
   await screenshot("nai_master_tab.png");
   await clickInFrame(frame, "document.getElementById('show_chips')");
   await clickInFrame(frame, viewChip("straight-on"));

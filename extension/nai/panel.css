@@ -71,9 +71,30 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 .quick { display: flex; gap: 8px; align-items: baseline; }
 .quick + .quick { margin-top: 4px; }
 .quick > span { flex: 0 0 auto; color: var(--muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 3px; }
+.chips { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
 .chips button { padding: 0 8px; border-radius: 10px; font-size: 12px; }
-.chips.multi button[aria-pressed="true"]:not(:first-child)::before { content: "✓ "; }
+.chips .chip { display: inline-flex; align-items: center; gap: 2px; }
+.chips .chip:has(.glyph) { padding-left: 4px; }
+.chips .chip .glyph { flex: 0 0 auto; }
+/* 여러 개 고르는 줄에서 그림이 없는 칩은 눌림을 ✓ 로도 보인다(그림 칩에 ✓ 까지 붙이면 너무 빽빽하다) */
+.chips.multi .chip:not(.auto):not(:has(.glyph))[aria-pressed="true"]::before { content: "✓"; }
+/* 묶음은 칩과 함께 흘러(줄을 아끼려고) 이름표가 앞 묶음과의 경계가 된다 */
+.chip-group { display: contents; }
+.chip-group .group-head { display: inline-flex; align-items: center; gap: 3px; }
+.chip-group .group-label { margin-left: 3px; padding-left: 6px; border-left: 1px solid var(--line-strong); color: var(--muted); font-size: 11px; }
+.picked { flex: 1 1 90px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+/* 고정 폭 열(가장 좁은 붙인 패널에서도 한 줄). 열 머리 글자는 칸보다 조금 넓으면 사이 여백으로 넘친다 */
+.gaze-grid { flex: 0 1 auto; min-width: 0; display: grid; grid-template-columns: max-content repeat(var(--cols), minmax(26px, 36px)); gap: 2px 3px; align-items: center; }
+.gaze-grid .corner { padding-right: 4px; }
+.gaze-grid .col-head, .gaze-grid .row-head { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.gaze-grid .col-head { text-align: center; overflow: visible; display: flex; justify-content: center; }
+.gaze-grid .row-head { padding-right: 4px; cursor: help; }
+#overrides { container-type: inline-size; }
+@container (max-width: 420px) { .gaze-grid .col-head { font-size: 10px; letter-spacing: -.5px; } }
+/* 좁으면 포즈 묶음 이름표가 한 줄을 더 쓰게 하므로 글은 숨기고 경계선만 둔다(이름은 마우스를 올리면 보인다) */
+@container (max-width: 719px) { .chip-group .group-label { padding-left: 3px; font-size: 0; } }
+.gaze-grid .cell { display: flex; align-items: center; justify-content: center; height: 24px; padding: 0; border-radius: 6px; }
+.gaze-grid .empty { height: 24px; }
 
 #master[hidden], #master_body[hidden], #master_warning[hidden], #show_master[hidden], #show_text[hidden], #generate[hidden] { display: none; }
 #master_body { display: flex; flex-direction: column; gap: 6px; height: 100%; }

@@ -2,6 +2,7 @@
 // 페이지는 이 iframe 안을 볼 수 없다. 패널을 닫으면 프레임째 사라져 팩이 차지한 메모리도 돌아간다.
 
 import { ArrangementEditor, el, field, openDialog, textInput } from "../editor/editor.js";
+import { glyph } from "../editor/glyphs.js";
 import { Model, gazeToggle, poseToggle, splitItems, viewToggle } from "../editor/model.js";
 import { arrangementFromLayout, organize, palette, warningText } from "../engine/core.js";
 import { listPresets, loadBoxSettings, loadImported, loadMasters, loadMasterOverrides, loadPack, loadSettings, putImported, saveBoxSetting, saveMasters } from "../engine/store.js";
@@ -30,7 +31,7 @@ const $ = (id) => document.getElementById(id);
 
 let pack = null;
 let quick = { framing: [], view: [], gaze: [], pose: [] };
-let chipPalette = { quick, gaze_conflicts: {}, pose_conflicts: {}, view_conflicts: {}, view_lift: [] };
+let chipPalette = { quick, gaze_conflicts: {}, pose_conflicts: {}, view_conflicts: {}, view_lift: [], gaze_grid: [], pose_groups: [] };
 let settings = null;
 let stored = {};
 let presets = [];
@@ -181,18 +182,91 @@ function renderBoxButtons() {
   $("boxes").replaceChildren(...buttons);
 }
 
-const quickChip = (label, pressed, onClick) => {
-  const chip = document.createElement("button");
-  chip.type = "button";
-  chip.textContent = label;
-  chip.setAttribute("aria-pressed", String(pressed));
-  chip.addEventListener("click", () => {
+function quickButton(className, tag, pressed, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = className;
+  button.dataset.tag = tag;
+  button.setAttribute("aria-pressed", String(pressed));
+  button.addEventListener("click", () => {
     onClick();
     // 켠 원본이 없는 묶음의 칩은 패널을 닫으면 잊는다
     if (Object.keys(masterOverrides(masters, overrides)).length) storeMasters();
   });
+  return button;
+}
+
+// 퀵 칩. 태그 칩에는 그림을 붙이고(group 의 그림이 있으면), 자동 칩은 tag 가 비어 있다.
+const quickChip = (label, pressed, onClick, group = "", tag = "") => {
+  const chip = quickButton(tag ? "chip" : "chip auto", tag, pressed, onClick);
+  const icon = tag && glyph(group, tag, { size: group === "pose" ? 18 : 16 });
+  if (icon) chip.append(icon);
+  chip.append(label);
   return chip;
 };
+
+const span = (className, text = "") => {
+  const node = document.createElement("span");
+  node.className = className;
+  node.textContent = text;
+  return node;
+};
+
+// 시선 격자: 열은 방향, 행은 looking(눈이 보임)·facing(눈을 감거나 가림). 자동 칩은 격자 왼쪽 위 모서리에 둔다.
+// 칸에는 그림만 있으니 고른 태그 이름을 격자 옆에 글로 보인다. 격자에 없는 퀵 태그는 뒤에 보통 칩으로 둔다.
+// 막힌 태그 칸은 비워 자리만 지킨다.
+function gazeLayout(tags, selected, chipFor, shown, press, autoChip) {
+  const grid = chipPalette.gaze_grid ?? [];
+  const placed = new Set(grid.flatMap((col) => [col.looking, col.facing]).filter(Boolean));
+  const rest = tags.filter((tag) => !placed.has(tag) && shown(tag)).map(chipFor);
+  if (!grid.length) return [autoChip, ...rest];
+  const table = document.createElement("div");
+  table.className = "gaze-grid";
+  table.style.setProperty("--cols", String(grid.length));
+  const corner = span("corner");
+  corner.append(autoChip);
+  table.append(corner, ...grid.map((col) => span("col-head", col.label)));
+  for (const [row, title] of [["looking", "looking: 눈이 보일 때"], ["facing", "facing: 눈을 감거나 가렸을 때"]]) {
+    const head = span("row-head", row);
+    head.title = title;
+    table.append(head);
+    for (const col of grid) {
+      const tag = col[row];
+      if (!tag || !tags.includes(tag) || !shown(tag)) {
+        table.append(span("empty"));
+        continue;
+      }
+      const cell = quickButton("cell", tag, selected.includes(tag), () => press(tag));
+      cell.title = `${tag} (${col.label})`;
+      cell.setAttribute("aria-label", tag);
+      cell.append(glyph("gaze", tag, { size: 18 }) ?? tag);
+      table.append(cell);
+    }
+  }
+  return [table, span("picked", selected.filter(shown).join(", ")), ...rest];
+}
+
+// 포즈 묶음: 자세별로 칩을 모은다. 묶음 이름표는 첫 칩과 붙여 줄 끝에 혼자 남지 않게 한다.
+// 묶음 안이 모두 막히면 묶음째 숨기고, 묶음에 없는 퀵 태그는 뒤에 둔다.
+function poseLayout(tags, chipFor, shown) {
+  const groups = chipPalette.pose_groups ?? [];
+  const placed = new Set(groups.flatMap((g) => g.tags));
+  const out = [];
+  for (const g of groups) {
+    const [first, ...chips] = g.tags.filter((tag) => tags.includes(tag) && shown(tag)).map(chipFor);
+    if (!first) continue;
+    const box = span("chip-group");
+    box.setAttribute("role", "group");
+    box.setAttribute("aria-label", g.label);
+    const head = span("group-head");
+    const label = span("group-label", g.label);
+    label.title = g.label;
+    head.append(label, first);
+    box.append(head, ...chips);
+    out.push(box);
+  }
+  return [...out, ...tags.filter((tag) => !placed.has(tag) && shown(tag)).map(chipFor)];
+}
 
 // 시선·포즈는 여러 개를 고른다. 지금 크롭·시점이 막는 태그는 숨기되 선택은 두어, 크롭·시점을 되돌리면 다시 든다.
 function renderBlockable(name, toggle, group, blocked) {
@@ -201,11 +275,13 @@ function renderBlockable(name, toggle, group, blocked) {
     overrides[group] = { ...overrides[group], [name]: tags.join(", ") };
     render();
   };
-  const chips = quick[name].filter((tag) => !blocked.includes(tag)).map((tag) =>
-    quickChip(tag, selected.includes(tag), () => set(toggle(chipPalette, selected, tag))));
+  const shown = (tag) => !blocked.includes(tag);
+  const press = (tag) => set(toggle(chipPalette, selected, tag));
+  const chipFor = (tag) => quickChip(tag, selected.includes(tag), () => press(tag), name, tag);
   // 고른 것이 모두 막히면 프롬프트 그대로이므로 자동으로 보인다
-  const auto = !selected.some((tag) => !blocked.includes(tag));
-  $(name).replaceChildren(quickChip("자동", auto, () => set([])), ...chips);
+  const autoChip = quickChip("자동", !selected.some(shown), () => set([]));
+  $(name).replaceChildren(...(name === "gaze" ? gazeLayout(quick[name], selected, chipFor, shown, press, autoChip)
+    : [autoChip, ...poseLayout(quick[name], chipFor, shown)]));
   $(name).parentElement.hidden = !quick[name].length;
 }
 
@@ -222,7 +298,7 @@ function renderView(group, lifted) {
     if (dropped.length) setNotice(`${dropped.join(", ")}: ${tag} 와 함께 쓸 수 없어 껐습니다. ${chipPalette.view_lift.join(", ")} 를 켜면 함께 고를 수 있습니다.`);
     set(next);
   };
-  const chips = quick.view.map((tag) => quickChip(tag, selected.includes(tag), () => toggle(tag)));
+  const chips = quick.view.map((tag) => quickChip(tag, selected.includes(tag), () => toggle(tag), "view", tag));
   $("view").replaceChildren(quickChip("자동", !selected.length, () => set([])), ...chips);
 }
 
@@ -238,7 +314,7 @@ function renderOverrides(box, gazeBlocked = [], lifted = false, poseBlocked = []
       quickChip(label, value === current, () => {
         overrides[group] = { ...overrides[group], [name]: value };
         render();
-      }));
+      }, name, value));
     $(name).replaceChildren(...chips);
   }
 }

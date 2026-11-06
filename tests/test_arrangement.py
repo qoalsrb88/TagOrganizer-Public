@@ -743,6 +743,39 @@ class PoseTests(unittest.TestCase):
             self.assertNotIn(tag, quick["pose_scope"]["tags"])
 
 
+class ChipLayoutTests(unittest.TestCase):
+    def test_grid_and_groups_place_each_quick_tag_once(self):
+        quick = tagdb.load_config()["rules"]["quick"]
+        grid = quick["gaze_grid"]
+        self.assertEqual(sorted(t for col in grid for t in (col.get("looking"), col.get("facing")) if t), sorted(quick["gaze"]))
+        for col in grid:
+            self.assertTrue(col["label"], col)
+            self.assertTrue(col.get("looking") or col.get("facing"), col)
+            self.assertFalse((col.get("looking") or "").startswith("facing"), col)
+            self.assertTrue((col.get("facing") or "facing").startswith("facing"), col)
+        groups = quick["pose_groups"]
+        self.assertEqual([t for g in groups for t in g["tags"]], quick["pose"])
+        self.assertTrue(all(g["label"] for g in groups))
+
+    def test_builder_warns_about_misplaced_layout_tags(self):
+        config = tagdb.load_config()
+        quick = config["rules"]["quick"]
+        quick["gaze_grid"] = quick["gaze_grid"] + [{"label": "x", "looking": "looking at viewer", "facing": "facing nowhere"}]
+        quick["pose_groups"] = quick["pose_groups"] + [{"label": "y", "tags": ["flying"]}]
+        _, warnings = build(config=config)
+        self.assertIn("rules.quick.gaze_grid 'looking at viewer' 가 두 번 나옵니다", warnings)
+        self.assertIn("rules.quick.gaze_grid 'facing nowhere' 는 gaze 퀵 목록에 없습니다", warnings)
+        self.assertIn("rules.quick.pose_groups 'flying' 는 pose 퀵 목록에 없습니다", warnings)
+        _, clean = build()
+        self.assertFalse([w for w in clean if "gaze_grid" in w or "pose_groups" in w], clean)
+
+    def test_old_packs_have_empty_layouts(self):
+        data, _ = build()
+        del data["rules"]["quick"]["gaze_grid"], data["rules"]["quick"]["pose_groups"]
+        pal = core.palette(core.TagPack(data))
+        self.assertEqual((pal["gaze_grid"], pal["pose_groups"]), ([], []))
+
+
 class GuessTests(unittest.TestCase):
     def test_off_by_default(self):
         r = run("holding chainsword, silky long hair")
@@ -833,6 +866,8 @@ class PaletteTests(unittest.TestCase):
         self.assertIn("from behind", pal["quick"]["view"])
         self.assertIn("looking back", pal["quick"]["gaze"])
         self.assertIn("facing back", pal["gaze_conflicts"]["looking back"])
+        self.assertIn({"label": "곁눈", "looking": "sideways glance"}, pal["gaze_grid"])
+        self.assertEqual(pal["pose_groups"][0], {"label": "서기", "tags": ["standing", "standing on one leg", "contrapposto"]})
         self.assertIn("default", pal["layouts"])
         self.assertEqual(core.selector_label("subject/count", pack().taxonomy), "인원")
         self.assertEqual(core.selector_label("clothes", pack().taxonomy), "의상")

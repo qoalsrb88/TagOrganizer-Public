@@ -437,7 +437,8 @@ class TextHelpersTest(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "node 가 없음")
     def test_node_suite(self):
         result = subprocess.run(["node", "--test", str(ROOT / "tests" / "extension" / "text.test.mjs"),
-                                 str(ROOT / "tests" / "extension" / "model.test.mjs")],
+                                 str(ROOT / "tests" / "extension" / "model.test.mjs"),
+                                 str(ROOT / "tests" / "extension" / "glyphs.test.mjs")],
                                 capture_output=True, encoding="utf-8", timeout=120)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 

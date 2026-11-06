@@ -307,6 +307,15 @@ def build_pack(
             for name in (tag, *others):
                 if name not in quick.get(group, ()):
                     warnings.append(f"rules.quick.{group}_conflicts '{name}' 는 {title} 퀵 목록에 없습니다")
+    # 칩 모양(시선 격자·포즈 묶음)은 퀵 목록의 태그를 한 번씩만 놓는다
+    placed = {"gaze": [tag for col in quick.get("gaze_grid", ()) for tag in (col.get("looking"), col.get("facing")) if tag],
+              "pose": [tag for grp in quick.get("pose_groups", ()) for tag in grp.get("tags", ())]}
+    for group, where in (("gaze", "gaze_grid"), ("pose", "pose_groups")):
+        for tag in sorted({t for t in placed[group] if placed[group].count(t) > 1}):
+            warnings.append(f"rules.quick.{where} '{tag}' 가 두 번 나옵니다")
+        for tag in placed[group]:
+            if tag not in quick.get(group, ()):
+                warnings.append(f"rules.quick.{where} '{tag}' 는 {group} 퀵 목록에 없습니다")
     pose_scope = (quick.get("pose_scope") or {}).get("tags", ())
     _check_rule_tags("rules.quick.pose_scope", pose_scope, rows, aliases, warnings)
     for tag in pose_scope:

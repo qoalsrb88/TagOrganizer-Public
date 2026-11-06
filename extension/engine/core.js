@@ -1660,6 +1660,9 @@ export function palette(pack) {
     pose_conflicts: Object.fromEntries(Object.entries(quick.pose_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
     view_conflicts: Object.fromEntries(Object.entries(quick.view_conflicts ?? {}).map(([tag, others]) => [tag, [...others]])),
     view_lift: [...(quick.view_lift ?? [])],
+    gaze_grid: (quick.gaze_grid ?? []).map((col) =>
+      Object.fromEntries(["label", "looking", "facing"].filter((key) => col[key]).map((key) => [key, col[key]]))),
+    pose_groups: (quick.pose_groups ?? []).map((group) => ({ label: group.label ?? "", tags: [...(group.tags ?? [])] })),
     layouts: Object.fromEntries(Object.entries(pack.layouts).map(([lid, lay]) => [lid, lay.label ?? lid])) };
 }
 
