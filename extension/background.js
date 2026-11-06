@@ -8,21 +8,42 @@ const ROOT_MENU = "tagorg";
 const PRESET_PREFIX = "preset|";
 const PANEL_MENU = "panel";
 
-async function rebuildMenus() {
-  await chrome.contextMenus.removeAll();
-  const contexts = ["editable"];
-  chrome.contextMenus.create({ id: ROOT_MENU, title: "프롬프트 정렬", contexts });
-  let presets = [];
+// create 는 콜백으로 lastError 를 읽어야 "Unchecked runtime.lastError" 로 남지 않는다.
+const addMenu = (item) =>
+  new Promise((resolve) => {
+    chrome.contextMenus.create(item, () => {
+      if (chrome.runtime.lastError) console.warn(chrome.runtime.lastError.message);
+      resolve();
+    });
+  });
+
+async function buildMenus() {
+  let presets = null;
+  let failure = null;
   try {
     presets = await listPresets();
   } catch (e) {
-    chrome.contextMenus.create({ id: PANEL_MENU, parentId: ROOT_MENU, title: "자료가 없습니다 — 설정 열기", contexts });
-    console.error(e);
+    failure = e;
+  }
+  // 목록을 다 읽은 뒤에 지우고 만든다. 그 사이에 기다리면 다른 재구성이 끼어들어 같은 id 를 두 번 만든다.
+  await chrome.contextMenus.removeAll();
+  const contexts = ["editable"];
+  await addMenu({ id: ROOT_MENU, title: "프롬프트 정렬", contexts });
+  if (failure) {
+    await addMenu({ id: PANEL_MENU, parentId: ROOT_MENU, title: "자료가 없습니다 — 설정 열기", contexts });
+    console.error(failure);
     return;
   }
   for (const preset of presets) {
-    chrome.contextMenus.create({ id: PRESET_PREFIX + preset.id, parentId: ROOT_MENU, title: preset.label, contexts });
+    await addMenu({ id: PRESET_PREFIX + preset.id, parentId: ROOT_MENU, title: preset.label, contexts });
   }
+}
+
+// 설치·시작·가져오기 변경이 겹쳐 불려도 한 번에 하나씩 차례로 만든다.
+let menuQueue = Promise.resolve();
+function rebuildMenus() {
+  menuQueue = menuQueue.then(buildMenus).catch((e) => console.error(e));
+  return menuQueue;
 }
 
 const inFrames = (tabId, frameIds, details) =>
