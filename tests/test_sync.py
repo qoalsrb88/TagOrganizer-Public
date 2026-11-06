@@ -64,7 +64,9 @@ class SyncTests(unittest.TestCase):
         self.assertIn("kneeling", info["quick"]["pose"])
         self.assertEqual(info["files"][sync.PACK_REL], sync.sha256_bytes(self.pack.read_bytes()))
         self.assertEqual(list(self.target.rglob("*.sync-tmp")), [])
-        for rel, source in ((self.editor_rel, "editor.js"), (self.model_rel, "model.js")):
+        self.assertEqual(set(sync.EDITOR_FILES), {"editor.js", "model.js", "glyphs.js"})
+        for source in sync.EDITOR_FILES:
+            rel = f"{sync.EDITOR_REL}/{source}"
             expected = (ROOT / sync.EDITOR_SRC / source).read_bytes().replace(b"\r\n", b"\n")
             self.assertEqual((self.target / rel).read_bytes(), expected)
             self.assertEqual(info["files"][rel], sync.sha256_bytes(expected))
@@ -189,11 +191,29 @@ class SyncTests(unittest.TestCase):
         self.assertFalse((self.target / sync.CORE_REL).exists())          # 충돌이 있으면 다른 파일도 쓰지 않는다
 
     def test_missing_editor_is_rejected_before_writing(self):
-        repo = self.editor_copy()
-        (repo / sync.EDITOR_SRC / "model.js").unlink()
-        with self.assertRaises(sync.SyncError):
-            self.run_sync(editor_repo=repo)
-        self.assertEqual(sorted(p.name for p in self.target.iterdir()), ["__init__.py"])
+        for name in ("model.js", "glyphs.js"):
+            with self.subTest(name=name):
+                repo = self.editor_copy()
+                (repo / sync.EDITOR_SRC / name).unlink()
+                with self.assertRaises(sync.SyncError):
+                    self.run_sync(editor_repo=repo)
+                self.assertEqual(sorted(p.name for p in self.target.iterdir()), ["__init__.py"])
+                shutil.rmtree(repo)
+
+    def test_glyphs_added_to_older_sync_is_created(self):
+        """그림 모듈이 없던 노드 팩에 다시 동기화하면 glyphs.js 만 새로 생기고 나머지는 그대로다."""
+        self.run_sync()
+        glyphs_rel = f"{sync.EDITOR_REL}/glyphs.js"
+        (self.target / glyphs_rel).unlink()
+        info_path = self.target / sync.INFO_REL
+        info = json.loads(info_path.read_text(encoding="utf-8"))
+        del info["files"][glyphs_rel]
+        info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        states = self.run_sync()
+        self.assertEqual(states[glyphs_rel], "create")
+        self.assertEqual(states[self.editor_rel], "unchanged")
+        self.assertEqual(states[sync.CORE_REL], "unchanged")
+        self.assertEqual(states[sync.INFO_REL], "update")
 
     def test_dirty_editor_is_recorded(self):
         repo = self.editor_copy()
